@@ -3,7 +3,7 @@ import { queryOptions, useQuery } from "@tanstack/react-query";
 import { QUERY_KEYS } from "./consts";
 import { useCourseContext } from "@/context/course-context";
 
-export const useTask = ({ taskId, enabled }: { taskId: string, enabled: boolean }) => {
+export const useTask = ({ taskId, enabled = false }: { taskId: string, enabled?: boolean } = { taskId: "" }) => {
   const { queryClient } = useCourseContext();
 
   const options = queryOptions({

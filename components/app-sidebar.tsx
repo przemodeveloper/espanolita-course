@@ -15,14 +15,17 @@ import {
 import { useTasks } from "@/queries/useTasks";
 import type { ListTask } from "@/models/tasks";
 import Link from "next/link";
+import { useTask } from "@/queries/useTask";
 
 export function AppSidebar() {
   const { tasks } = useTasks();
+  const { prefetchQuery } = useTask();
 
   const items = tasks?.map((task: ListTask) => ({
     title: task.title,
     url: `/task/${task.id}`,
     icon: ListChecks,
+    onMouseOver: () => prefetchQuery(task.id),
   }));
 
   return (
@@ -35,7 +38,7 @@ export function AppSidebar() {
               {items?.map((item) => (
                 <SidebarMenuItem key={item.title}>
                   <SidebarMenuButton asChild>
-                    <Link href={item.url}>
+                    <Link href={item.url} onMouseOver={item.onMouseOver}>
                       <item.icon />
                       <span>{item.title}</span>
                     </Link>
