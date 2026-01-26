@@ -19,7 +19,7 @@ import { useTask } from "@/queries/useTask";
 
 export function AppSidebar() {
   const { tasks } = useTasks();
-  const { prefetchQuery } = useTask();
+  const { prefetchQuery } = useTask({ enabled: false });
 
   const items = tasks?.map((task: ListTask) => ({
     title: task.title,
