@@ -6,7 +6,7 @@ import { stripe } from "@/lib/stripe";
 export async function POST(req: Request) {
   const body = await req.text();
   const signature = (await headers()).get("stripe-signature");
-  const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET;
+  const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET_TEST;
 
   if (!webhookSecret) {
     return new NextResponse("STRIPE_WEBHOOK_SECRET is not configured", { status: 500 });
