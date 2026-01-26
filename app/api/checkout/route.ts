@@ -2,12 +2,20 @@ import { NextResponse } from "next/server";
 import { stripe } from "@/lib/stripe";
 
 export async function POST() {
+  const priceId = process.env.STRIPE_PRICE_ID;
+  if (!priceId) {
+    return NextResponse.json(
+      { error: "STRIPE_PRICE_ID is not configured" },
+      { status: 500 }
+    );
+  }
+
   const session = await stripe.checkout.sessions.create({
     mode: "payment",
     payment_method_types: ["card"],
     line_items: [
       {
-        price: process.env.STRIPE_PRICE_ID!, // ← your Stripe price ID
+        price: priceId,
         quantity: 1,
       },
     ],

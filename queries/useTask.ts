@@ -9,10 +9,13 @@ export const useTask = ({ taskId, enabled = true }: { taskId?: string, enabled?:
   const options = queryOptions({
     queryKey: [QUERY_KEYS.TASK, taskId],
     queryFn: async () => {
-      const response = await getTask(taskId!);
+      if (!taskId) {
+        throw new Error("taskId is required");
+      }
+      const response = await getTask(taskId);
       return response;
     },
-    enabled: enabled,
+    enabled: enabled && Boolean(taskId),
     staleTime: Infinity,
   });
 
