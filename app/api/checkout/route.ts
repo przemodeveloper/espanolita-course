@@ -2,7 +2,7 @@ import { NextResponse } from "next/server";
 import { stripe } from "@/lib/stripe";
 
 export async function POST() {
-  const priceId = process.env.STRIPE_PRICE_ID_TEST;
+  const priceId = process.env.STRIPE_PRICE_ID;
   if (!priceId) {
     return NextResponse.json(
       { error: "STRIPE_PRICE_ID is not configured" },
