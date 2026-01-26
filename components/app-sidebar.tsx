@@ -23,7 +23,7 @@ export function AppSidebar() {
 
   const items = tasks?.map((task: ListTask) => ({
     title: task.title,
-    url: `/task/${task.id}`,
+    url: `/course/task/${task.id}`,
     icon: ListChecks,
     onMouseOver: () => prefetchQuery(task.id),
   }));
