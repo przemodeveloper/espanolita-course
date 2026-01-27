@@ -3,10 +3,10 @@ import { supabaseAdmin } from "@/lib/supabase/admin";
 
 export async function POST(req: Request) {
   try {
-    const { email, password } = await req.json();
+    const { firstName, lastName, email, password } = await req.json();
 
     // Validation
-    if (!email || !password) {
+    if (!firstName || !lastName || !email || !password) {
       return NextResponse.json(
         { error: "Email and password are required." },
         { status: 400 }
@@ -41,6 +41,8 @@ export async function POST(req: Request) {
       password,
       email_confirm: true,
       user_metadata: {
+        first_name: firstName,
+        last_name: lastName,
         purchase_id: purchase.id,
         registered_at: new Date().toISOString(),
       },
@@ -78,6 +80,8 @@ export async function POST(req: Request) {
       .insert({
         id: authData.user.id,
         email: authData.user.email,
+        first_name: firstName,
+        last_name: lastName,
         created_at: new Date().toISOString(),
       });
 
@@ -91,6 +95,8 @@ export async function POST(req: Request) {
       user: {
         id: authData.user.id,
         email: authData.user.email,
+        first_name: firstName,
+        last_name: lastName,
       },
     });
 
