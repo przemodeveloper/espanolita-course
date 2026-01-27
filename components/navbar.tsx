@@ -4,8 +4,8 @@ import logo from "@/public/logo.png";
 
 export function Navbar() {
   return (
-    <nav className="fixed top-0 left-0 right-0 z-50 flex justify-between items-center p-4 bg-white border-b">
-      <div className="flex items-center gap-4">
+    <nav className="fixed top-0 left-0 right-0 z-50 flex flex-wrap justify-between items-center p-4 bg-white border-b">
+      <div className="flex items-center flex-wrap gap-4">
         <Link href="/">
           <Image
             src={logo}
@@ -18,7 +18,7 @@ export function Navbar() {
         <span className="text-sm">Kurs maturalny Españolita</span>
       </div>
 
-      <ul className="flex gap-4">
+      <ul className="flex flex-wrap gap-4">
         <li>
           <Link href="/login">Logowanie</Link>
         </li>
