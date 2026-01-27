@@ -19,6 +19,7 @@ import { Input } from "@/components/ui/input";
 import { useRegister } from "@/queries/useRegister";
 import { useForm } from "react-hook-form";
 import type { Inputs } from "@/models/signupForm";
+import Link from "next/link";
 
 export function SignupForm({ ...props }: React.ComponentProps<typeof Card>) {
   const { mutateAsync: register } = useRegister();
@@ -148,7 +149,7 @@ export function SignupForm({ ...props }: React.ComponentProps<typeof Card>) {
                   Utwórz konto
                 </Button>
                 <FieldDescription className="px-6 text-center">
-                  Masz już konto? <a href="/login">Zaloguj się</a>
+                  Masz już konto? <Link href="/login">Zaloguj się</Link>
                 </FieldDescription>
               </Field>
             </FieldGroup>
