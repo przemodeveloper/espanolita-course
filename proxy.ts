@@ -10,7 +10,6 @@ export async function proxy(req: NextRequest) {
 
   const { data: { user } } = await supabase.auth.getUser();
 
-  // 🔐 NOT LOGGED IN
   if (!user) {
     if (isApiRoute) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
