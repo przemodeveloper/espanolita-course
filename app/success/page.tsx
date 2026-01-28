@@ -1,5 +1,19 @@
 import { Button } from "@/components/ui/button";
+import type { Metadata } from "next";
 import Link from "next/link";
+
+export const metadata: Metadata = {
+  title: "Kurs maturalny Españolita - Płatność zakończona sukcesem",
+  description: "Płatność zakończona sukcesem.",
+  keywords: [
+    "kurs maturalny",
+    "hiszpański",
+    "matura",
+    "españolita",
+    "płatność",
+    "sukces",
+  ],
+};
 
 export default function Success() {
   return (

@@ -1,3 +1,11 @@
+import type { Metadata } from "next";
+
+export const metadata: Metadata = {
+  title: "Kurs maturalny Españolita - Zadania",
+  description: "Kurs maturalny Españolita - Zadania",
+  keywords: ["kurs maturalny", "hiszpański", "matura", "españolita", "zadania"],
+};
+
 export default function CoursePage() {
   return (
     <div className="flex flex-col items-center justify-center min-h-[calc(100vh-73px)] w-full">
