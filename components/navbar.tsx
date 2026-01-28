@@ -61,8 +61,8 @@ export function Navbar({ user }: { user: User | null }) {
           <li>
             <Button
               variant="outline"
-              onClick={async () => {
-                await supabase.auth.signOut();
+              onClick={() => {
+                supabase.auth.signOut();
                 router.push("/");
                 router.refresh();
               }}
