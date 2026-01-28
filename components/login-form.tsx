@@ -20,6 +20,7 @@ import { useForm } from "react-hook-form";
 import type { Inputs } from "@/models/loginForm";
 import Link from "next/link";
 import { motion } from "motion/react";
+import { useLogin } from "@/queries/useLogin";
 
 export function LoginForm({ ...props }: React.ComponentProps<typeof Card>) {
   const {
@@ -34,8 +35,13 @@ export function LoginForm({ ...props }: React.ComponentProps<typeof Card>) {
     },
   });
 
+  const { mutateAsync, isPending } = useLogin();
+
   const handleSubmitFormHandler = async (data: Inputs) => {
-    // TODO: Implement login
+    await mutateAsync({
+      email: data.email.trim(),
+      password: data.password.trim(),
+    });
   };
 
   return (
@@ -85,7 +91,7 @@ export function LoginForm({ ...props }: React.ComponentProps<typeof Card>) {
               </Field>
               <FieldGroup>
                 <Field>
-                  <Button type="submit" disabled={!isValid}>
+                  <Button type="submit" disabled={!isValid || isPending}>
                     Zaloguj się
                   </Button>
                   <FieldDescription className="px-6 text-center">
