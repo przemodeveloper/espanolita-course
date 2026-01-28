@@ -1,6 +1,15 @@
 import { prisma } from "@/lib/prisma"
+import { createSupabaseServerClient } from "@/lib/supabase/server";
 
 export async function GET() {
+  const supabase = await createSupabaseServerClient();
+
+  const { data: { user } } = await supabase.auth.getUser();
+
+  if (!user) {
+    return Response.json({ error: "Unauthorized" }, { status: 401 })
+  }
+
   const tasks = await prisma.tasks.findMany({
     orderBy: { created_at: "asc" },
     select: {
