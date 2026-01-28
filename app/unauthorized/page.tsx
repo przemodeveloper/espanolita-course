@@ -3,7 +3,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 
 export const metadata: Metadata = {
-  title: "Kurs maturalny Españolita - Brak dostępu",
+  title: "Brak dostępu - Kurs maturalny Españolita",
   description: "Brak dostępu do tej strony.",
   keywords: [
     "kurs maturalny",

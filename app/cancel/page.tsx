@@ -1,8 +1,8 @@
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: "Kurs maturalny Españolita - Płatność nie powiodła się",
-  description: "Płatność zakończona nie powiodła się.",
+  title: "Płatność nie powiodła się - Kurs maturalny Españolita",
+  description: "Płatność nie powiodła się.",
   keywords: [
     "kurs maturalny",
     "hiszpański",

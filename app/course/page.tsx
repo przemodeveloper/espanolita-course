@@ -1,8 +1,8 @@
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: "Kurs maturalny Españolita - Zadania",
-  description: "Kurs maturalny Españolita - Zadania",
+  title: "Zadania - Kurs maturalny Españolita",
+  description: "Zadania - Kurs maturalny Españolita",
   keywords: ["kurs maturalny", "hiszpański", "matura", "españolita", "zadania"],
 };
 

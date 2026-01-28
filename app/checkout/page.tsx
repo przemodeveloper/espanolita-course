@@ -2,8 +2,8 @@ import { CheckoutPageContent } from "@/components/checkout-page-content";
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: "Kurs maturalny Españolita - Zakup kursu",
-  description: "Zakup kursu",
+  title: "Zakup kursu - Kurs maturalny Españolita",
+  description: "Dokonaj zakupu kursu maturalnego Españolita",
   keywords: [
     "kurs maturalny",
     "hiszpański",
