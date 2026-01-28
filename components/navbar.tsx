@@ -5,13 +5,11 @@ import Image from "next/image";
 import logo from "@/public/logo.png";
 import { Button } from "@/components/ui/button";
 import type { User } from "@supabase/supabase-js";
-import { useRouter } from "next/navigation";
-import { createClient } from "@/lib/supabase/client";
+import { useLogout } from "@/queries/useLogout";
 
 export function Navbar({ user }: { user: User | null }) {
   const isAuthenticated = user?.aud === "authenticated";
-  const router = useRouter();
-  const supabase = createClient();
+  const { mutate: logout } = useLogout();
 
   const initials =
     user?.user_metadata?.first_name?.[0] + user?.user_metadata?.last_name?.[0];
@@ -59,14 +57,7 @@ export function Navbar({ user }: { user: User | null }) {
         )}
         {isAuthenticated && (
           <li>
-            <Button
-              variant="outline"
-              onClick={() => {
-                supabase.auth.signOut();
-                router.push("/");
-                router.refresh();
-              }}
-            >
+            <Button variant="outline" onClick={() => logout()}>
               Wyloguj się
             </Button>
           </li>

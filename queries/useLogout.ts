@@ -1,21 +1,21 @@
 import { useNotificationContext } from "@/context/notification-context";
-import { login } from "@/services/login.service";
+import { createClient } from "@/lib/supabase/client";
 import { useMutation } from "@tanstack/react-query";
 import { useRouter } from "next/navigation";
 
-export const useLogin = () => {
+export const useLogout = () => {
+  const supabase = createClient();
   const router = useRouter();
   const { notify } = useNotificationContext();
   const mutation = useMutation({
-    mutationFn: ({ email, password }: { email: string, password: string }) => login(email, password),
+    mutationFn: () => supabase.auth.signOut(),
     onSuccess: () => {
-      router.push("/course");
+      router.push("/");
       router.refresh();
     },
     onError: () => {
-      notify("Nie udało się zalogować, sprawdź swoje dane i spróbuj ponownie", "error");
+      notify("Nie udało się wylogować, sprawdź swoje dane i spróbuj ponownie", "error");
     },
   });
-  
   return mutation;
 };
