@@ -32,6 +32,7 @@ export const useTask = ({ taskId, enabled = true }: { taskId?: string, enabled?:
   };
 
   return {
+    task: query.data,
     query,
     prefetchQuery,
   };

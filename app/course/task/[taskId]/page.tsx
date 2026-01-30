@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { prisma } from "@/lib/prisma";
+import type { Question } from "@/models/task";
 
 export async function generateMetadata({
   params,
@@ -49,5 +50,26 @@ export default async function TaskPage({
   params: Promise<{ taskId: string }>;
 }) {
   const { taskId } = await params;
-  return <div>{taskId}</div>;
+  const questions = (await prisma.questions.findMany({
+    where: { task_id: taskId },
+    select: {
+      id: true,
+      order_index: true,
+      prompt: true,
+      options: {
+        select: { id: true, label: true, text: true },
+      },
+    },
+  })) as Question[];
+
+  return (
+    <div>
+      {questions.map((question) => (
+        <div key={question.id}>
+          <h3>{question?.prompt?.lines?.join(" ")}</h3>
+          <p>{question.options.map((option) => option.text).join(", ")}</p>
+        </div>
+      ))}
+    </div>
+  );
 }
