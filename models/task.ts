@@ -2,7 +2,7 @@ export interface Task {
   id: string;
   title: string;
   instructions: string;
-  questions: Question[];
+  questions_v2: Question[];
 }
 
 export interface Question {
@@ -11,7 +11,7 @@ export interface Question {
   prompt: {
     lines: string[];
   };
-  options: Option[];
+  options_v2: Option[];
 }
 
 export interface Option {
