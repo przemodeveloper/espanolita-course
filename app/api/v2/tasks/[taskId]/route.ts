@@ -23,9 +23,12 @@ export async function GET(
       id: true,
       title: true,
       instructions: true,
+      content: true,
+      type: true,
       questions_v2: {
         orderBy: { order_index: "asc" },
         select: {
+          gap_index: true,
           id: true,
           order_index: true,
           prompt: true,

@@ -9,7 +9,7 @@ export async function generateMetadata({
 }): Promise<Metadata> {
   const { taskId } = await params;
 
-  const task = await prisma.tasks.findUnique({
+  const task = await prisma.tasks_v2.findUnique({
     where: { id: taskId },
     select: {
       title: true,
