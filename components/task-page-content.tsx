@@ -4,9 +4,18 @@ import { SingleChoiceTask } from "@/components/single-choice-task";
 import { useTask } from "@/queries/useTask";
 import { GapFillSharedTask } from "./gap-fill-shared-task";
 import OpenTextTask from "./open-text-task";
+import LoadingSpinner from "./loading-spinner";
 
 export function TaskPageContent({ taskId }: { taskId: string }) {
-  const { task } = useTask({ taskId });
+  const { task, isLoading } = useTask({ taskId });
+
+  if (isLoading) {
+    return (
+      <div className="flex justify-center items-center h-screen w-full">
+        <LoadingSpinner />
+      </div>
+    );
+  }
 
   switch (task?.type) {
     case "single_choice":

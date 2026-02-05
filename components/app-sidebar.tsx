@@ -1,7 +1,6 @@
 "use client";
 
 import { ListChecks } from "lucide-react";
-
 import {
   Sidebar,
   SidebarContent,
@@ -16,10 +15,17 @@ import { useTasks } from "@/queries/useTasks";
 import type { ListTask } from "@/models/tasks";
 import Link from "next/link";
 import { useTask } from "@/queries/useTask";
+import { usePathname } from "next/navigation";
+import clsx from "clsx";
 
 export function AppSidebar() {
   const { tasks } = useTasks();
   const { prefetchQuery } = useTask({ enabled: false });
+  const pathname = usePathname();
+
+  const isActiveLink = (url: string) => {
+    return pathname === url;
+  };
 
   const items = tasks?.map((task: ListTask) => ({
     title: task.title,
@@ -38,7 +44,13 @@ export function AppSidebar() {
               {items?.map((item) => (
                 <SidebarMenuItem key={item.title}>
                   <SidebarMenuButton asChild>
-                    <Link href={item.url} onMouseOver={item.onMouseOver}>
+                    <Link
+                      href={item.url}
+                      onMouseOver={item.onMouseOver}
+                      className={clsx(
+                        isActiveLink(item.url) && "font-semibold",
+                      )}
+                    >
                       <item.icon />
                       <span>{item.title}</span>
                     </Link>
