@@ -41,6 +41,15 @@ export function TaskPageContent({ taskId }: { taskId: string }) {
           />
         </div>
       );
+    case "open_text":
+      return (
+        <div>
+          <h1 className="text-lg font-bold mb-2">{task?.title}</h1>
+          <p className="max-w-2xl text-muted-foreground mb-4">
+            {task?.instructions}
+          </p>
+        </div>
+      );
     default:
       return null;
   }
