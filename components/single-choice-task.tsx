@@ -4,7 +4,7 @@ import type { Option } from "@/models/task";
 import { Options } from "./options";
 import { Fragment } from "react/jsx-runtime";
 
-export function SingleChoiceTaskContent({
+export function SingleChoiceTask({
   orderIndex,
   options,
   prompt,

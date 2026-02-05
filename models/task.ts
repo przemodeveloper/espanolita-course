@@ -4,6 +4,13 @@ export interface Task {
   instructions: string;
   type: "single_choice" | 'gap_fill_shared';
   questions_v2: Question[];
+  content: {
+    text: string;
+    options: {
+      text: string;
+      key: string;
+    }[];
+  };
 }
 
 export interface Question {
