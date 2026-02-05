@@ -17,7 +17,9 @@ export interface Question {
   id: string;
   order_index: number;
   prompt: {
-    lines: string[];
+    lines?: string[];
+    sentence?: string;
+    keywords?: string[];
   };
   options_v2: Option[];
 }

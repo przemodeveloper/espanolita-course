@@ -11,15 +11,15 @@ export function SingleChoiceTask({
 }: {
   orderIndex: number;
   options: Option[];
-  prompt: {
-    lines: string[];
+  prompt?: {
+    lines?: string[];
   };
 }) {
   return (
     <div className="mb-8">
       <h2 className="text-sm mb-2">Przykład {orderIndex}</h2>
       <div className="mb-4">
-        {prompt?.lines?.map((line) => (
+        {prompt?.lines?.map((line: string) => (
           <Fragment key={line}>
             <p>{line}</p>
           </Fragment>

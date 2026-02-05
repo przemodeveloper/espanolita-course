@@ -3,6 +3,7 @@
 import { SingleChoiceTask } from "@/components/single-choice-task";
 import { useTask } from "@/queries/useTask";
 import { GapFillSharedTask } from "./gap-fill-shared-task";
+import OpenTextTask from "./open-text-task";
 
 export function TaskPageContent({ taskId }: { taskId: string }) {
   const { task } = useTask({ taskId });
@@ -48,6 +49,14 @@ export function TaskPageContent({ taskId }: { taskId: string }) {
           <p className="max-w-2xl text-muted-foreground mb-4">
             {task?.instructions}
           </p>
+          {task?.questions_v2.map((question) => (
+            <OpenTextTask
+              orderIndex={question.order_index}
+              key={question.id}
+              sentence={question.prompt.sentence}
+              keywords={question.prompt.keywords}
+            />
+          ))}
         </div>
       );
     default:
