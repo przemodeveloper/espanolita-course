@@ -5,6 +5,7 @@ import { useTask } from "@/queries/useTask";
 import { GapFillSharedTask } from "./gap-fill-shared-task";
 import OpenTextTask from "./open-text-task";
 import LoadingSpinner from "./loading-spinner";
+import WritingTask from "./writing-task";
 
 export function TaskPageContent({ taskId }: { taskId: string }) {
   const { task, isLoading } = useTask({ taskId });
@@ -66,6 +67,16 @@ export function TaskPageContent({ taskId }: { taskId: string }) {
               keywords={question.prompt.keywords}
             />
           ))}
+        </div>
+      );
+    case "writing":
+      return (
+        <div>
+          <h1 className="text-lg font-bold mb-2">{task?.title}</h1>
+          <p className="max-w-2xl text-muted-foreground mb-4">
+            {task?.instructions}
+          </p>
+          <WritingTask />
         </div>
       );
     default:

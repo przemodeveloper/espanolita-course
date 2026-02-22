@@ -2,7 +2,7 @@ export interface Task {
   id: string;
   title: string;
   instructions: string;
-  type: "single_choice" | "gap_fill_shared" | "open_text";
+  type: "single_choice" | "gap_fill_shared" | "open_text" | "writing";
   questions_v2: Question[];
   content: {
     text: string;
