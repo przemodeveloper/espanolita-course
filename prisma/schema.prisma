@@ -24,18 +24,23 @@ model audit_log_entries {
 /// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
 /// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
 model flow_state {
-  id                     String                @id @db.Uuid
-  user_id                String?               @db.Uuid
-  auth_code              String
-  code_challenge_method  code_challenge_method
-  code_challenge         String
+  id                     String                 @id @db.Uuid
+  user_id                String?                @db.Uuid
+  auth_code              String?
+  code_challenge_method  code_challenge_method?
+  code_challenge         String?
   provider_type          String
   provider_access_token  String?
   provider_refresh_token String?
-  created_at             DateTime?             @db.Timestamptz(6)
-  updated_at             DateTime?             @db.Timestamptz(6)
+  created_at             DateTime?              @db.Timestamptz(6)
+  updated_at             DateTime?              @db.Timestamptz(6)
   authentication_method  String
-  auth_code_issued_at    DateTime?             @db.Timestamptz(6)
+  auth_code_issued_at    DateTime?              @db.Timestamptz(6)
+  invite_token           String?
+  referrer               String?
+  oauth_client_state_id  String?                @db.Uuid
+  linking_target_id      String?                @db.Uuid
+  email_optional         Boolean                @default(false)
   saml_relay_states      saml_relay_states[]
 
   @@index([created_at(sort: Desc)])
@@ -169,21 +174,22 @@ model oauth_client_states {
 
 /// This table contains check constraints and requires additional setup for migrations. Visit https://pris.ly/d/check-constraints for more info.
 model oauth_clients {
-  id                   String                  @id @db.Uuid
-  client_secret_hash   String?
-  registration_type    oauth_registration_type
-  redirect_uris        String
-  grant_types          String
-  client_name          String?
-  client_uri           String?
-  logo_uri             String?
-  created_at           DateTime                @default(now()) @db.Timestamptz(6)
-  updated_at           DateTime                @default(now()) @db.Timestamptz(6)
-  deleted_at           DateTime?               @db.Timestamptz(6)
-  client_type          oauth_client_type       @default(confidential)
-  oauth_authorizations oauth_authorizations[]
-  oauth_consents       oauth_consents[]
-  sessions             sessions[]
+  id                         String                  @id @db.Uuid
+  client_secret_hash         String?
+  registration_type          oauth_registration_type
+  redirect_uris              String
+  grant_types                String
+  client_name                String?
+  client_uri                 String?
+  logo_uri                   String?
+  created_at                 DateTime                @default(now()) @db.Timestamptz(6)
+  updated_at                 DateTime                @default(now()) @db.Timestamptz(6)
+  deleted_at                 DateTime?               @db.Timestamptz(6)
+  client_type                oauth_client_type       @default(confidential)
+  token_endpoint_auth_method String
+  oauth_authorizations       oauth_authorizations[]
+  oauth_consents             oauth_consents[]
+  sessions                   sessions[]
 
   @@index([deleted_at])
   @@schema("auth")
@@ -404,7 +410,6 @@ model users {
   oauth_consents              oauth_consents[]
   one_time_tokens             one_time_tokens[]
   sessions                    sessions[]
-  purchases                   purchases[]
   student_answers_v2          student_answers_v2[]
   task_attempts_v2            task_attempts_v2[]
 
@@ -415,15 +420,14 @@ model users {
 
 /// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
 model options_v2 {
-  id                 String               @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  question_id        String               @db.Uuid
-  label              String?
-  text               String
-  is_correct         Boolean?             @default(false)
-  explanation        String?
-  order_index        Int?                 @default(0)
-  questions_v2       questions_v2         @relation(fields: [question_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
-  student_answers_v2 student_answers_v2[]
+  id           String       @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  question_id  String       @db.Uuid
+  label        String?
+  text         String
+  is_correct   Boolean?     @default(false)
+  explanation  String?
+  order_index  Int?         @default(0)
+  questions_v2 questions_v2 @relation(fields: [question_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
 
   @@index([question_id], map: "idx_options_question")
   @@schema("public")
@@ -439,26 +443,24 @@ model purchases {
   created_at         DateTime? @default(now()) @db.Timestamptz(6)
   user_id            String?   @db.Uuid
   claimed_at         DateTime? @db.Timestamptz(6)
-  users              users?    @relation(fields: [user_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
 
   @@schema("public")
 }
 
 /// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
 model questions_v2 {
-  id                 String               @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  task_id            String               @db.Uuid
-  type               String
-  order_index        Int
-  prompt             Json?
-  points             Int?                 @default(1)
-  created_at         DateTime?            @default(now()) @db.Timestamptz(6)
-  gap_index          Int?
-  correct_key        String?
-  answers_v2         answers_v2[]
-  options_v2         options_v2[]
-  tasks_v2           tasks_v2             @relation(fields: [task_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
-  student_answers_v2 student_answers_v2[]
+  id          String       @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  task_id     String       @db.Uuid
+  type        String
+  order_index Int
+  prompt      Json?
+  points      Int?         @default(1)
+  created_at  DateTime?    @default(now()) @db.Timestamptz(6)
+  gap_index   Int?
+  correct_key String?
+  answers_v2  answers_v2[]
+  options_v2  options_v2[]
+  tasks_v2    tasks_v2     @relation(fields: [task_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
 
   @@unique([task_id, order_index])
   @@index([task_id], map: "idx_questions_task")
@@ -476,10 +478,8 @@ model student_answers_v2 {
   is_correct       Boolean?
   points_awarded   Int?             @default(0)
   answered_at      DateTime?        @default(now()) @db.Timestamptz(6)
-  task_attempts_v2 task_attempts_v2 @relation(fields: [attempt_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
-  options_v2       options_v2?      @relation(fields: [option_id], references: [id], onUpdate: NoAction)
-  questions_v2     questions_v2     @relation(fields: [question_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
-  users            users            @relation(fields: [user_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  task_attempts_v2 task_attempts_v2 @relation(fields: [attempt_id], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "student_answers_v2_attempt_fk")
+  users            users            @relation(fields: [user_id], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "student_answers_v2_user_fk")
 
   @@unique([attempt_id, question_id])
   @@index([attempt_id], map: "idx_answers_attempt")
@@ -495,9 +495,15 @@ model task_attempts_v2 {
   user_id            String               @db.Uuid
   score              Decimal?             @db.Decimal
   created_at         DateTime?            @default(now()) @db.Timestamptz(6)
+  ai_score           Decimal?             @db.Decimal
+  answer_text        String?
+  feedback           String?
+  status             String?              @default("submitted")
+  started_at         DateTime?            @db.Timestamptz(6)
+  submitted_at       DateTime?            @db.Timestamptz(6)
+  graded_at          DateTime?            @db.Timestamptz(6)
   student_answers_v2 student_answers_v2[]
-  tasks_v2           tasks_v2             @relation(fields: [task_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
-  users              users                @relation(fields: [user_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  users              users                @relation(fields: [user_id], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "task_attempts_v2_user_fk")
 
   @@index([user_id, task_id], map: "task_attempts_v2_user_task_idx")
   @@schema("public")
@@ -505,14 +511,13 @@ model task_attempts_v2 {
 
 /// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
 model tasks_v2 {
-  id               String             @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  title            String
-  instructions     String?
-  type             String
-  content          Json
-  created_at       DateTime?          @default(now()) @db.Timestamptz(6)
-  questions_v2     questions_v2[]
-  task_attempts_v2 task_attempts_v2[]
+  id           String         @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  title        String
+  instructions String?
+  type         String
+  content      Json
+  created_at   DateTime?      @default(now()) @db.Timestamptz(6)
+  questions_v2 questions_v2[]
 
   @@index([type])
   @@schema("public")

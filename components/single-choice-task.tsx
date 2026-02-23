@@ -8,12 +8,16 @@ export function SingleChoiceTask({
   orderIndex,
   options,
   prompt,
+  onChange,
+  value,
 }: {
   orderIndex: number;
   options: Option[];
   prompt?: {
     lines?: string[];
   };
+  onChange: (optionId: string) => void;
+  value: string;
 }) {
   return (
     <div className="mb-8">
@@ -26,7 +30,7 @@ export function SingleChoiceTask({
         ))}
       </div>
 
-      <Options options={options} />
+      <Options options={options} onChange={onChange} value={value} />
     </div>
   );
 }

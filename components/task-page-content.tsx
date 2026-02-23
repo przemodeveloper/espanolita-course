@@ -6,9 +6,42 @@ import { GapFillSharedTask } from "./gap-fill-shared-task";
 import OpenTextTask from "./open-text-task";
 import LoadingSpinner from "./loading-spinner";
 import WritingTask from "./writing-task";
+import { useSubmitResponse } from "@/queries/useSubmitResponse";
+import { useState } from "react";
+import { Button } from "./ui/button";
 
 export function TaskPageContent({ taskId }: { taskId: string }) {
   const { task, isLoading } = useTask({ taskId });
+
+  const { mutate: submitResponse } = useSubmitResponse();
+
+  const [answers, setAnswers] = useState<
+    {
+      questionId: string;
+      optionId?: string;
+      answerText?: string;
+    }[]
+  >([]);
+
+  console.log(answers);
+
+  const handleSetAnswer = (
+    questionId: string,
+    optionId?: string,
+    answerText?: string,
+  ) => {
+    if (answers.find((answer) => answer.questionId === questionId)) {
+      setAnswers((prev) =>
+        prev.map((answer) =>
+          answer.questionId === questionId
+            ? { questionId, optionId, answerText }
+            : answer,
+        ),
+      );
+    } else {
+      setAnswers((prev) => [...prev, { questionId, optionId, answerText }]);
+    }
+  };
 
   if (isLoading) {
     return (
@@ -31,12 +64,22 @@ export function TaskPageContent({ taskId }: { taskId: string }) {
 
           {task?.questions_v2?.map((question) => (
             <SingleChoiceTask
+              value={
+                answers.find((answer) => answer.questionId === question.id)
+                  ?.optionId || ""
+              }
               key={question.id}
               options={question.options_v2}
               prompt={question.prompt}
               orderIndex={question.order_index}
+              onChange={(optionId) => {
+                handleSetAnswer(question.id, optionId);
+              }}
             />
           ))}
+          <Button onClick={() => submitResponse({ taskId, answers })}>
+            Sprawdź odpowiedzi
+          </Button>
         </div>
       );
     case "gap_fill_shared":
