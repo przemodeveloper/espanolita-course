@@ -18,7 +18,7 @@ export default function SingleChoiceTasks({
   instructions: string;
   taskId: string;
 }) {
-  const { mutate: submitResponse } = useSubmitResponse();
+  const { mutateAsync: submitResponse } = useSubmitResponse();
 
   const [answers, setAnswers] = useState<
     {
@@ -27,6 +27,8 @@ export default function SingleChoiceTasks({
       answerText?: string;
     }[]
   >([]);
+
+  const [incorrectAnswers, setIncorrectAnswers] = useState<string[]>([]);
 
   const handleSetAnswer = (
     questionId: string,
@@ -46,6 +48,13 @@ export default function SingleChoiceTasks({
     }
   };
 
+  const handleSubmitAnswers = async () => {
+    const result = await submitResponse({ taskId, answers });
+    if (result.incorrectQuestionIds) {
+      setIncorrectAnswers(result.incorrectQuestionIds);
+    }
+  };
+
   return (
     <div>
       <TaskHeader title={title} instructions={instructions} />
@@ -60,14 +69,13 @@ export default function SingleChoiceTasks({
           options={question.options_v2}
           prompt={question.prompt}
           orderIndex={question.order_index}
+          isIncorrect={incorrectAnswers.includes(question.id)}
           onChange={(optionId) => {
             handleSetAnswer(question.id, optionId);
           }}
         />
       ))}
-      <Button onClick={() => submitResponse({ taskId, answers })}>
-        Sprawdź odpowiedzi
-      </Button>
+      <Button onClick={handleSubmitAnswers}>Sprawdź odpowiedzi</Button>
     </div>
   );
 }

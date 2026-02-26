@@ -10,6 +10,7 @@ export function SingleChoiceTask({
   prompt,
   onChange,
   value,
+  isIncorrect,
 }: {
   orderIndex: number;
   options: Option[];
@@ -18,10 +19,14 @@ export function SingleChoiceTask({
   };
   onChange: (optionId: string) => void;
   value: string;
+  isIncorrect: boolean;
 }) {
   return (
     <div className="mb-8">
-      <h2 className="text-sm mb-2">Przykład {orderIndex}</h2>
+      <h2 className="text-sm mb-1">Przykład {orderIndex}</h2>
+      {isIncorrect && (
+        <p className="text-red-500 mb-2">Nieprawidłowa odpowiedź</p>
+      )}
       <div className="mb-4">
         {prompt?.lines?.map((line: string) => (
           <Fragment key={line}>
