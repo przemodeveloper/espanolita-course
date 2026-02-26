@@ -86,7 +86,9 @@ export default function SingleChoiceTasks({
       <div className="flex justify-end gap-2">
         <Button
           onClick={handleSubmitAnswers}
-          disabled={Boolean(attempt?.attemptId)}
+          disabled={
+            Boolean(attempt?.attemptId) || questions.length !== answers.length
+          }
         >
           Sprawdź odpowiedzi
         </Button>
