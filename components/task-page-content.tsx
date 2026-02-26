@@ -7,9 +7,14 @@ import LoadingSpinner from "./loading-spinner";
 import WritingTask from "./writing-task";
 import SingleChoiceTasks from "./single-choice-tasks";
 import TaskHeader from "./task-header";
+import { useLayoutEffect } from "react";
 
 export function TaskPageContent({ taskId }: { taskId: string }) {
   const { task, isLoading } = useTask({ taskId });
+
+  useLayoutEffect(() => {
+    document.title = `${task?.title} - Kurs maturalny Españolita`;
+  }, [task]);
 
   if (isLoading) {
     return (
