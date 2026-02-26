@@ -6,27 +6,28 @@ import { Button } from "./ui/button";
 import { useState } from "react";
 import { useSubmitResponse } from "@/queries/useSubmitResponse";
 import TaskHeader from "./task-header";
+import type { Attempt } from "@/models/attempt";
+import { useDeleteAttempt } from "@/queries/useDeleteAttempt";
 
 export default function SingleChoiceTasks({
   title,
   instructions,
   questions,
   taskId,
+  attempt,
 }: {
   questions: Question[];
   title: string;
   instructions: string;
   taskId: string;
+  attempt?: Attempt | null;
 }) {
-  const { mutateAsync: submitResponse } = useSubmitResponse();
+  const { mutateAsync: submitResponse } = useSubmitResponse(taskId);
+  const { mutate: deleteAttempt } = useDeleteAttempt(taskId);
 
-  const [answers, setAnswers] = useState<
-    {
-      questionId: string;
-      optionId?: string;
-      answerText?: string;
-    }[]
-  >([]);
+  const [answers, setAnswers] = useState<Attempt["answers"]>(
+    () => attempt?.answers ?? [],
+  );
 
   const [incorrectAnswers, setIncorrectAnswers] = useState<string[]>([]);
 
@@ -73,9 +74,30 @@ export default function SingleChoiceTasks({
           onChange={(optionId) => {
             handleSetAnswer(question.id, optionId);
           }}
+          disabled={Boolean(attempt?.attemptId)}
         />
       ))}
-      <Button onClick={handleSubmitAnswers}>Sprawdź odpowiedzi</Button>
+      {attempt?.attemptId && (
+        <div className="bg-green-100 p-2 rounded-md mb-2">
+          <p>Wynik tego zadania: {attempt.score}</p>
+          <p>To zadanie zostało zakończone</p>
+        </div>
+      )}
+      <div className="flex justify-end gap-2">
+        <Button
+          onClick={handleSubmitAnswers}
+          disabled={Boolean(attempt?.attemptId)}
+        >
+          Sprawdź odpowiedzi
+        </Button>
+        <Button
+          variant="outline"
+          disabled={Boolean(!attempt?.attemptId)}
+          onClick={() => deleteAttempt()}
+        >
+          Zresetuj odpowiedzi
+        </Button>
+      </div>
     </div>
   );
 }

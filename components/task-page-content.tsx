@@ -8,9 +8,11 @@ import WritingTask from "./writing-task";
 import SingleChoiceTasks from "./single-choice-tasks";
 import TaskHeader from "./task-header";
 import { useLayoutEffect } from "react";
+import { useAttempt } from "@/queries/useAttempt";
 
 export function TaskPageContent({ taskId }: { taskId: string }) {
   const { task, isLoading } = useTask({ taskId });
+  const { attempt } = useAttempt(taskId);
 
   useLayoutEffect(() => {
     document.title = `${task?.title} - Kurs maturalny Españolita`;
@@ -28,10 +30,12 @@ export function TaskPageContent({ taskId }: { taskId: string }) {
     case "single_choice":
       return (
         <SingleChoiceTasks
+          key={attempt?.attemptId ?? taskId}
           title={task?.title}
           instructions={task?.instructions}
           questions={task?.questions_v2}
           taskId={taskId}
+          attempt={attempt}
         />
       );
     case "gap_fill_shared":

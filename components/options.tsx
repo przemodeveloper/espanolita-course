@@ -8,16 +8,19 @@ export function Options({
   options,
   onChange,
   value,
+  disabled,
 }: {
   options: Option[];
   onChange: (optionId: string) => void;
   value: string;
+  disabled: boolean;
 }) {
   return (
     <RadioGroup
       className="w-fit"
       value={value}
       onValueChange={(value) => onChange(value)}
+      disabled={disabled}
     >
       {options.map((option) => (
         <div key={option.id} className="flex items-center gap-3">

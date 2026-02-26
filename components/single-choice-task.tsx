@@ -11,6 +11,7 @@ export function SingleChoiceTask({
   onChange,
   value,
   isIncorrect,
+  disabled,
 }: {
   orderIndex: number;
   options: Option[];
@@ -20,6 +21,7 @@ export function SingleChoiceTask({
   onChange: (optionId: string) => void;
   value: string;
   isIncorrect: boolean;
+  disabled: boolean;
 }) {
   return (
     <div className="mb-8">
@@ -35,7 +37,12 @@ export function SingleChoiceTask({
         ))}
       </div>
 
-      <Options options={options} onChange={onChange} value={value} />
+      <Options
+        options={options}
+        onChange={onChange}
+        value={value}
+        disabled={disabled}
+      />
     </div>
   );
 }
