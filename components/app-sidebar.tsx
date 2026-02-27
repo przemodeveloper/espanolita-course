@@ -1,6 +1,6 @@
 "use client";
 
-import { ChevronRight, ListChecks } from "lucide-react";
+import { CheckCircle, ChevronRight, ListChecks } from "lucide-react";
 import {
   Sidebar,
   SidebarContent,
@@ -24,9 +24,11 @@ import { useTask } from "@/queries/useTask";
 import { usePathname } from "next/navigation";
 import { useTaskSets } from "@/queries/useTaskSets";
 import type { TaskSet } from "@/models/taskSets";
+import { useProgress } from "@/queries/useProgress";
 
 export function AppSidebar() {
   const { taskSets = [] } = useTaskSets();
+  const { progress } = useProgress();
   const { prefetchQuery } = useTask({ enabled: false });
   const pathname = usePathname();
 
@@ -78,6 +80,11 @@ export function AppSidebar() {
                                       onMouseOver={() => prefetchQuery(task.id)}
                                     >
                                       <span>{task.title}</span>
+                                      {progress?.[task.id]?.completed && (
+                                        <span className="text-xs text-green-500 flex items-center gap-1">
+                                          <CheckCircle className="size-4" />
+                                        </span>
+                                      )}
                                     </Link>
                                   </SidebarMenuSubButton>
                                 </SidebarMenuSubItem>

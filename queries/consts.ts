@@ -3,4 +3,5 @@ export const QUERY_KEYS = {
   TASK: "task",
   TASK_SETS: "task-sets",
   ATTEMPT: "attempt",
+  PROGRESS: "progress",
 } as const;

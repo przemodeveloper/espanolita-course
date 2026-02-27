@@ -9,6 +9,7 @@ export const useSubmitResponse = (taskId: string) => {
     mutationFn: ({ taskId, answers }: { taskId: string, answers: { questionId: string, optionId?: string, answerText?: string }[] }) => submitResponse(taskId, answers),
     onSettled: () => {
       queryClient.invalidateQueries({ queryKey: [QUERY_KEYS.ATTEMPT, taskId] })
+      queryClient.invalidateQueries({ queryKey: [QUERY_KEYS.PROGRESS] })
     }
   })
   return mutation

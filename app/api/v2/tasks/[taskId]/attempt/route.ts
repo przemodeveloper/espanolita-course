@@ -40,6 +40,13 @@ export async function GET(
   }
 
   // question based
+  const correctQuestionIds = attempt.student_answers_v2
+    .filter((a) => a.is_correct === true)
+    .map((a) => a.question_id)
+  const incorrectQuestionIds = attempt.student_answers_v2
+    .filter((a) => a.is_correct === false)
+    .map((a) => a.question_id)
+
   return NextResponse.json({
     attemptId: attempt.id,
     score: attempt.score,
@@ -48,6 +55,8 @@ export async function GET(
       optionId: a.option_id,
       answerText: a.answer_text,
     })),
+    correctQuestionIds,
+    incorrectQuestionIds,
   })
 }
 

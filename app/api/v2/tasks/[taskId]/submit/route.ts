@@ -123,14 +123,6 @@ export async function POST(
       await tx.student_answers_v2.createMany({ data: rows })
 
       const total = rows.reduce((sum, r) => sum + r.points_awarded, 0)
-      
-      const correctQuestionIds = rows
-        .filter((r) => r.is_correct)
-        .map((r) => r.question_id);
-
-      const incorrectQuestionIds = rows
-        .filter((r) => r.is_correct === false)
-        .map((r) => r.question_id);
 
       const maxScore = rows.length;
 
@@ -139,7 +131,7 @@ export async function POST(
         data: { score: total },
       })
 
-      return { attemptId: attempt.id, type: task.type, score: total, correctQuestionIds, incorrectQuestionIds, maxScore }
+      return { attemptId: attempt.id, type: task.type, score: total, maxScore }
     })
 
     return NextResponse.json(result)

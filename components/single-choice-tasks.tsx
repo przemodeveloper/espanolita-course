@@ -22,14 +22,12 @@ export default function SingleChoiceTasks({
   taskId: string;
   attempt?: Attempt | null;
 }) {
-  const { mutateAsync: submitResponse } = useSubmitResponse(taskId);
+  const { mutate: submitResponse } = useSubmitResponse(taskId);
   const { mutate: deleteAttempt } = useDeleteAttempt(taskId);
 
   const [answers, setAnswers] = useState<Attempt["answers"]>(
     () => attempt?.answers ?? [],
   );
-
-  const [incorrectAnswers, setIncorrectAnswers] = useState<string[]>([]);
 
   const handleSetAnswer = (
     questionId: string,
@@ -50,10 +48,7 @@ export default function SingleChoiceTasks({
   };
 
   const handleSubmitAnswers = async () => {
-    const result = await submitResponse({ taskId, answers });
-    if (result.incorrectQuestionIds) {
-      setIncorrectAnswers(result.incorrectQuestionIds);
-    }
+    submitResponse({ taskId, answers });
   };
 
   return (
@@ -70,7 +65,9 @@ export default function SingleChoiceTasks({
           options={question.options_v2}
           prompt={question.prompt}
           orderIndex={question.order_index}
-          isIncorrect={incorrectAnswers.includes(question.id)}
+          isIncorrect={Boolean(
+            attempt?.incorrectQuestionIds?.includes(question.id),
+          )}
           onChange={(optionId) => {
             handleSetAnswer(question.id, optionId);
           }}

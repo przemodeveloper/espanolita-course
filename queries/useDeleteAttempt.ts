@@ -9,6 +9,7 @@ export const useDeleteAttempt = (taskId: string) => {
     mutationFn: () => deleteAttempt(taskId),
     onSettled: () => {
       queryClient.invalidateQueries({ queryKey: [QUERY_KEYS.ATTEMPT, taskId] })
+      queryClient.invalidateQueries({ queryKey: [QUERY_KEYS.PROGRESS] })
     }
   })
   return mutation
