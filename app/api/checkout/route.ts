@@ -6,7 +6,7 @@ export async function POST() {
   if (!priceId) {
     return NextResponse.json(
       { error: "STRIPE_PRICE_ID is not configured" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 

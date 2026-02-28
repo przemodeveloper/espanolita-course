@@ -10,7 +10,9 @@ export async function POST(req: Request) {
   const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET;
 
   if (!webhookSecret) {
-    return new NextResponse("STRIPE_WEBHOOK_SECRET is not configured", { status: 500 });
+    return new NextResponse("STRIPE_WEBHOOK_SECRET is not configured", {
+      status: 500,
+    });
   }
 
   if (!signature) {
@@ -20,11 +22,7 @@ export async function POST(req: Request) {
   let event: Stripe.Event;
 
   try {
-    event = stripe.webhooks.constructEvent(
-      body,
-      signature,
-      webhookSecret
-    );
+    event = stripe.webhooks.constructEvent(body, signature, webhookSecret);
   } catch (err: unknown) {
     const error = err as Error;
     console.error("Webhook verification failed:", error.message);
@@ -35,20 +33,20 @@ export async function POST(req: Request) {
   switch (event.type) {
     case "checkout.session.completed": {
       const session = event.data.object as Stripe.Checkout.Session;
-  
+
       // 🔑 Fetch line items to get price_id
       const lineItems = await stripe.checkout.sessions.listLineItems(
         session.id,
-        { limit: 1 }
+        { limit: 1 },
       );
-  
+
       const priceId = lineItems.data[0]?.price?.id;
-  
+
       if (!priceId) {
         console.error("No price found for session:", session.id);
         return new NextResponse("Missing price", { status: 400 });
       }
-  
+
       await prisma.purchases.upsert({
         where: {
           stripe_session_id: session.id,
@@ -61,7 +59,7 @@ export async function POST(req: Request) {
           email: session.customer_details?.email ?? null,
         },
       });
-  
+
       console.log("✅ Purchase stored:", session.id);
       break;
     }

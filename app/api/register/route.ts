@@ -9,14 +9,14 @@ export async function POST(req: Request) {
     if (!firstName || !lastName || !email || !password) {
       return NextResponse.json(
         { error: "Email and password are required." },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
     if (password.length < 8) {
       return NextResponse.json(
         { error: "Password must be at least 8 characters." },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
@@ -26,34 +26,32 @@ export async function POST(req: Request) {
       .select("*")
       .eq("email", email)
       .is("user_id", null)
-      .single()
+      .single();
 
     if (purchaseError || !purchase) {
       return NextResponse.json(
         { error: "No valid purchase found for this email." },
-        { status: 403 }
+        { status: 403 },
       );
     }
 
     // 3️⃣ Create user
-    const { data: authData, error: authError } = await supabaseAdmin.auth.admin.createUser({
-      email: email.toLowerCase().trim(),
-      password,
-      email_confirm: true,
-      user_metadata: {
-        first_name: firstName,
-        last_name: lastName,
-        purchase_id: purchase.id,
-        registered_at: new Date().toISOString(),
-      },
-    });
+    const { data: authData, error: authError } =
+      await supabaseAdmin.auth.admin.createUser({
+        email: email.toLowerCase().trim(),
+        password,
+        email_confirm: true,
+        user_metadata: {
+          first_name: firstName,
+          last_name: lastName,
+          purchase_id: purchase.id,
+          registered_at: new Date().toISOString(),
+        },
+      });
 
     if (authError) {
       console.error("Auth error:", authError);
-      return NextResponse.json(
-        { error: authError.message },
-        { status: 400 }
-      );
+      return NextResponse.json({ error: authError.message }, { status: 400 });
     }
 
     const { error: updateError } = await supabaseAdmin
@@ -70,7 +68,7 @@ export async function POST(req: Request) {
       console.error("Purchase update error:", updateError);
       return NextResponse.json(
         { error: "Failed to link purchase. Please try again." },
-        { status: 500 }
+        { status: 500 },
       );
     }
 
@@ -99,12 +97,11 @@ export async function POST(req: Request) {
         last_name: lastName,
       },
     });
-
   } catch (error) {
     console.error("Registration error:", error);
     return NextResponse.json(
       { error: "An unexpected error occurred. Please try again." },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }

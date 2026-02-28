@@ -1,7 +1,7 @@
 export interface RubricItem {
   name: string;
   weight: number; // points or %
-};
+}
 
 export interface GradeEssayRequest {
   language: string;

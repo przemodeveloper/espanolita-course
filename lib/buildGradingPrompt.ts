@@ -6,7 +6,7 @@ export function buildGradingPrompt(data: GradeEssayRequest) {
     .join("\n");
 
   const rubric = data.rubric
-    .map(r => `- ${r.name} (${r.weight} points)`)
+    .map((r) => `- ${r.name} (${r.weight} points)`)
     .join("\n");
 
   return `

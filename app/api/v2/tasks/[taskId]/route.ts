@@ -1,21 +1,22 @@
-import { type NextRequest, NextResponse } from "next/server"
-import { prisma } from "@/lib/prisma"
+import { type NextRequest, NextResponse } from "next/server";
+import { prisma } from "@/lib/prisma";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 
 export async function GET(
   _req: Request,
-  { params }: { params: Promise<{ taskId: string }> }
+  { params }: { params: Promise<{ taskId: string }> },
 ) {
-
   const supabase = await createSupabaseServerClient();
 
-  const { data: { user } } = await supabase.auth.getUser();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
 
   if (!user) {
-    return Response.json({ error: "Unauthorized" }, { status: 401 })
+    return Response.json({ error: "Unauthorized" }, { status: 401 });
   }
-  
-  const { taskId } = await params
+
+  const { taskId } = await params;
 
   const task = await prisma.tasks_v2.findUnique({
     where: { id: taskId },
@@ -36,55 +37,52 @@ export async function GET(
             select: {
               id: true,
               label: true,
-              text: true
-            }
-          }
-        }
-      }
-    }
-  })
+              text: true,
+            },
+          },
+        },
+      },
+    },
+  });
 
   if (!task) {
-    return NextResponse.json(
-      { error: "Task not found" },
-      { status: 404 }
-    )
+    return NextResponse.json({ error: "Task not found" }, { status: 404 });
   }
 
-  return NextResponse.json(task)
+  return NextResponse.json(task);
 }
 
 export async function POST(
   req: NextRequest,
-  { params }: { params: Promise<{ taskId: string }> }
+  { params }: { params: Promise<{ taskId: string }> },
 ) {
-  const supabase = await createSupabaseServerClient()
+  const supabase = await createSupabaseServerClient();
 
   const {
     data: { user },
-  } = await supabase.auth.getUser()
+  } = await supabase.auth.getUser();
 
   if (!user) {
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
-  const { taskId } = await params
-  const body = await req.json()
+  const { taskId } = await params;
+  const body = await req.json();
 
   try {
     const result = await prisma.$transaction(async (tx) => {
       const task = await tx.tasks_v2.findUnique({
         where: { id: taskId },
         select: { type: true },
-      })
+      });
 
-      if (!task) throw new Error("Task not found")
+      if (!task) throw new Error("Task not found");
 
       // ==================================================
       // WRITING (whole answer stored on attempt)
       // ==================================================
       if (task.type === "writing") {
-        const answerText: string = body.answerText ?? ""
+        const answerText: string = body.answerText ?? "";
 
         const attempt = await tx.task_attempts_v2.create({
           data: {
@@ -95,12 +93,12 @@ export async function POST(
             submitted_at: new Date(),
             status: "submitted",
           },
-        })
+        });
 
         return {
           attemptId: attempt.id,
           type: "writing",
-        }
+        };
       }
 
       // ==================================================
@@ -108,12 +106,12 @@ export async function POST(
       // single_choice | gap_fill_shared | open_text
       // ==================================================
       const answers: {
-        questionId: string
-        optionId?: string
-        answerText?: string
-      }[] = body.answers ?? []
+        questionId: string;
+        optionId?: string;
+        answerText?: string;
+      }[] = body.answers ?? [];
 
-      if (!answers.length) throw new Error("No answers provided")
+      if (!answers.length) throw new Error("No answers provided");
 
       const attempt = await tx.task_attempts_v2.create({
         data: {
@@ -123,13 +121,13 @@ export async function POST(
           submitted_at: new Date(),
           status: "graded",
         },
-      })
+      });
 
-      const rows = []
+      const rows = [];
 
       for (const a of answers) {
-        let points = 0
-        let isCorrect: boolean | null = null
+        let points = 0;
+        let isCorrect: boolean | null = null;
 
         // -------------------------
         // single choice / gap fill
@@ -138,10 +136,10 @@ export async function POST(
           const option = await tx.options_v2.findUnique({
             where: { id: a.optionId },
             include: { questions_v2: true },
-          })
+          });
 
-          isCorrect = option?.is_correct ?? false
-          points = isCorrect ? option?.questions_v2.points ?? 1 : 0
+          isCorrect = option?.is_correct ?? false;
+          points = isCorrect ? (option?.questions_v2.points ?? 1) : 0;
         }
 
         // -------------------------
@@ -150,13 +148,13 @@ export async function POST(
         if (a.answerText) {
           const q = await tx.questions_v2.findUnique({
             where: { id: a.questionId },
-          })
+          });
 
           isCorrect =
             a.answerText.trim().toLowerCase() ===
-            q?.correct_key?.trim().toLowerCase()
+            q?.correct_key?.trim().toLowerCase();
 
-          points = isCorrect ? q?.points ?? 1 : 0
+          points = isCorrect ? (q?.points ?? 1) : 0;
         }
 
         rows.push({
@@ -167,32 +165,29 @@ export async function POST(
           answer_text: a.answerText ?? null,
           is_correct: isCorrect,
           points_awarded: points,
-        })
+        });
       }
 
-      await tx.student_answers_v2.createMany({ data: rows })
+      await tx.student_answers_v2.createMany({ data: rows });
 
-      const total = rows.reduce((s, r) => s + r.points_awarded, 0)
+      const total = rows.reduce((s, r) => s + r.points_awarded, 0);
 
       await tx.task_attempts_v2.update({
         where: { id: attempt.id },
         data: { score: total },
-      })
+      });
 
       return {
         attemptId: attempt.id,
         type: task.type,
         score: total,
-      }
-    })
+      };
+    });
 
-    return NextResponse.json(result)
+    return NextResponse.json(result);
   } catch (err) {
-    console.error(err)
+    console.error(err);
 
-    return NextResponse.json(
-      { error: "Submission failed" },
-      { status: 500 }
-    )
+    return NextResponse.json({ error: "Submission failed" }, { status: 500 });
   }
 }

@@ -1,4 +1,4 @@
-import { useQuery } from "@tanstack/react-query"
+import { useQuery } from "@tanstack/react-query";
 import { QUERY_KEYS } from "./consts";
 import { getProgress } from "@/services/progress.service";
 
@@ -10,7 +10,11 @@ export const useProgress = () => {
       return response;
     },
     staleTime: Infinity,
-  
-  })
-  return { progress: query.data, isLoading: query.isLoading, error: query.error, query }
-}
+  });
+  return {
+    progress: query.data,
+    isLoading: query.isLoading,
+    error: query.error,
+    query,
+  };
+};

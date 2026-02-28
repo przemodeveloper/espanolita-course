@@ -26,18 +26,12 @@ export async function POST(req: Request) {
       ],
     });
 
-    const result = JSON.parse(
-      completion.choices[0].message.content!
-    );
+    const result = JSON.parse(completion.choices[0].message.content!);
 
     return NextResponse.json(result);
-
   } catch (error) {
     console.error(error);
 
-    return NextResponse.json(
-      { error: "Grading failed" },
-      { status: 500 }
-    );
+    return NextResponse.json({ error: "Grading failed" }, { status: 500 });
   }
 }

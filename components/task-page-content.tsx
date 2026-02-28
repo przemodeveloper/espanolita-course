@@ -30,7 +30,6 @@ export function TaskPageContent({ taskId }: { taskId: string }) {
     case "single_choice":
       return (
         <SingleChoiceTasks
-          key={attempt?.attemptId ?? taskId}
           title={task?.title}
           instructions={task?.instructions}
           questions={task?.questions_v2}

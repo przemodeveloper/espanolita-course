@@ -3,7 +3,10 @@ import { queryOptions, useQuery } from "@tanstack/react-query";
 import { QUERY_KEYS } from "./consts";
 import { useCourseContext } from "@/context/course-context";
 
-export const useTask = ({ taskId, enabled = true }: { taskId?: string, enabled?: boolean } = { }) => {
+export const useTask = ({
+  taskId,
+  enabled = true,
+}: { taskId?: string; enabled?: boolean } = {}) => {
   const { queryClient } = useCourseContext();
 
   const options = queryOptions({
@@ -20,7 +23,7 @@ export const useTask = ({ taskId, enabled = true }: { taskId?: string, enabled?:
   });
 
   const query = useQuery(options);
-  
+
   const prefetchQuery = (taskId: string) => {
     queryClient.prefetchQuery({
       queryKey: [QUERY_KEYS.TASK, taskId],

@@ -1,18 +1,20 @@
-import { type NextRequest, NextResponse } from "next/server"
-import { prisma } from "@/lib/prisma"
-import { createSupabaseServerClient } from "@/lib/supabase/server"
+import { type NextRequest, NextResponse } from "next/server";
+import { prisma } from "@/lib/prisma";
+import { createSupabaseServerClient } from "@/lib/supabase/server";
 
 export async function GET(
   _req: NextRequest,
-  { params }: { params: Promise<{ taskId: string }> }
+  { params }: { params: Promise<{ taskId: string }> },
 ) {
-  const supabase = await createSupabaseServerClient()
-  const { data: { user } } = await supabase.auth.getUser()
+  const supabase = await createSupabaseServerClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
 
-  const { taskId } = await params
+  const { taskId } = await params;
 
   if (!user) {
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
   const attempt = await prisma.task_attempts_v2.findFirst({
@@ -24,10 +26,10 @@ export async function GET(
     include: {
       student_answers_v2: true,
     },
-  })
+  });
 
   if (!attempt) {
-    return NextResponse.json({ attempt: null })
+    return NextResponse.json({ attempt: null });
   }
 
   // writing task
@@ -36,41 +38,43 @@ export async function GET(
       attemptId: attempt.id,
       answerText: attempt.answer_text,
       score: attempt.score,
-    })
+    });
   }
 
   // question based
   const correctQuestionIds = attempt.student_answers_v2
     .filter((a) => a.is_correct === true)
-    .map((a) => a.question_id)
+    .map((a) => a.question_id);
   const incorrectQuestionIds = attempt.student_answers_v2
     .filter((a) => a.is_correct === false)
-    .map((a) => a.question_id)
+    .map((a) => a.question_id);
 
   return NextResponse.json({
     attemptId: attempt.id,
     score: attempt.score,
-    answers: attempt.student_answers_v2.map(a => ({
+    answers: attempt.student_answers_v2.map((a) => ({
       questionId: a.question_id,
       optionId: a.option_id,
       answerText: a.answer_text,
     })),
     correctQuestionIds,
     incorrectQuestionIds,
-  })
+  });
 }
 
 export async function DELETE(
   _req: NextRequest,
-  { params }: { params: Promise<{ taskId: string }> }
+  { params }: { params: Promise<{ taskId: string }> },
 ) {
-  const supabase = await createSupabaseServerClient()
-  const { data: { user } } = await supabase.auth.getUser()
+  const supabase = await createSupabaseServerClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
 
-  const { taskId } = await params
+  const { taskId } = await params;
 
   if (!user) {
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
   // delete latest attempt only
@@ -81,16 +85,16 @@ export async function DELETE(
     },
     orderBy: { created_at: "desc" },
     select: { id: true },
-  })
+  });
 
   if (!latestAttempt) {
-    return NextResponse.json({ success: true })
+    return NextResponse.json({ success: true });
   }
 
   await prisma.task_attempts_v2.delete({
     where: { id: latestAttempt.id },
-  })
+  });
 
   // student_answers auto delete via cascade
-  return NextResponse.json({ success: true })
+  return NextResponse.json({ success: true });
 }

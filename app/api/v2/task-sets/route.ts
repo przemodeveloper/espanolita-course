@@ -1,13 +1,15 @@
-import { NextResponse } from "next/server"
-import { prisma } from "@/lib/prisma"
-import { createSupabaseServerClient } from "@/lib/supabase/server"
+import { NextResponse } from "next/server";
+import { prisma } from "@/lib/prisma";
+import { createSupabaseServerClient } from "@/lib/supabase/server";
 
 export async function GET() {
-  const supabase = await createSupabaseServerClient()
-  const { data: { user } } = await supabase.auth.getUser()
+  const supabase = await createSupabaseServerClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
 
   if (!user) {
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
   const sets = await prisma.task_sets_v2.findMany({
@@ -30,23 +32,23 @@ export async function GET() {
         },
       },
     },
-  })
+  });
 
   if (!sets) {
-    return NextResponse.json({ error: "No task sets found" }, { status: 404 })
+    return NextResponse.json({ error: "No task sets found" }, { status: 404 });
   }
 
-  const result = sets.map(set => ({
+  const result = sets.map((set) => ({
     id: set.id,
     title: set.title,
 
-    tasks: set.task_set_items_v2.map(i => ({
+    tasks: set.task_set_items_v2.map((i) => ({
       id: i.tasks_v2.id,
       title: i.tasks_v2.title,
     })),
 
     tasksCount: set.task_set_items_v2.length,
-  }))
+  }));
 
-  return NextResponse.json(result)
+  return NextResponse.json(result);
 }

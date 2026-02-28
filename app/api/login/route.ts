@@ -8,7 +8,7 @@ export async function POST(req: Request) {
     if (!email || !password) {
       return NextResponse.json(
         { error: "Email and password are required." },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
@@ -20,10 +20,7 @@ export async function POST(req: Request) {
     });
 
     if (error) {
-      return NextResponse.json(
-        { error: error.message },
-        { status: 401 }
-      );
+      return NextResponse.json({ error: error.message }, { status: 401 });
     }
 
     return NextResponse.json({
@@ -37,7 +34,7 @@ export async function POST(req: Request) {
     console.error("Login error:", err);
     return NextResponse.json(
       { error: "Unexpected error during login." },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }
