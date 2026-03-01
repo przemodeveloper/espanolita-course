@@ -9,6 +9,7 @@ import { useSubmitResponse } from "@/queries/useSubmitResponse";
 import type { Question } from "@/models/task";
 import type { Attempt } from "@/models/attempt";
 import { useDeleteAttempt } from "@/queries/useDeleteAttempt";
+import { TaskSummary } from "./task-summary";
 
 type Option = { text: string; id: string; label: string };
 
@@ -95,7 +96,6 @@ export function GapFillSharedTask({
     setAnswers((prev) => {
       const next = { ...prev };
 
-      // remove previous placement
       Object.keys(next).forEach((k) => {
         if (next[Number(k)] === optionKey) next[Number(k)] = null;
       });
@@ -123,7 +123,7 @@ export function GapFillSharedTask({
     <DndContext onDragEnd={handleDragEnd}>
       <div className="space-y-6">
         <div className="flex items-center justify-between">
-          <p className="max-w-2xl leading-relaxed text-muted-foreground">
+          <p className="max-w-3xl leading-relaxed text-muted-foreground">
             {parts.map((part, index) => {
               if (index === parts.length - 1) return part;
 
@@ -134,8 +134,16 @@ export function GapFillSharedTask({
                 <span key={gapIndex}>
                   {part}
                   <Gap
+                    disabled={Boolean(attempt?.attemptId)}
                     value={getDisplayValue(answers[gapIndex])}
                     id={`gap-${gapIndex}`}
+                    onRemoveAnswer={() =>
+                      setAnswers((prev) => {
+                        const next = { ...prev };
+                        next[gapIndex] = null;
+                        return next;
+                      })
+                    }
                   />
                 </span>
               );
@@ -143,15 +151,24 @@ export function GapFillSharedTask({
           </p>
         </div>
 
-        <div className="flex flex-wrap gap-3">
-          {availableOptions.map((option) => (
-            <DraggableOption key={option.id} option={option} />
-          ))}
+        <div className="max-w-3xl space-y-4">
+          <div className="flex flex-wrap gap-3">
+            {availableOptions.map((option) => (
+              <DraggableOption
+                key={option.id}
+                option={option}
+                disabled={Boolean(attempt?.attemptId)}
+              />
+            ))}
+          </div>
+          {attempt?.attemptId && <TaskSummary score={attempt.score} />}
+          <div className="flex justify-end gap-2">
+            <Button onClick={handleSubmitAnswers}>Sprawdź odpowiedzi</Button>
+            <Button onClick={resetAnswers} variant="outline">
+              Zresetuj odpowiedzi
+            </Button>
+          </div>
         </div>
-        <Button onClick={handleSubmitAnswers}>Sprawdź odpowiedzi</Button>
-        <Button onClick={resetAnswers} variant="outline">
-          Zresetuj odpowiedzi
-        </Button>
       </div>
     </DndContext>
   );
