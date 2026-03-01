@@ -163,8 +163,21 @@ export function GapFillSharedTask({
           </div>
           {attempt?.attemptId && <TaskSummary score={attempt.score} />}
           <div className="flex justify-end gap-2">
-            <Button onClick={handleSubmitAnswers}>Sprawdź odpowiedzi</Button>
-            <Button onClick={resetAnswers} variant="outline">
+            <Button
+              onClick={handleSubmitAnswers}
+              disabled={
+                Boolean(attempt?.attemptId) ||
+                Object.values(answers).filter(Boolean).length !==
+                  questions.length
+              }
+            >
+              Sprawdź odpowiedzi
+            </Button>
+            <Button
+              onClick={resetAnswers}
+              variant="outline"
+              disabled={Boolean(!attempt?.attemptId)}
+            >
               Zresetuj odpowiedzi
             </Button>
           </div>

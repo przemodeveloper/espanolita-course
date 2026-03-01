@@ -1,6 +1,7 @@
 import { useDroppable } from "@dnd-kit/core";
 import { Button } from "./ui/button";
 import { XIcon } from "lucide-react";
+import { cn } from "@/lib/utils";
 
 export default function Gap({
   id,
@@ -27,7 +28,7 @@ export default function Gap({
         <Button
           variant="outline"
           size="xs"
-          className="ml-2"
+          className={cn("ml-2", disabled && "opacity-50 pointer-events-none")}
           onClick={onRemoveAnswer}
         >
           <XIcon className="size-4" />
