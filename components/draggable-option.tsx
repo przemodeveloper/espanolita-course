@@ -4,10 +4,10 @@ import { CSS } from "@dnd-kit/utilities";
 export default function DraggableOption({
   option,
 }: {
-  option: { key: string; text: string };
+  option: { id: string; text: string; label: string };
 }) {
   const { attributes, listeners, setNodeRef, transform } = useDraggable({
-    id: option.key,
+    id: option.id,
   });
 
   const style = {
@@ -22,7 +22,7 @@ export default function DraggableOption({
       {...attributes}
       className="cursor-grab rounded-xl border bg-white px-3 py-2 shadow-sm hover:shadow-md"
     >
-      <strong>{option.key}.</strong> {option.text}
+      <strong>{option.label}.</strong> {option.text}
     </div>
   );
 }

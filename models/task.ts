@@ -4,18 +4,16 @@ export interface Task {
   instructions: string;
   type: "single_choice" | "gap_fill_shared" | "open_text" | "writing";
   questions_v2: Question[];
+  sharedOptions?: Option[];
   content: {
     text: string;
-    options: {
-      text: string;
-      key: string;
-    }[];
   };
 }
 
 export interface Question {
   id: string;
   order_index: number;
+  gap_index: number;
   prompt: {
     lines?: string[];
     sentence?: string;

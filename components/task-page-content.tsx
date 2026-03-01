@@ -18,6 +18,8 @@ export function TaskPageContent({ taskId }: { taskId: string }) {
     document.title = `${task?.title} - Kurs maturalny Españolita`;
   }, [task]);
 
+  console.log("task", task);
+
   if (isLoading) {
     return (
       <div className="flex justify-center items-center h-screen w-full">
@@ -42,8 +44,11 @@ export function TaskPageContent({ taskId }: { taskId: string }) {
         <div>
           <TaskHeader title={task?.title} instructions={task?.instructions} />
           <GapFillSharedTask
+            taskId={taskId}
             text={task?.content.text}
-            options={task?.content.options}
+            options={task?.sharedOptions}
+            questions={task?.questions_v2}
+            attempt={attempt}
           />
         </div>
       );

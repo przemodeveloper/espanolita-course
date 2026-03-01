@@ -26,11 +26,12 @@ export async function POST(
         where: { id: taskId },
         select: { type: true },
       });
+
       if (!task) throw new Error("Task not found");
 
-      // ==========================
-      // WRITING TASKS
-      // ==========================
+      // =====================================================
+      // WRITING TASK
+      // =====================================================
       if (task.type === "writing") {
         const attempt = await tx.task_attempts_v2.create({
           data: {
@@ -39,23 +40,32 @@ export async function POST(
             answer_text: body.answerText ?? "",
             started_at: new Date(),
             submitted_at: new Date(),
-            status: "submitted",
+            status: "submitted", // AI/manual grading later
           },
         });
-        return { attemptId: attempt.id, type: "writing" };
+
+        return {
+          attemptId: attempt.id,
+          type: "writing",
+          completed: true,
+        };
       }
 
-      // ==========================
+      // =====================================================
       // QUESTION BASED TASKS
-      // ==========================
+      // (single_choice / gap_fill_shared / open_text)
+      // =====================================================
       const answers: {
         questionId: string;
         optionId?: string;
         answerText?: string;
       }[] = body.answers ?? [];
 
-      if (!answers.length) throw new Error("No answers provided");
+      if (!answers.length) {
+        throw new Error("No answers provided");
+      }
 
+      // create attempt
       const attempt = await tx.task_attempts_v2.create({
         data: {
           task_id: taskId,
@@ -66,29 +76,40 @@ export async function POST(
         },
       });
 
-      // --------------------------
-      // Batch fetch all related questions and options
-      // --------------------------
+      // -----------------------------
+      // Fetch questions
+      // -----------------------------
       const questionIds = answers.map((a) => a.questionId);
+
       const questions = await tx.questions_v2.findMany({
         where: { id: { in: questionIds } },
       });
+
       const questionMap = new Map(questions.map((q) => [q.id, q]));
 
+      // -----------------------------
+      // Fetch options if needed
+      // -----------------------------
       const optionIds = answers
         .map((a) => a.optionId)
         .filter(Boolean) as string[];
+
       let optionMap = new Map<string, options_v2>();
+
       if (optionIds.length > 0) {
         const options = await tx.options_v2.findMany({
           where: { id: { in: optionIds } },
         });
+
         optionMap = new Map(options.map((o) => [o.id, o]));
       }
 
-      // --------------------------
-      // Prepare student answers
-      // --------------------------
+      // -----------------------------
+      // Build answer rows + grading
+      // -----------------------------
+      const correctQuestionIds: string[] = [];
+      const incorrectQuestionIds: string[] = [];
+
       const rows = answers.map((a) => {
         const q = questionMap.get(a.questionId);
         const option = a.optionId ? optionMap.get(a.optionId) : null;
@@ -96,18 +117,29 @@ export async function POST(
         let isCorrect: boolean | null = null;
         let points = 0;
 
-        // single choice / gap fill
-        if (option) {
-          isCorrect = option.is_correct ?? false;
+        // ==================================
+        // single_choice + gap_fill_shared
+        // ==================================
+        if (task.type === "single_choice" || task.type === "gap_fill_shared") {
+          isCorrect = option?.is_correct ?? false;
           points = isCorrect ? (q?.points ?? 1) : 0;
         }
 
-        // open text
-        if (a.answerText) {
+        // ==================================
+        // open_text
+        // ==================================
+        if (task.type === "open_text") {
           isCorrect =
-            a.answerText.trim().toLowerCase() ===
+            a.answerText?.trim().toLowerCase() ===
             q?.correct_key?.trim().toLowerCase();
+
           points = isCorrect ? (q?.points ?? 1) : 0;
+        }
+
+        if (isCorrect) {
+          correctQuestionIds.push(a.questionId);
+        } else {
+          incorrectQuestionIds.push(a.questionId);
         }
 
         return {
@@ -124,16 +156,30 @@ export async function POST(
 
       await tx.student_answers_v2.createMany({ data: rows });
 
-      const total = rows.reduce((sum, r) => sum + r.points_awarded, 0);
+      // -----------------------------
+      // Score calculation
+      // -----------------------------
+      const score = rows.reduce((sum, r) => sum + r.points_awarded, 0);
 
-      const maxScore = rows.length;
+      const maxScore = questions.reduce((sum, q) => sum + (q.points ?? 1), 0);
 
       await tx.task_attempts_v2.update({
         where: { id: attempt.id },
-        data: { score: total },
+        data: { score },
       });
 
-      return { attemptId: attempt.id, type: task.type, score: total, maxScore };
+      // -----------------------------
+      // Return useful frontend data
+      // -----------------------------
+      return {
+        attemptId: attempt.id,
+        type: task.type,
+        score,
+        maxScore,
+        completed: true,
+        correctQuestionIds,
+        incorrectQuestionIds,
+      };
     });
 
     return NextResponse.json(result);

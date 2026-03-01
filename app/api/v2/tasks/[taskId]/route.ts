@@ -49,6 +49,21 @@ export async function GET(
     return NextResponse.json({ error: "Task not found" }, { status: 404 });
   }
 
+  if (task.type === "gap_fill_shared") {
+    const sharedOptions = task.questions_v2[0]?.options_v2 ?? [];
+
+    return NextResponse.json({
+      ...task,
+      sharedOptions,
+      questions_v2: task.questions_v2.map((q) => ({
+        id: q.id,
+        gap_index: q.gap_index,
+        order_index: q.order_index,
+        prompt: q.prompt,
+      })),
+    });
+  }
+
   return NextResponse.json(task);
 }
 

@@ -37,7 +37,7 @@ export async function GET(
     return NextResponse.json({
       attemptId: attempt.id,
       answerText: attempt.answer_text,
-      score: attempt.score,
+      score: attempt.score ? Number(attempt.score) : null,
     });
   }
 
@@ -51,7 +51,7 @@ export async function GET(
 
   return NextResponse.json({
     attemptId: attempt.id,
-    score: attempt.score,
+    score: attempt.score ? Number(attempt.score) : null,
     answers: attempt.student_answers_v2.map((a) => ({
       questionId: a.question_id,
       optionId: a.option_id,
