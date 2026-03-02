@@ -4,12 +4,12 @@ import { DndContext, type DragEndEvent } from "@dnd-kit/core";
 import { useMemo, useState } from "react";
 import DraggableOption from "./draggable-option";
 import Gap from "./gap";
-import { Button } from "./ui/button";
 import { useSubmitResponse } from "@/queries/useSubmitResponse";
 import type { Question } from "@/models/task";
 import type { Attempt } from "@/models/attempt";
 import { useDeleteAttempt } from "@/queries/useDeleteAttempt";
 import { TaskSummary } from "./task-summary";
+import { TaskActions } from "./task-actions";
 
 type Option = { text: string; id: string; label: string };
 
@@ -26,8 +26,10 @@ export function GapFillSharedTask({
   questions: Question[];
   attempt?: Attempt | null;
 }) {
-  const { mutate: submitResponse } = useSubmitResponse(taskId);
-  const { mutate: deleteAttempt } = useDeleteAttempt(taskId);
+  const { mutate: submitResponse, isPending: isSubmitting } =
+    useSubmitResponse(taskId);
+  const { mutate: deleteAttempt, isPending: isDeleting } =
+    useDeleteAttempt(taskId);
 
   const questionMap = useMemo(
     () => new Map(questions.map((q) => [q.gap_index, q.id])),
@@ -134,7 +136,9 @@ export function GapFillSharedTask({
                 <span key={gapIndex}>
                   {part}
                   <Gap
-                    disabled={Boolean(attempt?.attemptId)}
+                    disabled={
+                      Boolean(attempt?.attemptId) || isSubmitting || isDeleting
+                    }
                     value={getDisplayValue(answers[gapIndex])}
                     id={`gap-${gapIndex}`}
                     onRemoveAnswer={() =>
@@ -157,30 +161,23 @@ export function GapFillSharedTask({
               <DraggableOption
                 key={option.id}
                 option={option}
-                disabled={Boolean(attempt?.attemptId)}
+                disabled={
+                  Boolean(attempt?.attemptId) || isSubmitting || isDeleting
+                }
               />
             ))}
           </div>
           {attempt?.attemptId && <TaskSummary score={attempt.score} />}
-          <div className="flex justify-end gap-2">
-            <Button
-              onClick={handleSubmitAnswers}
-              disabled={
-                Boolean(attempt?.attemptId) ||
-                Object.values(answers).filter(Boolean).length !==
-                  questions.length
-              }
-            >
-              Sprawdź odpowiedzi
-            </Button>
-            <Button
-              onClick={resetAnswers}
-              variant="outline"
-              disabled={Boolean(!attempt?.attemptId)}
-            >
-              Zresetuj odpowiedzi
-            </Button>
-          </div>
+          <TaskActions
+            onSubmit={handleSubmitAnswers}
+            onReset={resetAnswers}
+            isSubmitting={isSubmitting}
+            isDeleting={isDeleting}
+            attemptId={attempt?.attemptId ?? null}
+            disabled={
+              Object.values(answers).filter(Boolean).length !== questions.length
+            }
+          />
         </div>
       </div>
     </DndContext>

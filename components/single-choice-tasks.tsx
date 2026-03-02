@@ -2,12 +2,13 @@
 
 import type { Question } from "@/models/task";
 import { SingleChoiceTask } from "./single-choice-task";
-import { Button } from "./ui/button";
 import { useState } from "react";
 import { useSubmitResponse } from "@/queries/useSubmitResponse";
 import TaskHeader from "./task-header";
 import type { Attempt } from "@/models/attempt";
 import { useDeleteAttempt } from "@/queries/useDeleteAttempt";
+import { TaskSummary } from "./task-summary";
+import { TaskActions } from "./task-actions";
 
 export default function SingleChoiceTasks({
   title,
@@ -22,8 +23,10 @@ export default function SingleChoiceTasks({
   taskId: string;
   attempt?: Attempt | null;
 }) {
-  const { mutate: submitResponse } = useSubmitResponse(taskId);
-  const { mutate: deleteAttempt } = useDeleteAttempt(taskId);
+  const { mutate: submitResponse, isPending: isSubmitting } =
+    useSubmitResponse(taskId);
+  const { mutate: deleteAttempt, isPending: isDeleting } =
+    useDeleteAttempt(taskId);
 
   const [answers, setAnswers] = useState<Attempt["answers"]>(
     () => attempt?.answers ?? [],
@@ -51,6 +54,14 @@ export default function SingleChoiceTasks({
     submitResponse({ taskId, answers });
   };
 
+  const handleResetAnswers = async () => {
+    deleteAttempt(undefined, {
+      onSuccess: () => {
+        setAnswers([]);
+      },
+    });
+  };
+
   return (
     <div>
       <TaskHeader title={title} instructions={instructions} />
@@ -71,32 +82,18 @@ export default function SingleChoiceTasks({
           onChange={(optionId) => {
             handleSetAnswer(question.id, optionId);
           }}
-          disabled={Boolean(attempt?.attemptId)}
+          disabled={Boolean(attempt?.attemptId) || isSubmitting || isDeleting}
         />
       ))}
-      {attempt?.attemptId && (
-        <div className="bg-green-100 p-2 rounded-md mb-2">
-          <p>Wynik tego zadania: {attempt.score}</p>
-          <p>To zadanie zostało zakończone</p>
-        </div>
-      )}
-      <div className="flex justify-end gap-2">
-        <Button
-          onClick={handleSubmitAnswers}
-          disabled={
-            Boolean(attempt?.attemptId) || questions.length !== answers.length
-          }
-        >
-          Sprawdź odpowiedzi
-        </Button>
-        <Button
-          variant="outline"
-          disabled={Boolean(!attempt?.attemptId)}
-          onClick={() => deleteAttempt()}
-        >
-          Zresetuj odpowiedzi
-        </Button>
-      </div>
+      {attempt?.attemptId && <TaskSummary score={attempt.score} />}
+      <TaskActions
+        onSubmit={handleSubmitAnswers}
+        onReset={handleResetAnswers}
+        isSubmitting={isSubmitting}
+        isDeleting={isDeleting}
+        attemptId={attempt?.attemptId ?? null}
+        disabled={questions.length !== answers.length}
+      />
     </div>
   );
 }

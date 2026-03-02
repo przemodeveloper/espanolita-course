@@ -22,7 +22,7 @@ export default function DraggableOption({
       style={style}
       {...listeners}
       {...attributes}
-      className={`cursor-grab rounded-xl border bg-white px-3 py-2 shadow-sm hover:shadow-md ${disabled ? "opacity-50" : ""}`}
+      className={`cursor-grab rounded-xl border bg-white px-3 py-2 shadow-sm hover:shadow-md ${disabled ? "opacity-50 pointer-events-none" : ""}`}
     >
       <strong>{option.label}.</strong> {option.text}
     </div>
