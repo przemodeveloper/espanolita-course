@@ -2,13 +2,13 @@
 
 import { useTask } from "@/queries/useTask";
 import { GapFillSharedTask } from "./gap-fill-shared-task";
-import OpenTextTask from "./open-text-task";
 import LoadingSpinner from "./loading-spinner";
 import WritingTask from "./writing-task";
 import SingleChoiceTasks from "./single-choice-tasks";
 import TaskHeader from "./task-header";
 import { useLayoutEffect } from "react";
 import { useAttempt } from "@/queries/useAttempt";
+import OpenTextTasks from "./open-text-tasks";
 
 export function TaskPageContent({ taskId }: { taskId: string }) {
   const { task, isLoading } = useTask({ taskId });
@@ -54,17 +54,14 @@ export function TaskPageContent({ taskId }: { taskId: string }) {
       );
     case "open_text":
       return (
-        <div>
-          <TaskHeader title={task?.title} instructions={task?.instructions} />
-          {task?.questions_v2.map((question) => (
-            <OpenTextTask
-              key={attempt?.attemptId ?? "new"}
-              orderIndex={question.order_index}
-              sentence={question.prompt.sentence}
-              keywords={question.prompt.keywords}
-            />
-          ))}
-        </div>
+        <OpenTextTasks
+          taskId={taskId}
+          key={attempt?.attemptId ?? "new"}
+          title={task?.title}
+          instructions={task?.instructions}
+          questions={task?.questions_v2}
+          attempt={attempt}
+        />
       );
     case "writing":
       return (

@@ -1,7 +1,11 @@
 import { type NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
-import type { options_v2 } from "@prisma/client";
+import type { answers_v2, options_v2 } from "@prisma/client";
+
+function normalize(text: string) {
+  return text.trim().toLowerCase().replace(/\s+/g, " ");
+}
 
 export async function POST(
   req: NextRequest,
@@ -23,7 +27,7 @@ export async function POST(
   try {
     const result = await prisma.$transaction(async (tx) => {
       // ---------------------------------
-      // Get task type
+      // Get task
       // ---------------------------------
       const task = await tx.tasks_v2.findUnique({
         where: { id: taskId },
@@ -43,7 +47,7 @@ export async function POST(
             answer_text: body.answerText ?? "",
             started_at: new Date(),
             submitted_at: new Date(),
-            status: "submitted", // graded later
+            status: "submitted",
           },
         });
 
@@ -76,11 +80,11 @@ export async function POST(
         },
       });
 
+      const questionIds = answers.map((a) => a.questionId);
+
       // ---------------------------------
       // Fetch questions
       // ---------------------------------
-      const questionIds = answers.map((a) => a.questionId);
-
       const questions = await tx.questions_v2.findMany({
         where: { id: { in: questionIds } },
       });
@@ -88,7 +92,7 @@ export async function POST(
       const questionMap = new Map(questions.map((q) => [q.id, q]));
 
       // ---------------------------------
-      // Fetch options (for choice tasks)
+      // Fetch options (choice tasks)
       // ---------------------------------
       const optionIds = answers
         .map((a) => a.optionId)
@@ -105,7 +109,25 @@ export async function POST(
       }
 
       // ---------------------------------
-      // Build rows + grade
+      // Fetch acceptable answers (open_text)
+      // ---------------------------------
+      let acceptableMap = new Map<string, answers_v2[]>();
+
+      if (task.type === "open_text") {
+        const acceptable = await tx.answers_v2.findMany({
+          where: { question_id: { in: questionIds } },
+        });
+
+        acceptableMap = acceptable.reduce((map, a) => {
+          const list = map.get(a.question_id) ?? [];
+          list.push(a);
+          map.set(a.question_id, list);
+          return map;
+        }, new Map<string, typeof acceptable>());
+      }
+
+      // ---------------------------------
+      // Grade answers
       // ---------------------------------
       const rows = answers.map((a) => {
         const q = questionMap.get(a.questionId);
@@ -114,18 +136,36 @@ export async function POST(
         let isCorrect: boolean | null = null;
         let points = 0;
 
+        // ================================
         // single_choice + gap_fill_shared
+        // ================================
         if (task.type === "single_choice" || task.type === "gap_fill_shared") {
           isCorrect = option?.is_correct ?? false;
           points = isCorrect ? (q?.points ?? 1) : 0;
         }
 
-        // open_text (simple exact match for now)
+        // ================================
+        // open_text (answers_v2 based)
+        // ================================
         if (task.type === "open_text") {
-          const normalizedUser = a.answerText?.trim().toLowerCase() ?? "";
-          const normalizedKey = q?.correct_key?.trim().toLowerCase() ?? "";
+          const userRaw = a.answerText ?? "";
+          const normalizedUser = normalize(userRaw);
 
-          isCorrect = normalizedUser === normalizedKey;
+          const acceptable = acceptableMap.get(a.questionId) ?? [];
+
+          isCorrect = acceptable.some((ans) => {
+            if (ans.normalized_text) {
+              if (normalizedUser === ans.normalized_text) return true;
+            }
+
+            if (ans.regex_pattern) {
+              const regex = new RegExp(ans.regex_pattern, "i");
+              if (regex.test(userRaw)) return true;
+            }
+
+            return false;
+          });
+
           points = isCorrect ? (q?.points ?? 1) : 0;
         }
 
@@ -141,10 +181,13 @@ export async function POST(
         };
       });
 
+      // ---------------------------------
+      // Save answers
+      // ---------------------------------
       await tx.student_answers_v2.createMany({ data: rows });
 
       // ---------------------------------
-      // Calculate + store score
+      // Score
       // ---------------------------------
       const score = rows.reduce((sum, r) => sum + r.points_awarded, 0);
 
@@ -154,7 +197,7 @@ export async function POST(
       });
 
       // ---------------------------------
-      // Return minimal response ONLY
+      // Minimal response
       // ---------------------------------
       return {
         attemptId: attempt.id,

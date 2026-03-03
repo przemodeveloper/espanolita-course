@@ -7,14 +7,24 @@ export async function GET(
   { params }: { params: Promise<{ taskId: string }> },
 ) {
   const supabase = await createSupabaseServerClient();
+
   const {
     data: { user },
   } = await supabase.auth.getUser();
 
-  const { taskId } = await params;
-
   if (!user) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  }
+
+  const { taskId } = await params;
+
+  const task = await prisma.tasks_v2.findUnique({
+    where: { id: taskId },
+    select: { type: true },
+  });
+
+  if (!task) {
+    return NextResponse.json({ error: "Task not found" }, { status: 404 });
   }
 
   const attempt = await prisma.task_attempts_v2.findFirst({
@@ -22,7 +32,7 @@ export async function GET(
       user_id: user.id,
       task_id: taskId,
     },
-    orderBy: { created_at: "desc" }, // latest
+    orderBy: { created_at: "desc" },
     include: {
       student_answers_v2: true,
     },
@@ -32,31 +42,40 @@ export async function GET(
     return NextResponse.json({ attempt: null });
   }
 
-  // writing task
-  if (attempt.answer_text) {
+  // =====================================================
+  // WRITING
+  // =====================================================
+  if (task.type === "writing") {
     return NextResponse.json({
       attemptId: attempt.id,
-      answerText: attempt.answer_text,
+      type: "writing",
+      answerText: attempt.answer_text ?? "",
       score: attempt.score ? Number(attempt.score) : null,
     });
   }
 
-  // question based
+  // =====================================================
+  // QUESTION BASED (single_choice / gap_fill_shared / open_text)
+  // =====================================================
+  const answers = attempt.student_answers_v2.map((a) => ({
+    questionId: a.question_id,
+    optionId: a.option_id,
+    answerText: a.answer_text, // 🔥 works for open_text
+  }));
+
   const correctQuestionIds = attempt.student_answers_v2
     .filter((a) => a.is_correct === true)
     .map((a) => a.question_id);
+
   const incorrectQuestionIds = attempt.student_answers_v2
     .filter((a) => a.is_correct === false)
     .map((a) => a.question_id);
 
   return NextResponse.json({
     attemptId: attempt.id,
+    type: task.type,
     score: attempt.score ? Number(attempt.score) : null,
-    answers: attempt.student_answers_v2.map((a) => ({
-      questionId: a.question_id,
-      optionId: a.option_id,
-      answerText: a.answer_text,
-    })),
+    answers, // 🔥 unified for all question types
     correctQuestionIds,
     incorrectQuestionIds,
   });

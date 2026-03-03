@@ -26,7 +26,7 @@ export function TaskActions({
       <Button
         onClick={onReset}
         variant="outline"
-        disabled={disabled || Boolean(!attemptId) || isSubmitting || isDeleting}
+        disabled={Boolean(!attemptId) || isSubmitting || isDeleting}
       >
         {isDeleting ? "Resetuję odpowiedzi..." : "Zresetuj odpowiedzi"}
       </Button>
