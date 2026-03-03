@@ -22,6 +22,9 @@ export async function POST(
 
   try {
     const result = await prisma.$transaction(async (tx) => {
+      // ---------------------------------
+      // Get task type
+      // ---------------------------------
       const task = await tx.tasks_v2.findUnique({
         where: { id: taskId },
         select: { type: true },
@@ -40,20 +43,15 @@ export async function POST(
             answer_text: body.answerText ?? "",
             started_at: new Date(),
             submitted_at: new Date(),
-            status: "submitted", // AI/manual grading later
+            status: "submitted", // graded later
           },
         });
 
-        return {
-          attemptId: attempt.id,
-          type: "writing",
-          completed: true,
-        };
+        return { attemptId: attempt.id, completed: true };
       }
 
       // =====================================================
       // QUESTION BASED TASKS
-      // (single_choice / gap_fill_shared / open_text)
       // =====================================================
       const answers: {
         questionId: string;
@@ -65,7 +63,9 @@ export async function POST(
         throw new Error("No answers provided");
       }
 
-      // create attempt
+      // ---------------------------------
+      // Create attempt
+      // ---------------------------------
       const attempt = await tx.task_attempts_v2.create({
         data: {
           task_id: taskId,
@@ -76,9 +76,9 @@ export async function POST(
         },
       });
 
-      // -----------------------------
+      // ---------------------------------
       // Fetch questions
-      // -----------------------------
+      // ---------------------------------
       const questionIds = answers.map((a) => a.questionId);
 
       const questions = await tx.questions_v2.findMany({
@@ -87,16 +87,16 @@ export async function POST(
 
       const questionMap = new Map(questions.map((q) => [q.id, q]));
 
-      // -----------------------------
-      // Fetch options if needed
-      // -----------------------------
+      // ---------------------------------
+      // Fetch options (for choice tasks)
+      // ---------------------------------
       const optionIds = answers
         .map((a) => a.optionId)
         .filter(Boolean) as string[];
 
       let optionMap = new Map<string, options_v2>();
 
-      if (optionIds.length > 0) {
+      if (optionIds.length) {
         const options = await tx.options_v2.findMany({
           where: { id: { in: optionIds } },
         });
@@ -104,12 +104,9 @@ export async function POST(
         optionMap = new Map(options.map((o) => [o.id, o]));
       }
 
-      // -----------------------------
-      // Build answer rows + grading
-      // -----------------------------
-      const correctQuestionIds: string[] = [];
-      const incorrectQuestionIds: string[] = [];
-
+      // ---------------------------------
+      // Build rows + grade
+      // ---------------------------------
       const rows = answers.map((a) => {
         const q = questionMap.get(a.questionId);
         const option = a.optionId ? optionMap.get(a.optionId) : null;
@@ -117,29 +114,19 @@ export async function POST(
         let isCorrect: boolean | null = null;
         let points = 0;
 
-        // ==================================
         // single_choice + gap_fill_shared
-        // ==================================
         if (task.type === "single_choice" || task.type === "gap_fill_shared") {
           isCorrect = option?.is_correct ?? false;
           points = isCorrect ? (q?.points ?? 1) : 0;
         }
 
-        // ==================================
-        // open_text
-        // ==================================
+        // open_text (simple exact match for now)
         if (task.type === "open_text") {
-          isCorrect =
-            a.answerText?.trim().toLowerCase() ===
-            q?.correct_key?.trim().toLowerCase();
+          const normalizedUser = a.answerText?.trim().toLowerCase() ?? "";
+          const normalizedKey = q?.correct_key?.trim().toLowerCase() ?? "";
 
+          isCorrect = normalizedUser === normalizedKey;
           points = isCorrect ? (q?.points ?? 1) : 0;
-        }
-
-        if (isCorrect) {
-          correctQuestionIds.push(a.questionId);
-        } else {
-          incorrectQuestionIds.push(a.questionId);
         }
 
         return {
@@ -156,29 +143,22 @@ export async function POST(
 
       await tx.student_answers_v2.createMany({ data: rows });
 
-      // -----------------------------
-      // Score calculation
-      // -----------------------------
+      // ---------------------------------
+      // Calculate + store score
+      // ---------------------------------
       const score = rows.reduce((sum, r) => sum + r.points_awarded, 0);
-
-      const maxScore = questions.reduce((sum, q) => sum + (q.points ?? 1), 0);
 
       await tx.task_attempts_v2.update({
         where: { id: attempt.id },
         data: { score },
       });
 
-      // -----------------------------
-      // Return useful frontend data
-      // -----------------------------
+      // ---------------------------------
+      // Return minimal response ONLY
+      // ---------------------------------
       return {
         attemptId: attempt.id,
-        type: task.type,
-        score,
-        maxScore,
         completed: true,
-        correctQuestionIds,
-        incorrectQuestionIds,
       };
     });
 

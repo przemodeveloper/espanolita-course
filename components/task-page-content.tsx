@@ -18,8 +18,6 @@ export function TaskPageContent({ taskId }: { taskId: string }) {
     document.title = `${task?.title} - Kurs maturalny Españolita`;
   }, [task]);
 
-  console.log("task", task);
-
   if (isLoading) {
     return (
       <div className="flex justify-center items-center h-screen w-full">
@@ -32,6 +30,7 @@ export function TaskPageContent({ taskId }: { taskId: string }) {
     case "single_choice":
       return (
         <SingleChoiceTasks
+          key={attempt?.attemptId ?? "new"}
           title={task?.title}
           instructions={task?.instructions}
           questions={task?.questions_v2}
@@ -44,6 +43,7 @@ export function TaskPageContent({ taskId }: { taskId: string }) {
         <div>
           <TaskHeader title={task?.title} instructions={task?.instructions} />
           <GapFillSharedTask
+            key={attempt?.attemptId ?? "new"}
             taskId={taskId}
             text={task?.content.text}
             options={task?.sharedOptions}
@@ -58,8 +58,8 @@ export function TaskPageContent({ taskId }: { taskId: string }) {
           <TaskHeader title={task?.title} instructions={task?.instructions} />
           {task?.questions_v2.map((question) => (
             <OpenTextTask
+              key={attempt?.attemptId ?? "new"}
               orderIndex={question.order_index}
-              key={question.id}
               sentence={question.prompt.sentence}
               keywords={question.prompt.keywords}
             />

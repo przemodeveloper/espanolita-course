@@ -13,6 +13,27 @@ import { TaskActions } from "./task-actions";
 
 type Option = { text: string; id: string; label: string };
 
+function buildInitialAnswers(
+  emptyAnswers: Record<number, string | null>,
+  attempt: Attempt | null | undefined,
+  questions: Question[],
+) {
+  const initial = { ...emptyAnswers };
+
+  if (!attempt?.answers) return initial;
+
+  const questionIdToGap = new Map(questions.map((q) => [q.id, q.gap_index]));
+
+  for (const a of attempt.answers) {
+    const gap = questionIdToGap.get(a.questionId);
+    if (gap !== undefined) {
+      initial[gap] = a.optionId ?? null;
+    }
+  }
+
+  return initial;
+}
+
 export function GapFillSharedTask({
   text,
   options,
@@ -50,22 +71,9 @@ export function GapFillSharedTask({
     [gapIndexes],
   );
 
-  const [answers, setAnswers] = useState<Record<number, string | null>>(() => {
-    const initial = { ...emptyAnswers };
-
-    if (!attempt?.answers) return initial;
-
-    const questionIdToGap = new Map(questions.map((q) => [q.id, q.gap_index]));
-
-    for (const a of attempt.answers) {
-      const gap = questionIdToGap.get(a.questionId);
-      if (gap !== undefined) {
-        initial[gap] = a.optionId ?? null;
-      }
-    }
-
-    return initial;
-  });
+  const [answers, setAnswers] = useState(() =>
+    buildInitialAnswers(emptyAnswers, attempt, questions),
+  );
 
   function resetAnswers() {
     deleteAttempt(undefined, {
