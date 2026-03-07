@@ -1,3 +1,5 @@
+import type { RubricItem } from "./grading";
+
 export interface Task {
   id: string;
   title: string;
@@ -7,6 +9,13 @@ export interface Task {
   sharedOptions?: Option[];
   content: {
     text: string;
+    language?: string;
+    maxScore?: number;
+    minWords?: number;
+    maxWords?: number;
+    requirements?: string[];
+    rubric?: RubricItem[];
+    openingText?: string;
   };
 }
 

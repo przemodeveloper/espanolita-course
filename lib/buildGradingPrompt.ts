@@ -17,6 +17,7 @@ You MUST:
 - follow rubric exactly
 - not invent criteria
 - return ONLY valid JSON
+- feedback, reasoning, missing points should be provided in Polish
 
 TASK:
 ${data.task}
