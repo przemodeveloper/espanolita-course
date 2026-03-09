@@ -37,24 +37,6 @@ export async function POST(
       if (!task) throw new Error("Task not found");
 
       // =====================================================
-      // WRITING TASK
-      // =====================================================
-      if (task.type === "writing") {
-        const attempt = await tx.task_attempts_v2.create({
-          data: {
-            task_id: taskId,
-            user_id: user.id,
-            answer_text: body.answerText ?? "",
-            started_at: new Date(),
-            submitted_at: new Date(),
-            status: "submitted",
-          },
-        });
-
-        return { attemptId: attempt.id, completed: true };
-      }
-
-      // =====================================================
       // QUESTION BASED TASKS
       // =====================================================
       const answers: {

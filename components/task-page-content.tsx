@@ -68,13 +68,14 @@ export function TaskPageContent({ taskId }: { taskId: string }) {
         <div>
           <TaskHeader title={task?.title} instructions={task?.instructions} />
           <WritingTask
-            language={task?.content.language}
-            maxScore={task?.content.maxScore}
-            minWords={task?.content.minWords}
-            maxWords={task?.content.maxWords}
-            requirements={task?.content.requirements}
-            rubric={task?.content.rubric}
-            openingText={task?.content.openingText}
+            taskId={taskId}
+            language={task?.content.language ?? ""}
+            minWords={task?.content.minWords ?? 0}
+            maxWords={task?.content.maxWords ?? 0}
+            requirements={task?.content.requirements ?? []}
+            rubric={task?.content.rubric ?? []}
+            openingText={task?.content.openingText ?? ""}
+            instructions={task?.instructions ?? ""}
           />
         </div>
       );
