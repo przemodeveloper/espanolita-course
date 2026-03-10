@@ -27,8 +27,20 @@ export default function WritingTask({
 }: WritingTaskProps) {
   const { mutate: gradeEssay } = useGradeEssay(taskId);
   const [essay, setEssay] = useState("");
+  const [error, setError] = useState<string | null>(null);
+
+  const handleChangeEssay = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+    setEssay(e.target.value);
+    if (error !== null) {
+      setError(null);
+    }
+  };
 
   const handleGradeEssay = () => {
+    if (essay.length < minWords) {
+      setError(`Wypracowanie musi mieć co najmniej ${minWords} słów`);
+      return;
+    }
     gradeEssay({
       language,
       task: instructions,
@@ -42,8 +54,12 @@ export default function WritingTask({
     });
   };
 
+  const handleResetEssay = () => {
+    setEssay("");
+  };
+
   return (
-    <div className="flex flex-col  gap-4">
+    <div className="flex flex-col gap-4">
       <ul>
         {requirements?.map((requirement) => (
           <li className="list-disc list-inside" key={requirement}>
@@ -53,6 +69,9 @@ export default function WritingTask({
       </ul>
       Oceniane są
       <ul>
+        <li className="list-disc list-inside">
+          długość wypowiedzi (min. {minWords} słów, max. {maxWords} słów)
+        </li>
         {rubric?.map((rubric) => (
           <li className="list-disc list-inside" key={rubric.name}>
             {rubric.name} ({rubric.weight} punktów)
@@ -63,11 +82,17 @@ export default function WritingTask({
       <Textarea
         className="w-full h-[500px]"
         value={essay}
-        onChange={(e) => setEssay(e.target.value)}
+        onChange={handleChangeEssay}
       />
-      <Button variant="outline" onClick={handleGradeEssay} disabled={!essay}>
-        Sprawdź
-      </Button>
+      {error && <p className="text-red-500">{error}</p>}
+      <div className="flex justify-end gap-2">
+        <Button variant="outline" onClick={handleGradeEssay}>
+          Sprawdź wypracowanie
+        </Button>
+        <Button variant="outline" onClick={handleResetEssay} disabled={!essay}>
+          Zresetuj wypracowanie
+        </Button>
+      </div>
     </div>
   );
 }
