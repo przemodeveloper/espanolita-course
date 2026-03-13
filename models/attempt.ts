@@ -3,6 +3,7 @@ export interface Attempt {
   score: number;
   correctQuestionIds: string[];
   incorrectQuestionIds: string[];
+  answerText?: string;
   answers: {
     questionId: string;
     optionId?: string;

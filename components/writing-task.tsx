@@ -3,8 +3,11 @@ import { Button } from "./ui/button";
 import { Textarea } from "./ui/textarea";
 import type { RubricItem } from "@/models/grading";
 import { useGradeEssay } from "@/queries/useGradeEssay";
+import { useDeleteAttempt } from "@/queries/useDeleteAttempt";
+import type { Attempt } from "@/models/attempt";
 
 interface WritingTaskProps {
+  attempt?: Attempt;
   taskId: string;
   instructions: string;
   language: string;
@@ -16,6 +19,7 @@ interface WritingTaskProps {
 }
 
 export default function WritingTask({
+  attempt,
   taskId,
   instructions,
   language,
@@ -26,7 +30,8 @@ export default function WritingTask({
   openingText,
 }: WritingTaskProps) {
   const { mutate: gradeEssay } = useGradeEssay(taskId);
-  const [essay, setEssay] = useState("");
+  const { mutate: deleteAttempt } = useDeleteAttempt(taskId);
+  const [essay, setEssay] = useState(() => attempt?.answerText ?? "");
   const [error, setError] = useState<string | null>(null);
 
   const handleChangeEssay = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
@@ -55,7 +60,11 @@ export default function WritingTask({
   };
 
   const handleResetEssay = () => {
-    setEssay("");
+    deleteAttempt(undefined, {
+      onSuccess: () => {
+        setEssay("");
+      },
+    });
   };
 
   return (
@@ -83,13 +92,22 @@ export default function WritingTask({
         className="w-full h-[500px]"
         value={essay}
         onChange={handleChangeEssay}
+        disabled={Boolean(attempt?.attemptId)}
       />
       {error && <p className="text-red-500">{error}</p>}
       <div className="flex justify-end gap-2">
-        <Button variant="outline" onClick={handleGradeEssay}>
+        <Button
+          variant="outline"
+          disabled={Boolean(attempt?.attemptId)}
+          onClick={handleGradeEssay}
+        >
           Sprawdź wypracowanie
         </Button>
-        <Button variant="outline" onClick={handleResetEssay} disabled={!essay}>
+        <Button
+          variant="outline"
+          onClick={handleResetEssay}
+          disabled={Boolean(!attempt?.attemptId) || !essay}
+        >
           Zresetuj wypracowanie
         </Button>
       </div>

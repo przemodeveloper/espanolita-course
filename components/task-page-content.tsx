@@ -68,6 +68,7 @@ export function TaskPageContent({ taskId }: { taskId: string }) {
         <div>
           <TaskHeader title={task?.title} instructions={task?.instructions} />
           <WritingTask
+            key={attempt?.attemptId ?? "new"}
             taskId={taskId}
             language={task?.content.language ?? ""}
             minWords={task?.content.minWords ?? 0}
@@ -76,6 +77,7 @@ export function TaskPageContent({ taskId }: { taskId: string }) {
             rubric={task?.content.rubric ?? []}
             openingText={task?.content.openingText ?? ""}
             instructions={task?.instructions ?? ""}
+            attempt={attempt}
           />
         </div>
       );
