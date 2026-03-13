@@ -1,6 +1,7 @@
 import { type NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
+import { GradeEssayResponse } from "@/models/grading";
 
 export async function GET(
   _req: NextRequest,
@@ -51,6 +52,12 @@ export async function GET(
       type: "writing",
       answerText: attempt.answer_text ?? "",
       score: attempt.score ? Number(attempt.score) : null,
+      grading:
+        (
+          attempt.metadata as {
+            grading?: { result: GradeEssayResponse };
+          } | null
+        )?.grading?.result ?? null,
     });
   }
 
