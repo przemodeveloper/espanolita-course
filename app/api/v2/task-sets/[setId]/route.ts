@@ -4,7 +4,7 @@ import { createSupabaseServerClient } from "@/lib/supabase/server";
 
 export async function GET(
   _req: Request,
-  { params }: { params: { id: string } },
+  { params }: { params: Promise<{ setId: string }> },
 ) {
   const supabase = await createSupabaseServerClient();
   const {
@@ -15,7 +15,7 @@ export async function GET(
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
-  const { id } = params;
+  const { setId: id } = await params;
 
   const taskSet = await prisma.task_sets_v2.findUnique({
     where: { id },
