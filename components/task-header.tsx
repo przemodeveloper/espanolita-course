@@ -1,4 +1,5 @@
 import { cn } from "@/lib/utils";
+import { Instructions } from "./instructions";
 
 export default function TaskHeader({
   title,
@@ -10,9 +11,9 @@ export default function TaskHeader({
   className?: string;
 }) {
   return (
-    <div className={cn("mb-8", className)}>
+    <div className={cn("mb-8 w-full", className)}>
       <h1 className="text-lg font-bold mb-2">{title}</h1>
-      <p className="max-w-2xl text-muted-foreground">{instructions}</p>
+      <Instructions>{instructions}</Instructions>
     </div>
   );
 }

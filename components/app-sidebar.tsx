@@ -1,6 +1,6 @@
 "use client";
 
-import { CheckCircle, ChevronRight, ListChecks } from "lucide-react";
+import { BookOpen, CheckCircle, ChevronRight, Circle } from "lucide-react";
 import {
   Sidebar,
   SidebarContent,
@@ -38,7 +38,9 @@ export function AppSidebar() {
     <Sidebar>
       <SidebarContent>
         <SidebarGroup>
-          <SidebarGroupLabel>Kurs maturalny Españolita</SidebarGroupLabel>
+          <SidebarGroupLabel className="uppercase">
+            Kurs maturalny Españolita
+          </SidebarGroupLabel>
           <SidebarGroupContent>
             <SidebarMenu>
               {taskSets.map((taskSet: TaskSet) => {
@@ -54,8 +56,8 @@ export function AppSidebar() {
                     <SidebarMenuItem>
                       <CollapsibleTrigger asChild>
                         <SidebarMenuButton className="cursor-pointer font-medium [&>svg[data-chevron]]:transition-transform group-data-[state=open]/collapsible:[&>svg[data-chevron]]:rotate-90">
-                          <ListChecks />
-                          <span className="flex-1 truncate text-left">
+                          <BookOpen />
+                          <span className="flex-1 truncate text-left font-semibold">
                             {taskSet.title}
                           </span>
                           <ChevronRight
@@ -79,12 +81,18 @@ export function AppSidebar() {
                                       href={url}
                                       onMouseOver={() => prefetchQuery(task.id)}
                                     >
-                                      <span>{task.title}</span>
-                                      {progress?.[task.id]?.completed && (
+                                      {progress?.[task.id]?.completed ? (
                                         <span className="text-xs text-green-500 flex items-center gap-1">
                                           <CheckCircle className="size-4" />
                                         </span>
+                                      ) : (
+                                        <span className="text-xs text-gray-500 flex items-center gap-1">
+                                          <Circle className="size-4" />
+                                        </span>
                                       )}
+                                      <span className="font-semibold">
+                                        {task.title}
+                                      </span>
                                     </Link>
                                   </SidebarMenuSubButton>
                                 </SidebarMenuSubItem>

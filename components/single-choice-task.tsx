@@ -25,7 +25,7 @@ export function SingleChoiceTask({
 }) {
   return (
     <div className="mb-8">
-      <h2 className="text-sm mb-1">Przykład {orderIndex}</h2>
+      <h2 className="text-sm mb-1 font-bold">Przykład {orderIndex}</h2>
       {isIncorrect && (
         <p className="text-red-500 mb-2">Nieprawidłowa odpowiedź</p>
       )}

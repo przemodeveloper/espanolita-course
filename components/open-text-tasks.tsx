@@ -1,7 +1,6 @@
 import type { Question } from "@/models/task";
 import type { Attempt } from "@/models/attempt";
 import OpenTextTask from "./open-text-task";
-import TaskHeader from "./task-header";
 import { useState } from "react";
 import { useSubmitResponse } from "@/queries/useSubmitResponse";
 import { useDeleteAttempt } from "@/queries/useDeleteAttempt";
@@ -11,14 +10,10 @@ import { TaskActions } from "./task-actions";
 export default function OpenTextTasks({
   questions,
   attempt,
-  title,
-  instructions,
   taskId,
 }: {
   questions: Question[];
   attempt?: Attempt | null;
-  title: string;
-  instructions: string;
   taskId: string;
 }) {
   const [answers, setAnswers] = useState<
@@ -61,7 +56,6 @@ export default function OpenTextTasks({
 
   return (
     <div>
-      <TaskHeader title={title} instructions={instructions} />
       {questions.map((question) => (
         <OpenTextTask
           key={question.id}

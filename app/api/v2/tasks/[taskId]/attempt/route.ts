@@ -1,7 +1,7 @@
 import { type NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
-import { GradeEssayResponse } from "@/models/grading";
+import type { GradeEssayResponse } from "@/models/grading";
 
 export async function GET(
   _req: NextRequest,
@@ -67,7 +67,7 @@ export async function GET(
   const answers = attempt.student_answers_v2.map((a) => ({
     questionId: a.question_id,
     optionId: a.option_id,
-    answerText: a.answer_text, // 🔥 works for open_text
+    answerText: a.answer_text,
   }));
 
   const correctQuestionIds = attempt.student_answers_v2
@@ -82,7 +82,7 @@ export async function GET(
     attemptId: attempt.id,
     type: task.type,
     score: attempt.score ? Number(attempt.score) : null,
-    answers, // 🔥 unified for all question types
+    answers,
     correctQuestionIds,
     incorrectQuestionIds,
   });

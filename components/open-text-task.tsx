@@ -48,7 +48,7 @@ export default function OpenTextTask({
 }) {
   return (
     <div>
-      <h2 className="text-sm mb-2">Przykład {orderIndex}</h2>
+      <h2 className="text-sm mb-2 font-bold">Przykład {orderIndex}</h2>
       <div className="mb-4">
         {sentence && (
           <GapFillInput

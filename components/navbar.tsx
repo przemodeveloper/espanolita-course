@@ -21,7 +21,7 @@ export function Navbar({ user }: { user: User | null }) {
   };
 
   return (
-    <nav className="fixed top-0 left-0 right-0 z-50 flex flex-wrap justify-between items-center p-4 bg-white border-b">
+    <nav className="fixed top-0 left-0 right-0 z-50 flex flex-wrap justify-between items-center p-4 bg-white border-b border-gray-300">
       <div className="flex items-center flex-wrap gap-4">
         <Link href="/">
           <Image
@@ -32,7 +32,7 @@ export function Navbar({ user }: { user: User | null }) {
             className="w-10 h-10"
           />
         </Link>
-        <span className="text-sm">Kurs maturalny Españolita</span>
+        <span className="font-bold text-lg">Kurs maturalny Españolita</span>
       </div>
 
       <ul className="flex flex-wrap items-center gap-4">

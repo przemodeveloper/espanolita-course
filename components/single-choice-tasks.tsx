@@ -4,22 +4,17 @@ import type { Question } from "@/models/task";
 import { SingleChoiceTask } from "./single-choice-task";
 import { useState } from "react";
 import { useSubmitResponse } from "@/queries/useSubmitResponse";
-import TaskHeader from "./task-header";
 import type { Attempt } from "@/models/attempt";
 import { useDeleteAttempt } from "@/queries/useDeleteAttempt";
 import { TaskSummary } from "./task-summary";
 import { TaskActions } from "./task-actions";
 
 export default function SingleChoiceTasks({
-  title,
-  instructions,
   questions,
   taskId,
   attempt,
 }: {
   questions: Question[];
-  title: string;
-  instructions: string;
   taskId: string;
   attempt?: Attempt | null;
 }) {
@@ -37,21 +32,24 @@ export default function SingleChoiceTasks({
     optionId?: string,
     answerText?: string,
   ) => {
-    if (answers.find((answer) => answer.questionId === questionId)) {
-      setAnswers((prev) =>
-        prev.map((answer) =>
+    if (answers?.find((answer) => answer.questionId === questionId)) {
+      setAnswers((prev?: Attempt["answers"]) =>
+        prev?.map((answer) =>
           answer.questionId === questionId
             ? { questionId, optionId, answerText }
             : answer,
         ),
       );
     } else {
-      setAnswers((prev) => [...prev, { questionId, optionId, answerText }]);
+      setAnswers((prev?: Attempt["answers"]) => [
+        ...(prev ?? []),
+        { questionId, optionId, answerText },
+      ]);
     }
   };
 
   const handleSubmitAnswers = async () => {
-    submitResponse({ taskId, answers });
+    submitResponse({ taskId, answers: answers ?? [] });
   };
 
   const handleResetAnswers = async () => {
@@ -64,12 +62,10 @@ export default function SingleChoiceTasks({
 
   return (
     <div>
-      <TaskHeader title={title} instructions={instructions} />
-
       {questions?.map((question) => (
         <SingleChoiceTask
           value={
-            answers.find((answer) => answer.questionId === question.id)
+            answers?.find((answer) => answer.questionId === question.id)
               ?.optionId || ""
           }
           key={question.id}
@@ -92,7 +88,7 @@ export default function SingleChoiceTasks({
         isSubmitting={isSubmitting}
         isDeleting={isDeleting}
         attemptId={attempt?.attemptId ?? null}
-        disabled={questions.length !== answers.length}
+        disabled={questions.length !== (answers?.length ?? 0)}
       />
     </div>
   );

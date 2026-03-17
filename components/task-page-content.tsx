@@ -5,10 +5,11 @@ import { GapFillSharedTask } from "./gap-fill-shared-task";
 import LoadingSpinner from "./loading-spinner";
 import WritingTask from "./writing-task";
 import SingleChoiceTasks from "./single-choice-tasks";
-import TaskHeader from "./task-header";
 import { useLayoutEffect } from "react";
 import { useAttempt } from "@/queries/useAttempt";
 import OpenTextTasks from "./open-text-tasks";
+import { Instructions } from "./instructions";
+import { Criterion } from "./criterion";
 
 export function TaskPageContent({ taskId }: { taskId: string }) {
   const { task, isLoading } = useTask({ taskId });
@@ -29,19 +30,22 @@ export function TaskPageContent({ taskId }: { taskId: string }) {
   switch (task?.type) {
     case "single_choice":
       return (
-        <SingleChoiceTasks
-          key={attempt?.attemptId ?? "new"}
-          title={task?.title}
-          instructions={task?.instructions}
-          questions={task?.questions_v2}
-          taskId={taskId}
-          attempt={attempt}
-        />
+        <>
+          <h1 className="text-lg font-bold mb-2">{task?.title}</h1>
+          <Instructions className="mb-4">{task?.instructions}</Instructions>
+          <SingleChoiceTasks
+            key={attempt?.attemptId ?? "new"}
+            questions={task?.questions_v2}
+            taskId={taskId}
+            attempt={attempt}
+          />
+        </>
       );
     case "gap_fill_shared":
       return (
-        <div>
-          <TaskHeader title={task?.title} instructions={task?.instructions} />
+        <>
+          <h1 className="text-lg font-bold mb-2">{task?.title}</h1>
+          <Instructions className="mb-4">{task?.instructions}</Instructions>
           <GapFillSharedTask
             key={attempt?.attemptId ?? "new"}
             taskId={taskId}
@@ -50,23 +54,59 @@ export function TaskPageContent({ taskId }: { taskId: string }) {
             questions={task?.questions_v2}
             attempt={attempt}
           />
-        </div>
+        </>
       );
     case "open_text":
       return (
-        <OpenTextTasks
-          taskId={taskId}
-          key={attempt?.attemptId ?? "new"}
-          title={task?.title}
-          instructions={task?.instructions}
-          questions={task?.questions_v2}
-          attempt={attempt}
-        />
+        <>
+          <h1 className="text-lg font-bold mb-2">{task?.title}</h1>
+          <Instructions className="mb-4">{task?.instructions}</Instructions>
+          <OpenTextTasks
+            taskId={taskId}
+            key={attempt?.attemptId ?? "new"}
+            questions={task?.questions_v2}
+            attempt={attempt}
+          />
+        </>
       );
     case "writing":
       return (
-        <div>
-          <TaskHeader title={task?.title} instructions={task?.instructions} />
+        <>
+          <h1 className="text-lg font-bold mb-4">{task?.title}</h1>
+          <Instructions className="mb-4">
+            <p className="mb-4">{task?.instructions}</p>
+            <ul>
+              {task?.content.requirements?.map((requirement) => (
+                <li className="list-disc list-inside ml-4" key={requirement}>
+                  {requirement}
+                </li>
+              ))}
+            </ul>
+          </Instructions>
+          <div className="border border-gray-200 p-4 rounded-lg">
+            <p className="font-semibold mb-4">Kryteria oceniania</p>
+            <ul className="flex flex-wrap gap-4">
+              <Criterion
+                name="długość wypowiedzi"
+                criterion={`min. ${task?.content.minWords} słów, max. ${task?.content.maxWords} słów`}
+              />
+              {task?.content.rubric?.map((rubric) => (
+                <Criterion
+                  key={rubric.name}
+                  name={rubric.name}
+                  criterion={`${rubric.weight} punktów`}
+                />
+              ))}
+            </ul>
+          </div>
+
+          <div className="border border-orange-200 bg-orange-50 p-4 rounded-lg my-4">
+            <div className="bg-orange-200 px-2 py-1 rounded-md mb-2 w-fit">
+              <p className="font-semibold text-sm text-orange-700">Zadanie</p>
+            </div>
+            <p className="font-semibold">{task?.content.openingText}</p>
+          </div>
+
           <WritingTask
             key={attempt?.attemptId ?? "new"}
             taskId={taskId}
@@ -75,11 +115,10 @@ export function TaskPageContent({ taskId }: { taskId: string }) {
             maxWords={task?.content.maxWords ?? 0}
             requirements={task?.content.requirements ?? []}
             rubric={task?.content.rubric ?? []}
-            openingText={task?.content.openingText ?? ""}
             instructions={task?.instructions ?? ""}
             attempt={attempt}
           />
-        </div>
+        </>
       );
     default:
       return null;

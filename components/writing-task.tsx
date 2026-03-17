@@ -15,7 +15,6 @@ interface WritingTaskProps {
   maxWords: number;
   requirements: string[];
   rubric: RubricItem[];
-  openingText: string;
 }
 
 export default function WritingTask({
@@ -27,7 +26,6 @@ export default function WritingTask({
   maxWords,
   requirements,
   rubric,
-  openingText,
 }: WritingTaskProps) {
   const { mutate: gradeEssay } = useGradeEssay(taskId);
   const { mutate: deleteAttempt } = useDeleteAttempt(taskId);
@@ -68,26 +66,7 @@ export default function WritingTask({
   };
 
   return (
-    <div className="flex flex-col gap-4">
-      <ul>
-        {requirements?.map((requirement) => (
-          <li className="list-disc list-inside" key={requirement}>
-            {requirement}
-          </li>
-        ))}
-      </ul>
-      Oceniane są
-      <ul>
-        <li className="list-disc list-inside">
-          długość wypowiedzi (min. {minWords} słów, max. {maxWords} słów)
-        </li>
-        {rubric?.map((rubric) => (
-          <li className="list-disc list-inside" key={rubric.name}>
-            {rubric.name} ({rubric.weight} punktów)
-          </li>
-        ))}
-      </ul>
-      <p className="font-bold">{openingText}</p>
+    <div className="flex flex-1 flex-col gap-4">
       <Textarea
         className="w-full h-[500px]"
         value={essay}
@@ -95,6 +74,25 @@ export default function WritingTask({
         disabled={Boolean(attempt?.attemptId)}
       />
       {error && <p className="text-red-500">{error}</p>}
+      {attempt?.grading && (
+        <div className="bg-green-100 p-2 rounded-md mb-2">
+          <p>
+            <span className="font-bold">Wynik:</span>{" "}
+            {attempt?.grading?.totalScore}
+          </p>
+          <ul>
+            {attempt?.grading?.missingPoints?.map((item) => (
+              <li className="list-disc list-inside" key={item}>
+                {item}
+              </li>
+            ))}
+          </ul>
+          <p>
+            <span className="font-bold">Podsumowanie:</span>{" "}
+            {attempt?.grading?.feedback}
+          </p>
+        </div>
+      )}
       <div className="flex justify-end gap-2">
         <Button
           variant="outline"
