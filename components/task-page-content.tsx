@@ -10,6 +10,8 @@ import { useAttempt } from "@/queries/useAttempt";
 import OpenTextTasks from "./open-text-tasks";
 import { Instructions } from "./instructions";
 import { Criterion } from "./criterion";
+import { TaskLabel } from "./task-label";
+import { formatPoints } from "@/lib/utils";
 
 export function TaskPageContent({ taskId }: { taskId: string }) {
   const { task, isLoading } = useTask({ taskId });
@@ -94,16 +96,14 @@ export function TaskPageContent({ taskId }: { taskId: string }) {
                 <Criterion
                   key={rubric.name}
                   name={rubric.name}
-                  criterion={`${rubric.weight} punktów`}
+                  criterion={formatPoints(rubric.weight)}
                 />
               ))}
             </ul>
           </div>
 
           <div className="border border-orange-200 bg-orange-50 p-4 rounded-lg my-4">
-            <div className="bg-orange-200 px-2 py-1 rounded-md mb-2 w-fit">
-              <p className="font-semibold text-sm text-orange-700">Zadanie</p>
-            </div>
+            <TaskLabel label="Zadanie" />
             <p className="font-semibold">{task?.content.openingText}</p>
           </div>
 

@@ -3,6 +3,7 @@
 import type { Option } from "@/models/task";
 import { Options } from "./options";
 import { Fragment } from "react/jsx-runtime";
+import { TaskLabel } from "./task-label";
 
 export function SingleChoiceTask({
   orderIndex,
@@ -25,7 +26,7 @@ export function SingleChoiceTask({
 }) {
   return (
     <div className="mb-8">
-      <h2 className="text-sm mb-1 font-bold">Przykład {orderIndex}</h2>
+      <TaskLabel label={`Przykład ${orderIndex}`} />
       {isIncorrect && (
         <p className="text-red-500 mb-2">Nieprawidłowa odpowiedź</p>
       )}

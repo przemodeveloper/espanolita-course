@@ -1,5 +1,6 @@
 "use client";
 
+import { TaskLabel } from "./task-label";
 import { Input } from "./ui/input";
 
 const GapFillInput = ({
@@ -48,7 +49,7 @@ export default function OpenTextTask({
 }) {
   return (
     <div>
-      <h2 className="text-sm mb-2 font-bold">Przykład {orderIndex}</h2>
+      <TaskLabel label={`Przykład ${orderIndex}`} />
       <div className="mb-4">
         {sentence && (
           <GapFillInput
