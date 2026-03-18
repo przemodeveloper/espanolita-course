@@ -48,7 +48,7 @@ export default function OpenTextTask({
   disabled: boolean;
 }) {
   return (
-    <div>
+    <div className="border border-gray-200 p-4 rounded-lg mb-8">
       <TaskLabel label={`Przykład ${orderIndex}`} />
       <div className="mb-4">
         {sentence && (
@@ -60,9 +60,7 @@ export default function OpenTextTask({
           />
         )}
       </div>
-      <div className="mb-4">
-        <p className="text-sm font-semibold">{keywords?.join(", ")}</p>
-      </div>
+      <p className="text-sm italic text-gray-500">{keywords?.join(", ")}</p>
     </div>
   );
 }

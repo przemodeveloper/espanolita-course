@@ -75,6 +75,9 @@ export default function SingleChoiceTasks({
           isIncorrect={Boolean(
             attempt?.incorrectQuestionIds?.includes(question.id),
           )}
+          isCorrect={Boolean(
+            attempt?.correctQuestionIds?.includes(question.id),
+          )}
           onChange={(optionId) => {
             handleSetAnswer(question.id, optionId);
           }}

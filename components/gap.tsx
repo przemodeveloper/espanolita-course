@@ -19,14 +19,14 @@ export default function Gap({
   return (
     <span
       ref={setNodeRef}
-      className={`mx-2 inline-flex min-w-[40px] items-center justify-center rounded-md border px-2 py-1 text-sm
+      className={`mx-2 inline-flex min-w-[40px] items-center justify-center rounded-md border border-gray-200 px-2 py-1 text-sm
         ${isOver ? "bg-muted" : "bg-background"} ${disabled ? "opacity-50" : ""}`}
     >
-      {value ?? "____"}
+      {value ?? <span className="text-gray-500">____</span>}
 
       {value && (
         <Button
-          variant="outline"
+          variant="ghost"
           size="xs"
           className={cn("ml-2", disabled && "opacity-50 pointer-events-none")}
           onClick={onRemoveAnswer}
