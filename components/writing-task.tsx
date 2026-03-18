@@ -67,12 +67,16 @@ export default function WritingTask({
 
   return (
     <div className="flex flex-1 flex-col gap-4">
-      <Textarea
-        className="w-full h-[500px]"
-        value={essay}
-        onChange={handleChangeEssay}
-        disabled={Boolean(attempt?.attemptId)}
-      />
+      <div className="border border-gray-200 p-4 rounded-lg">
+        <p className="font-semibold text-lg mb-4">Twoja odpowiedź</p>
+        <Textarea
+          className="w-full h-[500px] bg-gray-100 resize-none"
+          value={essay}
+          onChange={handleChangeEssay}
+          disabled={Boolean(attempt?.attemptId)}
+        />
+      </div>
+
       {error && <p className="text-red-500">{error}</p>}
       {attempt?.grading && (
         <div className="bg-green-100 p-2 rounded-md mb-2">
