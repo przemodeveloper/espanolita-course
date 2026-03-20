@@ -36,9 +36,6 @@ export async function POST(
 
       if (!task) throw new Error("Task not found");
 
-      // =====================================================
-      // QUESTION BASED TASKS
-      // =====================================================
       const answers: {
         questionId: string;
         optionId?: string;
@@ -47,6 +44,34 @@ export async function POST(
 
       if (!answers.length) {
         throw new Error("No answers provided");
+      }
+
+      // ---------------------------------
+      // VALIDATION
+      // ---------------------------------
+
+      // 1. No duplicate answers per question
+      const seen = new Set<string>();
+      for (const a of answers) {
+        if (seen.has(a.questionId)) {
+          throw new Error(`Duplicate answer for question ${a.questionId}`);
+        }
+        seen.add(a.questionId);
+      }
+
+      const isChoice =
+        task.type === "single_choice" || task.type === "gap_fill_shared";
+
+      const isOpenText =
+        task.type === "open_text" || task.type === "open_text_gaps";
+
+      // 2. Required fields
+      if (isChoice && !answers.every((a) => a.optionId)) {
+        throw new Error("Missing optionId for choice task");
+      }
+
+      if (isOpenText && !answers.every((a) => a.answerText !== undefined)) {
+        throw new Error("Missing answerText for open text task");
       }
 
       // ---------------------------------
@@ -74,7 +99,7 @@ export async function POST(
       const questionMap = new Map(questions.map((q) => [q.id, q]));
 
       // ---------------------------------
-      // Fetch options (choice tasks)
+      // Fetch options (choice)
       // ---------------------------------
       const optionIds = answers
         .map((a) => a.optionId)
@@ -93,19 +118,28 @@ export async function POST(
       // ---------------------------------
       // Fetch acceptable answers (open_text)
       // ---------------------------------
-      let acceptableMap = new Map<string, answers_v2[]>();
+      type AcceptableAnswer = answers_v2 & { compiled?: RegExp };
 
-      if (task.type === "open_text") {
+      let acceptableMap = new Map<string, AcceptableAnswer[]>();
+
+      if (isOpenText) {
         const acceptable = await tx.answers_v2.findMany({
           where: { question_id: { in: questionIds } },
         });
 
         acceptableMap = acceptable.reduce((map, a) => {
           const list = map.get(a.question_id) ?? [];
-          list.push(a);
+
+          list.push({
+            ...a,
+            compiled: a.regex_pattern
+              ? new RegExp(a.regex_pattern, "i")
+              : undefined,
+          });
+
           map.set(a.question_id, list);
           return map;
-        }, new Map<string, typeof acceptable>());
+        }, new Map<string, AcceptableAnswer[]>());
       }
 
       // ---------------------------------
@@ -119,30 +153,33 @@ export async function POST(
         let points = 0;
 
         // ================================
-        // single_choice + gap_fill_shared
+        // choice tasks
         // ================================
-        if (task.type === "single_choice" || task.type === "gap_fill_shared") {
+        if (isChoice) {
           isCorrect = option?.is_correct ?? false;
           points = isCorrect ? (q?.points ?? 1) : 0;
         }
 
         // ================================
-        // open_text (answers_v2 based)
+        // open text
         // ================================
-        if (task.type === "open_text") {
+        if (isOpenText) {
           const userRaw = a.answerText ?? "";
           const normalizedUser = normalize(userRaw);
 
           const acceptable = acceptableMap.get(a.questionId) ?? [];
 
+          if (!acceptable.length) {
+            console.warn(`No acceptable answers for question ${a.questionId}`);
+          }
+
           isCorrect = acceptable.some((ans) => {
-            if (ans.normalized_text) {
-              if (normalizedUser === ans.normalized_text) return true;
+            if (ans.normalized_text && normalizedUser === ans.normalized_text) {
+              return true;
             }
 
-            if (ans.regex_pattern) {
-              const regex = new RegExp(ans.regex_pattern, "i");
-              if (regex.test(userRaw)) return true;
+            if (ans.compiled?.test(normalizedUser)) {
+              return true;
             }
 
             return false;

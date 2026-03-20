@@ -12,6 +12,7 @@ import { Instructions } from "./instructions";
 import { Criterion } from "./criterion";
 import { TaskLabel } from "./task-label";
 import { formatPoints } from "@/lib/utils";
+import OpenTextGapsTask from "./open-text-gaps-task";
 
 export function TaskPageContent({ taskId }: { taskId: string }) {
   const { task, isLoading } = useTask({ taskId });
@@ -116,6 +117,20 @@ export function TaskPageContent({ taskId }: { taskId: string }) {
             requirements={task?.content.requirements ?? []}
             rubric={task?.content.rubric ?? []}
             instructions={task?.instructions ?? ""}
+            attempt={attempt}
+          />
+        </>
+      );
+    case "open_text_gaps":
+      return (
+        <>
+          <h1 className="text-lg font-bold mb-2">{task?.title}</h1>
+          <Instructions className="mb-4">{task?.instructions}</Instructions>
+          <OpenTextGapsTask
+            key={attempt?.attemptId ?? "new"}
+            taskId={taskId}
+            text={task?.content.text}
+            questions={task?.questions_v2}
             attempt={attempt}
           />
         </>

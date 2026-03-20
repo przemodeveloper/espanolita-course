@@ -4,7 +4,12 @@ export interface Task {
   id: string;
   title: string;
   instructions: string;
-  type: "single_choice" | "gap_fill_shared" | "open_text" | "writing";
+  type:
+    | "single_choice"
+    | "gap_fill_shared"
+    | "open_text"
+    | "writing"
+    | "open_text_gaps";
   questions_v2: Question[];
   sharedOptions?: Option[];
   content: {
