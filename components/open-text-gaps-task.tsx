@@ -1,6 +1,6 @@
 import type { Question } from "@/models/task";
 import { Input } from "./ui/input";
-import { useState } from "react";
+import { Fragment, useState } from "react";
 import type { Attempt } from "../models/attempt";
 import { useSubmitResponse } from "@/queries/useSubmitResponse";
 import { useDeleteAttempt } from "@/queries/useDeleteAttempt";
@@ -8,29 +8,22 @@ import { TaskSummary } from "./task-summary";
 import { TaskActions } from "./task-actions";
 
 const GapFillInput = ({
-  sentence,
   onChange,
   value,
   disabled,
 }: {
-  sentence: string;
   onChange: (answer: string) => void;
   value: string;
   disabled: boolean;
 }) => {
-  const parts = sentence?.split("______");
   return (
-    <span className="flex-1 text-wrap">
-      {parts[0]}{" "}
-      <Input
-        type="text"
-        className="w-[100px]"
-        onChange={(e) => onChange(e.target.value)}
-        value={value}
-        disabled={disabled}
-      />
-      {parts[1]}
-    </span>
+    <Input
+      type="text"
+      className="w-[100px]"
+      onChange={(e) => onChange(e.target.value)}
+      value={value}
+      disabled={disabled}
+    />
   );
 };
 
@@ -95,22 +88,20 @@ export default function OpenTextGapsTask({
   return (
     <div>
       <div className="mb-8">
-        {parts.map((part, index) => {
-          const question = sortedQuestions[index];
-          if (!question) return null;
-          return (
+        {sortedQuestions.map((question, index) => (
+          <Fragment key={question.id}>
+            <span className="text-wrap">{parts[index] ?? ""}</span>{" "}
             <GapFillInput
-              key={question.id}
-              sentence={part}
               onChange={(answer) => handleChangeAnswer(question.id, answer)}
               value={
-                answers.find((a) => a.questionId === question.id)?.answerText ??
-                ""
+                answers.find((a) => a.questionId === question.id)
+                  ?.answerText ?? ""
               }
               disabled={disabledInputs}
-            />
-          );
-        })}
+            />{" "}
+          </Fragment>
+        ))}
+        <span className="text-wrap">{parts[sortedQuestions.length] ?? ""}</span>
       </div>
       {attempt?.attemptId && <TaskSummary score={attempt.score} />}
       <TaskActions
