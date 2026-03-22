@@ -18,7 +18,7 @@ export async function GET(
 
   const { taskId } = await params;
 
-  const task = await prisma.tasks_v2.findUnique({
+  const task = await prisma.tasks.findUnique({
     where: { id: taskId },
     select: {
       id: true,
@@ -26,22 +26,22 @@ export async function GET(
       instructions: true,
       content: true,
       type: true,
-      task_set_items_v2: {
+      task_set_items: {
         take: 1,
         orderBy: { set_id: "asc" },
         select: {
           set_id: true,
-          task_sets_v2: { select: { title: true } },
+          task_sets: { select: { title: true } },
         },
       },
-      questions_v2: {
+      questions: {
         orderBy: { order_index: "asc" },
         select: {
           gap_index: true,
           id: true,
           order_index: true,
           prompt: true,
-          options_v2: {
+          options: {
             select: {
               id: true,
               label: true,
@@ -57,19 +57,19 @@ export async function GET(
     return NextResponse.json({ error: "Task not found" }, { status: 404 });
   }
 
-  const { task_set_items_v2, ...taskBase } = task;
-  const taskSetId = task_set_items_v2[0]?.set_id ?? null;
-  const taskSetTitle = task_set_items_v2[0]?.task_sets_v2?.title ?? null;
+  const { task_set_items, ...taskBase } = task;
+  const taskSetId = task_set_items[0]?.set_id ?? null;
+  const taskSetTitle = task_set_items[0]?.task_sets?.title ?? null;
 
   if (task.type === "gap_fill_shared") {
-    const sharedOptions = task.questions_v2[0]?.options_v2 ?? [];
+    const sharedOptions = task.questions[0]?.options ?? [];
 
     return NextResponse.json({
       ...taskBase,
       taskSetId,
       taskSetTitle,
       sharedOptions,
-      questions_v2: task.questions_v2.map((q) => ({
+      questions: task.questions.map((q) => ({
         id: q.id,
         gap_index: q.gap_index,
         order_index: q.order_index,
@@ -100,7 +100,7 @@ export async function POST(
 
   try {
     const result = await prisma.$transaction(async (tx) => {
-      const task = await tx.tasks_v2.findUnique({
+      const task = await tx.tasks.findUnique({
         where: { id: taskId },
         select: { type: true },
       });
@@ -113,7 +113,7 @@ export async function POST(
       if (task.type === "writing") {
         const answerText: string = body.answerText ?? "";
 
-        const attempt = await tx.task_attempts_v2.create({
+        const attempt = await tx.task_attempts.create({
           data: {
             task_id: taskId,
             user_id: user.id,
@@ -142,7 +142,7 @@ export async function POST(
 
       if (!answers.length) throw new Error("No answers provided");
 
-      const attempt = await tx.task_attempts_v2.create({
+      const attempt = await tx.task_attempts.create({
         data: {
           task_id: taskId,
           user_id: user.id,
@@ -162,20 +162,20 @@ export async function POST(
         // single choice / gap fill
         // -------------------------
         if (a.optionId) {
-          const option = await tx.options_v2.findUnique({
+          const option = await tx.options.findUnique({
             where: { id: a.optionId },
-            include: { questions_v2: true },
+            include: { questions: true },
           });
 
           isCorrect = option?.is_correct ?? false;
-          points = isCorrect ? (option?.questions_v2.points ?? 1) : 0;
+          points = isCorrect ? (option?.questions.points ?? 1) : 0;
         }
 
         // -------------------------
         // open text
         // -------------------------
         if (a.answerText) {
-          const q = await tx.questions_v2.findUnique({
+          const q = await tx.questions.findUnique({
             where: { id: a.questionId },
           });
 
@@ -197,11 +197,11 @@ export async function POST(
         });
       }
 
-      await tx.student_answers_v2.createMany({ data: rows });
+      await tx.student_answers.createMany({ data: rows });
 
       const total = rows.reduce((s, r) => s + r.points_awarded, 0);
 
-      await tx.task_attempts_v2.update({
+      await tx.task_attempts.update({
         where: { id: attempt.id },
         data: { score: total },
       });

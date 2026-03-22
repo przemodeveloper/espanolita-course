@@ -1,7 +1,7 @@
 import { type NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
-import type { answers_v2, options_v2 } from "@prisma/client";
+import type { answers, options } from "@prisma/client";
 
 function normalize(text: string) {
   return text.trim().toLowerCase().replace(/\s+/g, " ");
@@ -29,7 +29,7 @@ export async function POST(
       // ---------------------------------
       // Get task
       // ---------------------------------
-      const task = await tx.tasks_v2.findUnique({
+      const task = await tx.tasks.findUnique({
         where: { id: taskId },
         select: { type: true },
       });
@@ -77,7 +77,7 @@ export async function POST(
       // ---------------------------------
       // Create attempt
       // ---------------------------------
-      const attempt = await tx.task_attempts_v2.create({
+      const attempt = await tx.task_attempts.create({
         data: {
           task_id: taskId,
           user_id: user.id,
@@ -92,7 +92,7 @@ export async function POST(
       // ---------------------------------
       // Fetch questions
       // ---------------------------------
-      const questions = await tx.questions_v2.findMany({
+      const questions = await tx.questions.findMany({
         where: { id: { in: questionIds } },
       });
 
@@ -105,10 +105,10 @@ export async function POST(
         .map((a) => a.optionId)
         .filter(Boolean) as string[];
 
-      let optionMap = new Map<string, options_v2>();
+      let optionMap = new Map<string, options>();
 
       if (optionIds.length) {
-        const options = await tx.options_v2.findMany({
+        const options = await tx.options.findMany({
           where: { id: { in: optionIds } },
         });
 
@@ -118,12 +118,12 @@ export async function POST(
       // ---------------------------------
       // Fetch acceptable answers (open_text)
       // ---------------------------------
-      type AcceptableAnswer = answers_v2 & { compiled?: RegExp };
+      type AcceptableAnswer = answers & { compiled?: RegExp };
 
       let acceptableMap = new Map<string, AcceptableAnswer[]>();
 
       if (isOpenText) {
-        const acceptable = await tx.answers_v2.findMany({
+        const acceptable = await tx.answers.findMany({
           where: { question_id: { in: questionIds } },
         });
 
@@ -203,14 +203,14 @@ export async function POST(
       // ---------------------------------
       // Save answers
       // ---------------------------------
-      await tx.student_answers_v2.createMany({ data: rows });
+      await tx.student_answers.createMany({ data: rows });
 
       // ---------------------------------
       // Score
       // ---------------------------------
       const score = rows.reduce((sum, r) => sum + r.points_awarded, 0);
 
-      await tx.task_attempts_v2.update({
+      await tx.task_attempts.update({
         where: { id: attempt.id },
         data: { score },
       });

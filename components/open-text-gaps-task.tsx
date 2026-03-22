@@ -29,11 +29,13 @@ const GapFillInput = ({
 
 export default function OpenTextGapsTask({
   text,
+  title,
   questions,
   attempt,
   taskId,
 }: {
   text: string;
+  title?: string;
   questions: Question[];
   attempt?: Attempt | null;
   taskId: string;
@@ -87,6 +89,7 @@ export default function OpenTextGapsTask({
 
   return (
     <div>
+      {title && <h2 className="text-lg text-center font-bold mb-2">{title}</h2>}
       <div className="mb-8">
         {sortedQuestions.map((question, index) => (
           <Fragment key={question.id}>
@@ -94,8 +97,8 @@ export default function OpenTextGapsTask({
             <GapFillInput
               onChange={(answer) => handleChangeAnswer(question.id, answer)}
               value={
-                answers.find((a) => a.questionId === question.id)
-                  ?.answerText ?? ""
+                answers.find((a) => a.questionId === question.id)?.answerText ??
+                ""
               }
               disabled={disabledInputs}
             />{" "}

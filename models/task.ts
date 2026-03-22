@@ -12,10 +12,11 @@ export interface Task {
     | "open_text"
     | "writing"
     | "open_text_gaps";
-  questions_v2: Question[];
+  questions: Question[];
   sharedOptions?: Option[];
   content: {
-    text: string;
+    text?: string;
+    title?: string;
     language?: string;
     maxScore?: number;
     minWords?: number;
@@ -35,7 +36,7 @@ export interface Question {
     sentence?: string;
     keywords?: string[];
   };
-  options_v2: Option[];
+  options: Option[];
 }
 
 export interface Option {

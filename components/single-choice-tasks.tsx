@@ -10,10 +10,14 @@ import { TaskSummary } from "./task-summary";
 import { TaskActions } from "./task-actions";
 
 export default function SingleChoiceTasks({
+  text,
+  title,
   questions,
   taskId,
   attempt,
 }: {
+  text?: string;
+  title?: string;
   questions: Question[];
   taskId: string;
   attempt?: Attempt | null;
@@ -62,6 +66,8 @@ export default function SingleChoiceTasks({
 
   return (
     <div>
+      {title && <h2 className="text-lg text-center font-bold mb-2">{title}</h2>}
+      {text && <p className="mb-4">{text}</p>}
       {questions?.map((question) => (
         <SingleChoiceTask
           value={
@@ -69,7 +75,7 @@ export default function SingleChoiceTasks({
               ?.optionId || ""
           }
           key={question.id}
-          options={question.options_v2}
+          options={question.options}
           prompt={question.prompt}
           orderIndex={question.order_index}
           isIncorrect={Boolean(

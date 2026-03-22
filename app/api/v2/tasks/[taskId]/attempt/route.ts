@@ -19,7 +19,7 @@ export async function GET(
 
   const { taskId } = await params;
 
-  const task = await prisma.tasks_v2.findUnique({
+  const task = await prisma.tasks.findUnique({
     where: { id: taskId },
     select: { type: true },
   });
@@ -28,14 +28,14 @@ export async function GET(
     return NextResponse.json({ error: "Task not found" }, { status: 404 });
   }
 
-  const attempt = await prisma.task_attempts_v2.findFirst({
+  const attempt = await prisma.task_attempts.findFirst({
     where: {
       user_id: user.id,
       task_id: taskId,
     },
     orderBy: { created_at: "desc" },
     include: {
-      student_answers_v2: {
+      student_answers: {
         select: {
           question_id: true,
           option_id: true,
@@ -73,12 +73,12 @@ export async function GET(
   // (single_choice / gap_fill_shared / open_text / open_text_gaps)
   // =====================================================
 
-  const answersRaw = attempt.student_answers_v2;
+  const answersRaw = attempt.student_answers;
 
   // OPTIONAL: ensure stable order (recommended for gaps)
   const questionOrder = new Map(
     (
-      await prisma.questions_v2.findMany({
+      await prisma.questions.findMany({
         where: {
           id: { in: answersRaw.map((a) => a.question_id) },
         },
@@ -137,7 +137,7 @@ export async function DELETE(
 
   const { taskId } = await params;
 
-  const latestAttempt = await prisma.task_attempts_v2.findFirst({
+  const latestAttempt = await prisma.task_attempts.findFirst({
     where: {
       task_id: taskId,
       user_id: user.id,
@@ -150,7 +150,7 @@ export async function DELETE(
     return NextResponse.json({ success: true });
   }
 
-  await prisma.task_attempts_v2.deleteMany({
+  await prisma.task_attempts.deleteMany({
     where: {
       id: latestAttempt.id,
       user_id: user.id,

@@ -51,9 +51,11 @@ export function TaskPageContent({ taskId }: { taskId: string }) {
           <Instructions className="mb-4">{task?.instructions}</Instructions>
           <SingleChoiceTasks
             key={attempt?.attemptId ?? "new"}
-            questions={task?.questions_v2}
+            questions={task?.questions}
             taskId={taskId}
             attempt={attempt}
+            text={task?.content.text}
+            title={task?.content.title}
           />
         </>
       );
@@ -66,9 +68,9 @@ export function TaskPageContent({ taskId }: { taskId: string }) {
           <GapFillSharedTask
             key={attempt?.attemptId ?? "new"}
             taskId={taskId}
-            text={task?.content.text}
+            text={task?.content?.text ?? ""}
             options={task?.sharedOptions}
-            questions={task?.questions_v2}
+            questions={task?.questions}
             attempt={attempt}
           />
         </>
@@ -82,7 +84,7 @@ export function TaskPageContent({ taskId }: { taskId: string }) {
           <OpenTextTasks
             taskId={taskId}
             key={attempt?.attemptId ?? "new"}
-            questions={task?.questions_v2}
+            questions={task?.questions}
             attempt={attempt}
           />
         </>
@@ -146,8 +148,9 @@ export function TaskPageContent({ taskId }: { taskId: string }) {
           <OpenTextGapsTask
             key={attempt?.attemptId ?? "new"}
             taskId={taskId}
-            text={task?.content.text}
-            questions={task?.questions_v2}
+            title={task?.content?.title}
+            text={task?.content?.text ?? ""}
+            questions={task?.questions}
             attempt={attempt}
           />
         </>

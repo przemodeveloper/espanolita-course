@@ -13,7 +13,7 @@ export async function GET() {
   }
 
   // latest attempt per task
-  const attempts = await prisma.task_attempts_v2.findMany({
+  const attempts = await prisma.task_attempts.findMany({
     where: { user_id: user.id },
     orderBy: { created_at: "desc" },
     distinct: ["task_id"], // only latest
@@ -25,17 +25,15 @@ export async function GET() {
 
   const completedTaskIds = new Set(
     attempts
-      .filter(
-        (a) => a.status === "graded" || a.status === "submitted",
-      )
+      .filter((a) => a.status === "graded" || a.status === "submitted")
       .map((a) => a.task_id),
   );
 
-  const items = await prisma.task_set_items_v2.findMany({
+  const items = await prisma.task_set_items.findMany({
     select: {
       set_id: true,
       task_id: true,
-      task_sets_v2: { select: { title: true } },
+      task_sets: { select: { title: true } },
     },
   });
 
@@ -45,7 +43,7 @@ export async function GET() {
     let entry = bySet.get(row.set_id);
     if (!entry) {
       entry = {
-        title: row.task_sets_v2.title,
+        title: row.task_sets.title,
         taskIds: new Set(),
       };
       bySet.set(row.set_id, entry);

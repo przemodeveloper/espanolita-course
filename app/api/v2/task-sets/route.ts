@@ -12,18 +12,18 @@ export async function GET() {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
-  const sets = await prisma.task_sets_v2.findMany({
+  const sets = await prisma.task_sets.findMany({
     orderBy: { title: "asc" },
 
     select: {
       id: true,
       title: true,
 
-      task_set_items_v2: {
+      task_set_items: {
         orderBy: { order_index: "asc" },
 
         select: {
-          tasks_v2: {
+          tasks: {
             select: {
               id: true,
               title: true,
@@ -42,12 +42,12 @@ export async function GET() {
     id: set.id,
     title: set.title,
 
-    tasks: set.task_set_items_v2.map((i) => ({
-      id: i.tasks_v2.id,
-      title: i.tasks_v2.title,
+    tasks: set.task_set_items.map((i) => ({
+      id: i.tasks.id,
+      title: i.tasks.title,
     })),
 
-    tasksCount: set.task_set_items_v2.length,
+    tasksCount: set.task_set_items.length,
   }));
 
   return NextResponse.json(result);

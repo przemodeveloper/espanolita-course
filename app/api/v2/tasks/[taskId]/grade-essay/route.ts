@@ -50,7 +50,7 @@ export async function POST(
     const grading = JSON.parse(content);
 
     const result = await prisma.$transaction(async (tx) => {
-      const attempt = await tx.task_attempts_v2.create({
+      const attempt = await tx.task_attempts.create({
         data: {
           task_id: taskId,
           user_id: user.id,
@@ -69,12 +69,12 @@ export async function POST(
         },
       });
 
-      const question = await tx.questions_v2.findFirstOrThrow({
+      const question = await tx.questions.findFirstOrThrow({
         where: { task_id: taskId },
         select: { id: true },
       });
 
-      await tx.student_answers_v2.create({
+      await tx.student_answers.create({
         data: {
           attempt_id: attempt.id,
           user_id: user.id,
