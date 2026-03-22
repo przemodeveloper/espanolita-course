@@ -83,7 +83,7 @@ export async function POST(
           answer_text: body.essay,
           is_correct: null,
           points_awarded: grading.totalScore ?? 0,
-          answered_at: new Date(),
+          created_at: new Date(),
         },
       });
 

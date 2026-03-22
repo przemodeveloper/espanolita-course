@@ -196,7 +196,7 @@ export async function POST(
           answer_text: a.answerText ?? null,
           is_correct: isCorrect,
           points_awarded: points,
-          answered_at: new Date(),
+          created_at: new Date(),
         };
       });
 
