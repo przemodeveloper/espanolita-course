@@ -27,8 +27,9 @@ export default function WritingTask({
   requirements,
   rubric,
 }: WritingTaskProps) {
-  const { mutate: gradeEssay } = useGradeEssay(taskId);
-  const { mutate: deleteAttempt } = useDeleteAttempt(taskId);
+  const { mutate: gradeEssay, isPending: isSubmitting } = useGradeEssay(taskId);
+  const { mutate: deleteAttempt, isPending: isDeleting } =
+    useDeleteAttempt(taskId);
   const [essay, setEssay] = useState(() => attempt?.answerText ?? "");
   const [error, setError] = useState<string | null>(null);
 
@@ -100,17 +101,19 @@ export default function WritingTask({
       <div className="flex justify-end gap-2">
         <Button
           variant="outline"
-          disabled={Boolean(attempt?.attemptId)}
+          disabled={Boolean(attempt?.attemptId) || isSubmitting || isDeleting}
           onClick={handleGradeEssay}
         >
-          Sprawdź wypracowanie
+          {isSubmitting ? "Sprawdzam wypracowanie..." : "Sprawdź wypracowanie"}
         </Button>
         <Button
           variant="outline"
           onClick={handleResetEssay}
-          disabled={Boolean(!attempt?.attemptId) || !essay}
+          disabled={
+            Boolean(!attempt?.attemptId) || !essay || isSubmitting || isDeleting
+          }
         >
-          Zresetuj wypracowanie
+          {isDeleting ? "Resetuję wypracowanie..." : "Zresetuj wypracowanie"}
         </Button>
       </div>
     </div>
