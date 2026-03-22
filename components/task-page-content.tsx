@@ -13,14 +13,26 @@ import { Criterion } from "./criterion";
 import { TaskLabel } from "./task-label";
 import { formatPoints } from "@/lib/utils";
 import OpenTextGapsTask from "./open-text-gaps-task";
+import TaskSetProgressBar from "./task-set-progress-bar";
+import { useProgress } from "@/queries/useProgress";
 
 export function TaskPageContent({ taskId }: { taskId: string }) {
   const { task, isLoading } = useTask({ taskId });
   const { attempt } = useAttempt(taskId);
 
+  const { progress } = useProgress(task?.taskSetId ?? "");
+
   useLayoutEffect(() => {
     document.title = `${task?.title} - Kurs maturalny Españolita`;
   }, [task]);
+
+  const completedTasksCount = task?.taskSetId
+    ? (progress?.taskSets?.[task.taskSetId]?.completedTasksCount ?? 0)
+    : 0;
+
+  const totalTasksCount = task?.taskSetId
+    ? (progress?.taskSets?.[task.taskSetId]?.totalTasksCount ?? 0)
+    : 0;
 
   if (isLoading) {
     return (
@@ -30,9 +42,10 @@ export function TaskPageContent({ taskId }: { taskId: string }) {
     );
   }
 
+  let taskBody: React.ReactNode;
   switch (task?.type) {
     case "single_choice":
-      return (
+      taskBody = (
         <>
           <h1 className="text-lg font-bold mb-2">{task?.title}</h1>
           <Instructions className="mb-4">{task?.instructions}</Instructions>
@@ -44,8 +57,9 @@ export function TaskPageContent({ taskId }: { taskId: string }) {
           />
         </>
       );
+      break;
     case "gap_fill_shared":
-      return (
+      taskBody = (
         <>
           <h1 className="text-lg font-bold mb-2">{task?.title}</h1>
           <Instructions className="mb-4">{task?.instructions}</Instructions>
@@ -59,8 +73,9 @@ export function TaskPageContent({ taskId }: { taskId: string }) {
           />
         </>
       );
+      break;
     case "open_text":
-      return (
+      taskBody = (
         <>
           <h1 className="text-lg font-bold mb-2">{task?.title}</h1>
           <Instructions className="mb-4">{task?.instructions}</Instructions>
@@ -72,8 +87,9 @@ export function TaskPageContent({ taskId }: { taskId: string }) {
           />
         </>
       );
+      break;
     case "writing":
-      return (
+      taskBody = (
         <>
           <h1 className="text-lg font-bold mb-4">{task?.title}</h1>
           <Instructions className="mb-4">
@@ -121,8 +137,9 @@ export function TaskPageContent({ taskId }: { taskId: string }) {
           />
         </>
       );
+      break;
     case "open_text_gaps":
-      return (
+      taskBody = (
         <>
           <h1 className="text-lg font-bold mb-2">{task?.title}</h1>
           <Instructions className="mb-4">{task?.instructions}</Instructions>
@@ -135,7 +152,19 @@ export function TaskPageContent({ taskId }: { taskId: string }) {
           />
         </>
       );
+      break;
     default:
       return null;
   }
+
+  return (
+    <>
+      <TaskSetProgressBar
+        taskSetTitle={task.taskSetTitle ?? ""}
+        completedTasksCount={completedTasksCount}
+        totalTasksCount={totalTasksCount}
+      />
+      {taskBody}
+    </>
+  );
 }

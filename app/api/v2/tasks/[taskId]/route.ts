@@ -26,6 +26,14 @@ export async function GET(
       instructions: true,
       content: true,
       type: true,
+      task_set_items_v2: {
+        take: 1,
+        orderBy: { set_id: "asc" },
+        select: {
+          set_id: true,
+          task_sets_v2: { select: { title: true } },
+        },
+      },
       questions_v2: {
         orderBy: { order_index: "asc" },
         select: {
@@ -49,11 +57,17 @@ export async function GET(
     return NextResponse.json({ error: "Task not found" }, { status: 404 });
   }
 
+  const { task_set_items_v2, ...taskBase } = task;
+  const taskSetId = task_set_items_v2[0]?.set_id ?? null;
+  const taskSetTitle = task_set_items_v2[0]?.task_sets_v2?.title ?? null;
+
   if (task.type === "gap_fill_shared") {
     const sharedOptions = task.questions_v2[0]?.options_v2 ?? [];
 
     return NextResponse.json({
-      ...task,
+      ...taskBase,
+      taskSetId,
+      taskSetTitle,
       sharedOptions,
       questions_v2: task.questions_v2.map((q) => ({
         id: q.id,
@@ -64,7 +78,7 @@ export async function GET(
     });
   }
 
-  return NextResponse.json(task);
+  return NextResponse.json({ ...taskBase, taskSetId, taskSetTitle });
 }
 
 export async function POST(

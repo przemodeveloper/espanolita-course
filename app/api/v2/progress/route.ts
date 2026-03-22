@@ -19,22 +19,56 @@ export async function GET() {
     distinct: ["task_id"], // only latest
     select: {
       task_id: true,
-      id: true,
-      score: true,
       status: true,
     },
   });
 
-  const progress = Object.fromEntries(
-    attempts.map((a) => [
-      a.task_id,
-      {
-        completed: a.status === "graded" || a.status === "submitted",
-        score: a.score,
-        attemptId: a.id,
-      },
-    ]),
+  const completedTaskIds = new Set(
+    attempts
+      .filter(
+        (a) => a.status === "graded" || a.status === "submitted",
+      )
+      .map((a) => a.task_id),
   );
 
-  return NextResponse.json(progress);
+  const items = await prisma.task_set_items_v2.findMany({
+    select: {
+      set_id: true,
+      task_id: true,
+      task_sets_v2: { select: { title: true } },
+    },
+  });
+
+  const bySet = new Map<string, { title: string; taskIds: Set<string> }>();
+
+  for (const row of items) {
+    let entry = bySet.get(row.set_id);
+    if (!entry) {
+      entry = {
+        title: row.task_sets_v2.title,
+        taskIds: new Set(),
+      };
+      bySet.set(row.set_id, entry);
+    }
+    entry.taskIds.add(row.task_id);
+  }
+
+  const taskSets = Object.fromEntries(
+    [...bySet.entries()].map(([setId, { title, taskIds }]) => {
+      const ids = [...taskIds];
+      const completedTasks = ids.filter((id) => completedTaskIds.has(id));
+      return [
+        setId,
+        {
+          taskSetId: setId,
+          title,
+          completedTasks,
+          totalTasksCount: ids.length,
+          completedTasksCount: completedTasks.length,
+        },
+      ];
+    }),
+  );
+
+  return NextResponse.json({ taskSets });
 }

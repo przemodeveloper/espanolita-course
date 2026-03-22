@@ -4,6 +4,8 @@ export interface Task {
   id: string;
   title: string;
   instructions: string;
+  taskSetId?: string | null;
+  taskSetTitle: string;
   type:
     | "single_choice"
     | "gap_fill_shared"
