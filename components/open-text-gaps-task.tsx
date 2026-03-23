@@ -106,7 +106,9 @@ export default function OpenTextGapsTask({
         ))}
         <span className="text-wrap">{parts[sortedQuestions.length] ?? ""}</span>
       </div>
-      {attempt?.attemptId && <TaskSummary score={attempt.score} />}
+      {attempt?.attemptId && (
+        <TaskSummary score={attempt.score} className="mb-4" />
+      )}
       <TaskActions
         onSubmit={handleSubmitAnswers}
         onReset={handleResetAnswers}

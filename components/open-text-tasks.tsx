@@ -69,7 +69,9 @@ export default function OpenTextTasks({
           onChange={(answerText) => handleChangeAnswer(question.id, answerText)}
         />
       ))}
-      {attempt?.attemptId && <TaskSummary score={attempt.score} />}
+      {attempt?.attemptId && (
+        <TaskSummary score={attempt.score} className="mb-4" />
+      )}
       <TaskActions
         onSubmit={handleSubmitAnswers}
         onReset={handleResetAnswers}

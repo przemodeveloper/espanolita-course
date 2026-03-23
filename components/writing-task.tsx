@@ -80,7 +80,7 @@ export default function WritingTask({
 
       {error && <p className="text-red-500">{error}</p>}
       {attempt?.grading && (
-        <div className="bg-green-100 p-2 rounded-md mb-2">
+        <div className="bg-green-50 border border-green-200 p-2 rounded-md mb-2">
           <p>
             <span className="font-bold">Wynik:</span>{" "}
             {attempt?.grading?.totalScore}

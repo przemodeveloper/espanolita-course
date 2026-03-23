@@ -175,7 +175,9 @@ export function GapFillSharedTask({
               />
             ))}
           </div>
-          {attempt?.attemptId && <TaskSummary score={attempt.score} />}
+          {attempt?.attemptId && (
+            <TaskSummary score={attempt.score} className="mb-4" />
+          )}
           <TaskActions
             onSubmit={handleSubmitAnswers}
             onReset={resetAnswers}

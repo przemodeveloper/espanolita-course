@@ -90,7 +90,9 @@ export default function SingleChoiceTasks({
           disabled={Boolean(attempt?.attemptId) || isSubmitting || isDeleting}
         />
       ))}
-      {attempt?.attemptId && <TaskSummary score={attempt.score} />}
+      {attempt?.attemptId && (
+        <TaskSummary score={attempt.score} className="mb-4" />
+      )}
       <TaskActions
         onSubmit={handleSubmitAnswers}
         onReset={handleResetAnswers}
