@@ -1,5 +1,10 @@
 import type { RubricItem } from "./grading";
 
+export interface HeadingItem {
+  text: string;
+  label: string;
+}
+
 export interface Task {
   id: string;
   title: string;
@@ -11,10 +16,12 @@ export interface Task {
     | "gap_fill_shared"
     | "open_text"
     | "writing"
-    | "open_text_gaps";
+    | "open_text_gaps"
+    | "heading_match";
   questions: Question[];
   sharedOptions?: Option[];
   content: {
+    headings?: HeadingItem[];
     text?: string;
     title?: string;
     language?: string;
@@ -30,10 +37,12 @@ export interface Task {
 export interface Question {
   id: string;
   order_index: number;
-  gap_index: number;
+  gap_index: number | null;
   prompt: {
     lines?: string[];
     sentence?: string;
+    text?: string;
+    section?: string;
     keywords?: string[];
   };
   options: Option[];

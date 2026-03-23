@@ -13,6 +13,7 @@ import { Criterion } from "./criterion";
 import { TaskLabel } from "./task-label";
 import { formatPoints } from "@/lib/utils";
 import OpenTextGapsTask from "./open-text-gaps-task";
+import { HeadingMatchTask } from "./heading-match-task";
 import TaskSetProgressBar from "./task-set-progress-bar";
 import { useProgress } from "@/queries/useProgress";
 
@@ -151,6 +152,21 @@ export function TaskPageContent({ taskId }: { taskId: string }) {
             title={task?.content?.title}
             text={task?.content?.text ?? ""}
             questions={task?.questions}
+            attempt={attempt}
+          />
+        </>
+      );
+      break;
+    case "heading_match":
+      taskBody = (
+        <>
+          <h1 className="text-lg font-bold mb-2">{task?.title}</h1>
+          <Instructions className="mb-4">{task?.instructions}</Instructions>
+          <HeadingMatchTask
+            key={attempt?.attemptId ?? "new"}
+            taskId={taskId}
+            headings={task?.content?.headings ?? []}
+            questions={task?.questions ?? []}
             attempt={attempt}
           />
         </>

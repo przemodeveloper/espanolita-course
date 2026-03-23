@@ -65,6 +65,8 @@ export async function POST(
       const isOpenText =
         task.type === "open_text" || task.type === "open_text_gaps";
 
+      const isHeadingMatch = task.type === "heading_match";
+
       // 2. Required fields
       if (isChoice && !answers.every((a) => a.optionId)) {
         throw new Error("Missing optionId for choice task");
@@ -72,6 +74,10 @@ export async function POST(
 
       if (isOpenText && !answers.every((a) => a.answerText !== undefined)) {
         throw new Error("Missing answerText for open text task");
+      }
+
+      if (isHeadingMatch && !answers.every((a) => a.answerText !== undefined)) {
+        throw new Error("Missing answerText for heading match task");
       }
 
       // ---------------------------------
@@ -116,7 +122,7 @@ export async function POST(
       }
 
       // ---------------------------------
-      // Fetch acceptable answers (open_text)
+      // Fetch acceptable answers (open_text only)
       // ---------------------------------
       type AcceptableAnswer = answers & { compiled?: RegExp };
 
@@ -161,6 +167,24 @@ export async function POST(
         }
 
         // ================================
+        // heading match (letter vs questions.correct_key)
+        // ================================
+        if (isHeadingMatch) {
+          const userRaw = a.answerText ?? "";
+          const normalizedUser = normalize(userRaw);
+          const key = q?.correct_key;
+
+          if (key != null && key !== "") {
+            isCorrect = normalize(key) === normalizedUser;
+          } else {
+            console.warn(`Missing correct_key for question ${a.questionId}`);
+            isCorrect = false;
+          }
+
+          points = isCorrect ? (q?.points ?? 1) : 0;
+        }
+
+        // ================================
         // open text
         // ================================
         if (isOpenText) {
@@ -169,21 +193,32 @@ export async function POST(
 
           const acceptable = acceptableMap.get(a.questionId) ?? [];
 
-          if (!acceptable.length) {
-            console.warn(`No acceptable answers for question ${a.questionId}`);
+          if (acceptable.length) {
+            isCorrect = acceptable.some((ans) => {
+              if (
+                ans.normalized_text &&
+                normalizedUser === ans.normalized_text
+              ) {
+                return true;
+              }
+
+              if (ans.compiled?.test(normalizedUser)) {
+                return true;
+              }
+
+              return false;
+            });
+          } else {
+            const key = q?.correct_key;
+            if (key != null && key !== "") {
+              isCorrect = normalize(key) === normalizedUser;
+            } else {
+              console.warn(
+                `No acceptable answers for question ${a.questionId}`,
+              );
+              isCorrect = false;
+            }
           }
-
-          isCorrect = acceptable.some((ans) => {
-            if (ans.normalized_text && normalizedUser === ans.normalized_text) {
-              return true;
-            }
-
-            if (ans.compiled?.test(normalizedUser)) {
-              return true;
-            }
-
-            return false;
-          });
 
           points = isCorrect ? (q?.points ?? 1) : 0;
         }

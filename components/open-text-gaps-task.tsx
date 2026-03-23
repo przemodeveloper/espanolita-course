@@ -43,7 +43,9 @@ export default function OpenTextGapsTask({
   const parts = text.split("______");
 
   const sortedQuestions = [...questions].sort(
-    (a, b) => a.gap_index - b.gap_index || a.order_index - b.order_index,
+    (a, b) =>
+      (a.gap_index ?? 0) - (b.gap_index ?? 0) ||
+      a.order_index - b.order_index,
   );
 
   const [answers, setAnswers] = useState<

@@ -26,7 +26,7 @@ function buildInitialAnswers(
 
   for (const a of attempt.answers) {
     const gap = questionIdToGap.get(a.questionId);
-    if (gap !== undefined) {
+    if (gap !== undefined && gap !== null) {
       initial[gap] = a.optionId ?? null;
     }
   }
