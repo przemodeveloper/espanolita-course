@@ -4,6 +4,8 @@ import "./globals.css";
 import { CourseContext } from "@/context/course-context";
 import { NavbarContainer } from "@/components/navbar-container";
 import { NotificationContextProvider } from "@/context/notification-context";
+import { Analytics } from "@vercel/analytics/next";
+import { SpeedInsights } from "@vercel/speed-insights/next";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -38,6 +40,8 @@ export default function RootLayout({
             <main className="flex-1 pt-[73px]">{children}</main>
           </NotificationContextProvider>
         </CourseContext>
+        <Analytics />
+        <SpeedInsights />
       </body>
     </html>
   );
