@@ -6,6 +6,7 @@ import LoadingSpinner from "./loading-spinner";
 import WritingTask from "./writing-task";
 import SingleChoiceTasks from "./single-choice-tasks";
 import { useLayoutEffect } from "react";
+import { useParams } from "next/navigation";
 import { useAttempt } from "@/queries/useAttempt";
 import OpenTextTasks from "./open-text-tasks";
 import { Instructions } from "./instructions";
@@ -18,32 +19,30 @@ import TaskSetProgressBar from "./task-set-progress-bar";
 import { useProgress } from "@/queries/useProgress";
 
 export function TaskPageContent({ taskId }: { taskId: string }) {
-  const { task, isLoading } = useTask({ taskId });
+  const params = useParams<{ taskSetId: string }>();
+  const taskSetIdFromRoute = params.taskSetId ?? "";
+
+  const { task, isPending } = useTask({ taskId });
   const { attempt } = useAttempt(taskId);
 
-  const { progress } = useProgress(task?.taskSetId ?? "");
+  const { progress } = useProgress(taskSetIdFromRoute);
 
   useLayoutEffect(() => {
     document.title = `${task?.title} - Kurs maturalny Españolita`;
   }, [task]);
 
-  const completedTasksCount = task?.taskSetId
-    ? (progress?.taskSets?.[task.taskSetId]?.completedTasksCount ?? 0)
+  const completedTasksCount = taskSetIdFromRoute
+    ? (progress?.taskSets?.[taskSetIdFromRoute]?.completedTasksCount ?? 0)
     : 0;
 
-  const totalTasksCount = task?.taskSetId
-    ? (progress?.taskSets?.[task.taskSetId]?.totalTasksCount ?? 0)
+  const totalTasksCount = taskSetIdFromRoute
+    ? (progress?.taskSets?.[taskSetIdFromRoute]?.totalTasksCount ?? 0)
     : 0;
 
-  if (isLoading) {
-    return (
-      <div className="flex justify-center items-center h-screen w-full">
-        <LoadingSpinner />
-      </div>
-    );
-  }
+  const taskSetTitle =
+    task?.taskSetTitle ?? progress?.taskSets?.[taskSetIdFromRoute]?.title ?? "";
 
-  let taskBody: React.ReactNode;
+  let taskBody: React.ReactNode = null;
   switch (task?.type) {
     case "single_choice":
       taskBody = (
@@ -173,17 +172,24 @@ export function TaskPageContent({ taskId }: { taskId: string }) {
       );
       break;
     default:
-      return null;
+      taskBody = null;
+      break;
   }
 
   return (
     <>
       <TaskSetProgressBar
-        taskSetTitle={task.taskSetTitle ?? ""}
+        taskSetTitle={taskSetTitle}
         completedTasksCount={completedTasksCount}
         totalTasksCount={totalTasksCount}
       />
-      {taskBody}
+      {isPending ? (
+        <div className="flex justify-center items-center min-h-[50vh] w-full">
+          <LoadingSpinner />
+        </div>
+      ) : (
+        taskBody
+      )}
     </>
   );
 }

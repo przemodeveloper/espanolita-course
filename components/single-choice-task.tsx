@@ -28,7 +28,7 @@ export function SingleChoiceTask({
   disabled: boolean;
 }) {
   return (
-    <div className="mb-8 border border-gray-200 p-4 rounded-lg">
+    <div className="border border-gray-200 p-4 rounded-lg">
       <div className="flex items-center gap-2">
         <TaskLabel label={`Przykład ${orderIndex}`} />
         {isIncorrect && (

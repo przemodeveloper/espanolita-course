@@ -68,28 +68,31 @@ export default function SingleChoiceTasks({
     <div>
       {title && <h2 className="text-lg text-center font-bold mb-2">{title}</h2>}
       {text && <p className="mb-4">{text}</p>}
-      {questions?.map((question) => (
-        <SingleChoiceTask
-          value={
-            answers?.find((answer) => answer.questionId === question.id)
-              ?.optionId || ""
-          }
-          key={question.id}
-          options={question.options}
-          prompt={question.prompt}
-          orderIndex={question.order_index}
-          isIncorrect={Boolean(
-            attempt?.incorrectQuestionIds?.includes(question.id),
-          )}
-          isCorrect={Boolean(
-            attempt?.correctQuestionIds?.includes(question.id),
-          )}
-          onChange={(optionId) => {
-            handleSetAnswer(question.id, optionId);
-          }}
-          disabled={Boolean(attempt?.attemptId) || isSubmitting || isDeleting}
-        />
-      ))}
+      <div className="space-y-4 mb-4">
+        {questions?.map((question) => (
+          <SingleChoiceTask
+            value={
+              answers?.find((answer) => answer.questionId === question.id)
+                ?.optionId || ""
+            }
+            key={question.id}
+            options={question.options}
+            prompt={question.prompt}
+            orderIndex={question.order_index}
+            isIncorrect={Boolean(
+              attempt?.incorrectQuestionIds?.includes(question.id),
+            )}
+            isCorrect={Boolean(
+              attempt?.correctQuestionIds?.includes(question.id),
+            )}
+            onChange={(optionId) => {
+              handleSetAnswer(question.id, optionId);
+            }}
+            disabled={Boolean(attempt?.attemptId) || isSubmitting || isDeleting}
+          />
+        ))}
+      </div>
+
       {attempt?.attemptId && (
         <TaskSummary score={attempt.score} className="mb-4" />
       )}

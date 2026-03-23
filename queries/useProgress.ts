@@ -9,6 +9,7 @@ export const useProgress = (taskSetId: string) => {
       const response = await getProgress();
       return response;
     },
+    enabled: Boolean(taskSetId),
     staleTime: Infinity,
   });
   return {

@@ -48,7 +48,7 @@ export default function OpenTextTask({
   disabled: boolean;
 }) {
   return (
-    <div className="border border-gray-200 p-4 rounded-lg mb-8">
+    <div className="border border-gray-200 p-4 rounded-lg">
       <TaskLabel label={`Przykład ${orderIndex}`} />
       <div className="mb-4">
         {sentence && (

@@ -177,69 +177,67 @@ export function HeadingMatchTask({
 
   return (
     <DndContext onDragEnd={handleDragEnd}>
-      <div className="space-y-6">
-        <div className="space-y-5">
-          {sortedQuestions.map((question) => {
-            const label = assignments[question.id];
-            const headingText = label ? (labelToText.get(label) ?? null) : null;
+      <div className="space-y-4 mb-4">
+        {sortedQuestions.map((question) => {
+          const label = assignments[question.id];
+          const headingText = label ? (labelToText.get(label) ?? null) : null;
 
-            return (
-              <div
-                key={question.id}
-                className="rounded-xl border border-gray-200/80 bg-white p-4 shadow-sm"
-              >
-                <div className="flex flex-col gap-4 md:gap-6">
-                  <HeadingSectionSlot
-                    questionId={question.id}
-                    label={label}
-                    headingText={headingText}
-                    disabled={disabled}
-                    onRemove={() =>
-                      setAssignments((prev) => ({
-                        ...prev,
-                        [question.id]: null,
-                      }))
-                    }
-                  />
-                  <div className="min-w-0 flex-1 space-y-2">
-                    <p className="leading-relaxed text-foreground">
-                      {question.prompt.text}
-                    </p>
-                  </div>
+          return (
+            <div
+              key={question.id}
+              className="rounded-xl border border-gray-200 bg-white p-4 shadow-sm"
+            >
+              <div className="flex flex-col gap-4 md:gap-6">
+                <HeadingSectionSlot
+                  questionId={question.id}
+                  label={label}
+                  headingText={headingText}
+                  disabled={disabled}
+                  onRemove={() =>
+                    setAssignments((prev) => ({
+                      ...prev,
+                      [question.id]: null,
+                    }))
+                  }
+                />
+                <div className="min-w-0 flex-1 space-y-2">
+                  <p className="leading-relaxed text-foreground">
+                    {question.prompt.text}
+                  </p>
                 </div>
               </div>
-            );
-          })}
-        </div>
-
-        <div className="space-y-3">
-          <div className="flex flex-wrap gap-3">
-            {availableHeadings.map((h) => (
-              <DraggableOption
-                key={headingDragId(h.label)}
-                option={{
-                  id: headingDragId(h.label),
-                  label: h.label,
-                  text: h.text,
-                }}
-                disabled={disabled}
-              />
-            ))}
-          </div>
-        </div>
-
-        {attempt?.attemptId && (
-          <TaskSummary score={attempt.score} className="mb-4" />
-        )}
-        <TaskActions
-          onSubmit={handleSubmit}
-          onReset={handleReset}
-          isSubmitting={isSubmitting}
-          isDeleting={isDeleting}
-          attemptId={attempt?.attemptId ?? null}
-          disabled={!allFilled}
-        />
+            </div>
+          );
+        })}
       </div>
+
+      <div className="space-y-4 mb-4">
+        <div className="flex flex-wrap gap-3">
+          {availableHeadings.map((h) => (
+            <DraggableOption
+              key={headingDragId(h.label)}
+              option={{
+                id: headingDragId(h.label),
+                label: h.label,
+                text: h.text,
+              }}
+              disabled={disabled}
+            />
+          ))}
+        </div>
+      </div>
+
+      {attempt?.attemptId && (
+        <TaskSummary score={attempt.score} className="mb-4" />
+      )}
+      <TaskActions
+        onSubmit={handleSubmit}
+        onReset={handleReset}
+        isSubmitting={isSubmitting}
+        isDeleting={isDeleting}
+        attemptId={attempt?.attemptId ?? null}
+        disabled={!allFilled}
+      />
     </DndContext>
   );
 }

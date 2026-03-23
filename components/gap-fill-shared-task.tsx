@@ -163,32 +163,30 @@ export function GapFillSharedTask({
           </p>
         </div>
 
-        <div className="max-w-3xl space-y-4">
-          <div className="flex flex-wrap gap-3">
-            {availableOptions.map((option) => (
-              <DraggableOption
-                key={option.id}
-                option={option}
-                disabled={
-                  Boolean(attempt?.attemptId) || isSubmitting || isDeleting
-                }
-              />
-            ))}
-          </div>
-          {attempt?.attemptId && (
-            <TaskSummary score={attempt.score} className="mb-4" />
-          )}
-          <TaskActions
-            onSubmit={handleSubmitAnswers}
-            onReset={resetAnswers}
-            isSubmitting={isSubmitting}
-            isDeleting={isDeleting}
-            attemptId={attempt?.attemptId ?? null}
-            disabled={
-              Object.values(answers).filter(Boolean).length !== questions.length
-            }
-          />
+        <div className="flex flex-wrap gap-3 mb-4">
+          {availableOptions.map((option) => (
+            <DraggableOption
+              key={option.id}
+              option={option}
+              disabled={
+                Boolean(attempt?.attemptId) || isSubmitting || isDeleting
+              }
+            />
+          ))}
         </div>
+        {attempt?.attemptId && (
+          <TaskSummary score={attempt.score} className="mb-4" />
+        )}
+        <TaskActions
+          onSubmit={handleSubmitAnswers}
+          onReset={resetAnswers}
+          isSubmitting={isSubmitting}
+          isDeleting={isDeleting}
+          attemptId={attempt?.attemptId ?? null}
+          disabled={
+            Object.values(answers).filter(Boolean).length !== questions.length
+          }
+        />
       </div>
     </DndContext>
   );

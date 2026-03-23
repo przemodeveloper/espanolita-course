@@ -44,8 +44,7 @@ export default function OpenTextGapsTask({
 
   const sortedQuestions = [...questions].sort(
     (a, b) =>
-      (a.gap_index ?? 0) - (b.gap_index ?? 0) ||
-      a.order_index - b.order_index,
+      (a.gap_index ?? 0) - (b.gap_index ?? 0) || a.order_index - b.order_index,
   );
 
   const [answers, setAnswers] = useState<
@@ -92,7 +91,7 @@ export default function OpenTextGapsTask({
   return (
     <div>
       {title && <h2 className="text-lg text-center font-bold mb-2">{title}</h2>}
-      <div className="mb-8">
+      <div className="mb-4">
         {sortedQuestions.map((question, index) => (
           <Fragment key={question.id}>
             <span className="text-wrap">{parts[index] ?? ""}</span>{" "}

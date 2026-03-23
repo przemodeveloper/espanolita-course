@@ -1,5 +1,9 @@
 import { getTask } from "@/services/task.service";
-import { queryOptions, useQuery } from "@tanstack/react-query";
+import {
+  keepPreviousData,
+  queryOptions,
+  useQuery,
+} from "@tanstack/react-query";
 import { QUERY_KEYS } from "./consts";
 import { useCourseContext } from "@/context/course-context";
 
@@ -19,6 +23,7 @@ export const useTask = ({
       return response;
     },
     enabled: enabled && Boolean(taskId),
+    placeholderData: keepPreviousData,
     staleTime: Infinity,
   });
 
@@ -36,7 +41,7 @@ export const useTask = ({
 
   return {
     task: query.data,
-    isLoading: query.isLoading,
+    isPending: query.isPending,
     query,
     prefetchQuery,
   };
