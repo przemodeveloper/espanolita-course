@@ -37,7 +37,7 @@ export default function RootLayout({
         <CourseContext>
           <NotificationContextProvider>
             <NavbarContainer />
-            <main className="flex-1 pt-[73px]">{children}</main>
+            <main className="flex-1 pt-[64px]">{children}</main>
           </NotificationContextProvider>
         </CourseContext>
         <Analytics />

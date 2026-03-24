@@ -56,12 +56,12 @@
    Tailwind theme bridge
 ================================ */
 @theme inline {
-  --color-background: rgb(var(--background));
-  --color-foreground: rgb(var(--foreground));
-  --color-muted: rgb(var(--muted));
-  --color-muted-foreground: rgb(var(--muted-foreground));
-  --color-border: rgb(var(--border));
-  --color-accent: rgb(var(--accent));
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-border: var(--border);
+  --color-accent: var(--accent);
 
   --font-sans: var(--font-sans);
   --font-mono: var(--font-mono);
@@ -114,8 +114,8 @@ body {
 }
 
 body {
-  background-color: rgb(var(--background));
-  color: rgb(var(--foreground));
+  background-color: var(--background);
+  color: var(--foreground);
   font-family: var(--font-sans);
   line-height: 1.5;
   -webkit-font-smoothing: antialiased;
@@ -151,7 +151,7 @@ video {
 }
 
 .focus-ring:focus-visible {
-  outline: 2px solid rgb(var(--accent));
+  outline: 2px solid var(--accent);
   outline-offset: 2px;
 }
 
