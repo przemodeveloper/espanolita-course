@@ -171,6 +171,7 @@ export function SignupForm({ ...props }: React.ComponentProps<typeof Card>) {
                   render={() => (
                     <Turnstile
                       sitekey={process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY!}
+                      theme="light"
                       onVerify={(token) =>
                         setValue("turnstileToken", token, {
                           shouldValidate: true,

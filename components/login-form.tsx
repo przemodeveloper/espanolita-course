@@ -102,6 +102,8 @@ export function LoginForm({ ...props }: React.ComponentProps<typeof Card>) {
                   render={() => (
                     <Turnstile
                       sitekey={process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY!}
+                      appearance="interaction-only"
+                      theme="light"
                       onVerify={(token) =>
                         setValue("turnstileToken", token, {
                           shouldValidate: true,
