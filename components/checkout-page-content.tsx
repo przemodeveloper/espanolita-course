@@ -8,7 +8,7 @@ import { useCheckout } from "@/queries/useCheckout";
 const benefits = [
   {
     title: "Dostęp na zawsze",
-    description: "Dostęp do kursu na zawsze.",
+    description: "Dostęp do arkusza i zadań bonusowych na zawsze.",
   },
   {
     title: "12 zadań",
