@@ -23,7 +23,7 @@ const benefits = [
 ];
 
 export function CheckoutPageContent() {
-  const { mutateAsync } = useCheckout();
+  const { mutate } = useCheckout();
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -95,7 +95,7 @@ export function CheckoutPageContent() {
 
               <Button
                 className="w-full rounded-xl text-base py-6"
-                onClick={() => mutateAsync()}
+                onClick={() => mutate()}
               >
                 Kup Zadania Maturalne Españolita
               </Button>
