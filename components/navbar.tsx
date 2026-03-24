@@ -79,7 +79,7 @@ export function Navbar({ user }: { user: User | null }) {
           )}
           {!isAuthenticated && (
             <Link href="/checkout" className={linkClass("/checkout")}>
-              Zakup kursu
+              Zakup zadań maturalnych
             </Link>
           )}
           {isAuthenticated && (
@@ -155,7 +155,7 @@ export function Navbar({ user }: { user: User | null }) {
                     className={cn("font-semibold", linkClass("/checkout"))}
                     onClick={closeMobile}
                   >
-                    Zakup kursu
+                    Zakup zadań maturalnych
                   </Link>
                 )}
                 {isAuthenticated && (
