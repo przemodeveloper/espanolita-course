@@ -125,6 +125,10 @@ export function LoginForm({ ...props }: React.ComponentProps<typeof Card>) {
                     Zaloguj się
                   </Button>
                   <FieldDescription className="px-6 text-center">
+                    Nie pamiętasz hasła?{" "}
+                    <Link href="/forgot-password">Zresetuj hasło</Link>
+                  </FieldDescription>
+                  <FieldDescription className="px-6 text-center">
                     Nie masz jeszcze konta?{" "}
                     <Link href="/register">Zarejestruj się</Link>
                   </FieldDescription>
