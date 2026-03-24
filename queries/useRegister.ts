@@ -12,12 +12,14 @@ export const useRegister = () => {
       lastName,
       email,
       password,
+      turnstileToken,
     }: {
       firstName: string;
       lastName: string;
       email: string;
       password: string;
-    }) => register(firstName, lastName, email, password),
+      turnstileToken: string;
+    }) => register(firstName, lastName, email, password, turnstileToken),
     onSuccess: () => {
       notify(
         "Rejestracja zakończona pomyślnie! Możesz się teraz zalogować.",

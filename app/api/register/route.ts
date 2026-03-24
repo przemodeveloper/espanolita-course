@@ -1,9 +1,27 @@
 import { NextResponse } from "next/server";
 import { supabaseAdmin } from "@/lib/supabase/admin";
 
+async function verifyTurnstile(token: string): Promise<boolean> {
+  const res = await fetch(
+    "https://challenges.cloudflare.com/turnstile/v0/siteverify",
+    {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        secret: process.env.TURNSTILE_SECRET_KEY,
+        response: token,
+      }),
+    },
+  );
+
+  const data = await res.json();
+  return data.success === true;
+}
+
 export async function POST(req: Request) {
   try {
-    const { firstName, lastName, email, password } = await req.json();
+    const { firstName, lastName, email, password, turnstileToken } =
+      await req.json();
 
     // Validation
     if (!firstName || !lastName || !email || !password) {
@@ -17,6 +35,22 @@ export async function POST(req: Request) {
       return NextResponse.json(
         { error: "Password must be at least 8 characters." },
         { status: 400 },
+      );
+    }
+
+    // Verify Turnstile before any DB work
+    if (!turnstileToken) {
+      return NextResponse.json(
+        { error: "Security check token is missing." },
+        { status: 400 },
+      );
+    }
+
+    const isHuman = await verifyTurnstile(turnstileToken);
+    if (!isHuman) {
+      return NextResponse.json(
+        { error: "Security check failed. Please try again." },
+        { status: 403 },
       );
     }
 

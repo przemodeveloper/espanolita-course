@@ -17,19 +17,22 @@ import {
 } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
 import { useRegister } from "@/queries/useRegister";
-import { useForm } from "react-hook-form";
+import { Controller, useForm } from "react-hook-form";
 import type { Inputs } from "@/models/signupForm";
 import Link from "next/link";
 import { motion } from "motion/react";
+import Turnstile from "react-turnstile";
 
 export function SignupForm({ ...props }: React.ComponentProps<typeof Card>) {
-  const { mutateAsync: register } = useRegister();
+  const { mutate: register, isPending } = useRegister();
 
   const {
     register: registerForm,
     handleSubmit: handleSubmitForm,
     formState: { errors, isValid },
     getValues,
+    control,
+    setValue,
   } = useForm<Inputs>({
     mode: "onChange",
     defaultValues: {
@@ -38,15 +41,17 @@ export function SignupForm({ ...props }: React.ComponentProps<typeof Card>) {
       email: "",
       password: "",
       confirmPassword: "",
+      turnstileToken: "",
     },
   });
 
-  const handleSubmitFormHandler = async (data: Inputs) => {
-    await register({
+  const handleSubmitFormHandler = (data: Inputs) => {
+    register({
       firstName: data.firstName.trim(),
       lastName: data.lastName.trim(),
       email: data.email.trim(),
       password: data.password.trim(),
+      turnstileToken: data.turnstileToken,
     });
   };
 
@@ -158,9 +163,32 @@ export function SignupForm({ ...props }: React.ComponentProps<typeof Card>) {
                   }
                 />
               </Field>
+              <Field>
+                <Controller
+                  name="turnstileToken"
+                  control={control}
+                  rules={{ required: true }}
+                  render={() => (
+                    <Turnstile
+                      sitekey={process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY!}
+                      onVerify={(token) =>
+                        setValue("turnstileToken", token, {
+                          shouldValidate: true,
+                        })
+                      }
+                      onExpire={() =>
+                        setValue("turnstileToken", "", { shouldValidate: true })
+                      }
+                      onError={() =>
+                        setValue("turnstileToken", "", { shouldValidate: true })
+                      }
+                    />
+                  )}
+                />
+              </Field>
               <FieldGroup>
                 <Field>
-                  <Button type="submit" disabled={!isValid}>
+                  <Button type="submit" disabled={!isValid || isPending}>
                     Utwórz konto
                   </Button>
                   <FieldDescription className="px-6 text-center">

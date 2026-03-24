@@ -5,8 +5,15 @@ import { useRouter } from "next/navigation";
 export const useLogin = () => {
   const router = useRouter();
   const mutation = useMutation({
-    mutationFn: ({ email, password }: { email: string; password: string }) =>
-      login(email, password),
+    mutationFn: ({
+      email,
+      password,
+      turnstileToken,
+    }: {
+      email: string;
+      password: string;
+      turnstileToken: string;
+    }) => login(email, password, turnstileToken),
     onSuccess: () => {
       router.push("/course");
       router.refresh();

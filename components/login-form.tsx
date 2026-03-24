@@ -16,31 +16,36 @@ import {
   FieldLabel,
 } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
-import { useForm } from "react-hook-form";
+import { Controller, useForm } from "react-hook-form";
 import type { Inputs } from "@/models/loginForm";
 import Link from "next/link";
 import { motion } from "motion/react";
 import { useLogin } from "@/queries/useLogin";
+import Turnstile from "react-turnstile";
 
 export function LoginForm({ ...props }: React.ComponentProps<typeof Card>) {
   const {
     register: registerForm,
     handleSubmit: handleSubmitForm,
     formState: { errors, isValid },
+    control,
+    setValue,
   } = useForm<Inputs>({
     mode: "onChange",
     defaultValues: {
       email: "",
       password: "",
+      turnstileToken: "",
     },
   });
 
-  const { mutateAsync, isPending } = useLogin();
+  const { mutate, isPending } = useLogin();
 
-  const handleSubmitFormHandler = async (data: Inputs) => {
-    await mutateAsync({
+  const handleSubmitFormHandler = (data: Inputs) => {
+    mutate({
       email: data.email.trim(),
       password: data.password.trim(),
+      turnstileToken: data.turnstileToken,
     });
   };
 
@@ -88,6 +93,29 @@ export function LoginForm({ ...props }: React.ComponentProps<typeof Card>) {
                   })}
                 />
                 <FieldError errors={errors.password ? [errors.password] : []} />
+              </Field>
+              <Field>
+                <Controller
+                  name="turnstileToken"
+                  control={control}
+                  rules={{ required: true }}
+                  render={() => (
+                    <Turnstile
+                      sitekey={process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY!}
+                      onVerify={(token) =>
+                        setValue("turnstileToken", token, {
+                          shouldValidate: true,
+                        })
+                      }
+                      onExpire={() =>
+                        setValue("turnstileToken", "", { shouldValidate: true })
+                      }
+                      onError={() =>
+                        setValue("turnstileToken", "", { shouldValidate: true })
+                      }
+                    />
+                  )}
+                />
               </Field>
               <FieldGroup>
                 <Field>
