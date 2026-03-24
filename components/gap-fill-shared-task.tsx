@@ -133,7 +133,7 @@ export function GapFillSharedTask({
     <DndContext onDragEnd={handleDragEnd}>
       <div className="space-y-6">
         <div className="flex items-center justify-between">
-          <p className="leading-relaxed text-muted-foreground">
+          <p className="leading-relaxed">
             {parts.map((part, index) => {
               if (index === parts.length - 1) return part;
 

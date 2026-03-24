@@ -70,9 +70,7 @@ function HeadingSectionSlot({
           </Button>
         </div>
       ) : (
-        <span className="text-center text-muted-foreground">
-          Przeciągnij nagłówek
-        </span>
+        <span className="text-center">Przeciągnij nagłówek</span>
       )}
     </div>
   );
