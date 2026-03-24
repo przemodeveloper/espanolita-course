@@ -96,6 +96,7 @@ export function CheckoutPageContent() {
                 <li>✔ Dostęp na zawsze</li>
                 <li>✔ 12 zadań</li>
                 <li>✔ Zadania bonusowe</li>
+                <li>✔ Wsparcie AI przy pisaniu wypracowania</li>
               </ul>
 
               <Button
