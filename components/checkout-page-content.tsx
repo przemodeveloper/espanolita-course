@@ -11,13 +11,14 @@ const benefits = [
     description: "Dostęp do kursu na zawsze.",
   },
   {
-    title: "20 zadań",
+    title: "12 zadań",
     description:
-      "Kurs składa się z 20 zadań, które pomogą Ci zdać maturę z języka hiszpańskiego.",
+      "Arkusz składa się z 12 zadań, które pomogą Ci zdać maturę z języka hiszpańskiego.",
   },
   {
-    title: "Certyfikat",
-    description: "Po zakończeniu kursu otrzymasz certyfikat.",
+    title: "Zadania bonusowe",
+    description:
+      "Dostępne są również zadania bonusowe, które pomogą Ci dodatkowo przećwiczyć sprawdzić swoją wiedzę przed egzaminem.",
   },
 ];
 
@@ -34,7 +35,7 @@ export function CheckoutPageContent() {
           transition={{ duration: 0.6 }}
           className="text-4xl md:text-5xl font-bold mb-4"
         >
-          Kurs maturalny Españolita
+          Zadania Maturalne Españolita
         </motion.h1>
         <motion.p
           initial={{ opacity: 0, y: 20 }}
@@ -42,7 +43,7 @@ export function CheckoutPageContent() {
           transition={{ delay: 0.1, duration: 0.6 }}
           className="text-lg text-gray-600 max-w-2xl"
         >
-          Kup kurs maturalny Españolita i zacznij naukę już dziś.
+          Kup Zadania Maturalne Españolita i zacznij naukę już dziś.
         </motion.p>
       </section>
 
@@ -80,21 +81,23 @@ export function CheckoutPageContent() {
           <Card className="rounded-2xl shadow-lg">
             <CardContent className="p-6 space-y-6">
               <div>
-                <p className="text-sm text-gray-500">Dostęp do kursu</p>
-                <p className="text-3xl font-bold">799 zł</p>
+                <p className="text-sm text-gray-500">
+                  Dostęp do arkusza i zadań bonusowych
+                </p>
+                <p className="text-3xl font-bold">199 zł</p>
               </div>
 
               <ul className="space-y-3 text-sm text-gray-600">
                 <li>✔ Dostęp na zawsze</li>
-                <li>✔ 20 zadań</li>
-                <li>✔ Certyfikat</li>
+                <li>✔ 12 zadań</li>
+                <li>✔ Zadania bonusowe</li>
               </ul>
 
               <Button
                 className="w-full rounded-xl text-base py-6"
                 onClick={() => mutateAsync()}
               >
-                Kup kurs
+                Kup Zadania Maturalne Españolita
               </Button>
 
               <p className="text-xs text-center text-gray-400">

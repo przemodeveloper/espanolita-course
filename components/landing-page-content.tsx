@@ -25,18 +25,19 @@ export function LandingPageContent() {
           transition={{ duration: 0.6 }}
         >
           <h1 className="text-4xl md:text-5xl font-bold leading-tight">
-            Naucz się języka hiszpańskiego <br /> do matury z pewnością siebie
+            Przygotuj się do matury z pewnością siebie <br /> dzięki zadaniom
+            maturalnym Españolita
           </h1>
           <p className="mt-6 text-lg text-gray-600 max-w-xl">
-            Skuteczne przygotowanie do matury z języka hiszpańskiego — lekcje
-            wideo, arkusze maturalne i sprawdzona strategia nauki.
+            Skuteczne przygotowanie do matury z hiszpańskiego — wszystkie typy
+            zadań, które pojawią się na maturze.
           </p>
           <div className="mt-8 flex gap-4">
             <Button className="px-8 py-6 text-base rounded-xl">
-              Zacznij już dziś
+              <Link href="/checkout">Zacznij już dziś</Link>
             </Button>
             <Button variant="outline" className="px-8 py-6 rounded-xl">
-              Zobacz kurs
+              Nasze zadania
             </Button>
           </div>
         </motion.div>
@@ -167,8 +168,8 @@ export function LandingPageContent() {
                 Chcesz zdać maturę bez stresu?
               </h2>
               <p className="text-white/90 mb-8">
-                Dołącz do kursu i ucz się dokładnie tego, co pojawia się na
-                egzaminie.
+                Sprawdź nasze zadania i naucz się dokładnie tego, co pojawi się
+                na maturze.
               </p>
               <Link
                 href="/checkout"

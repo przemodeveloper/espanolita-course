@@ -3,12 +3,11 @@ import type { Metadata } from "next";
 import Link from "next/link";
 
 export const metadata: Metadata = {
-  title: "Płatność zakończona sukcesem - Kurs maturalny Españolita",
+  title: "Płatność zakończona sukcesem - Zadania Maturalne Españolita",
   description: "Płatność zakończona sukcesem.",
   keywords: [
-    "kurs maturalny",
+    "zadania maturalne",
     "hiszpański",
-    "matura",
     "españolita",
     "płatność",
     "sukces",

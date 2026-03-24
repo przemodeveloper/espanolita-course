@@ -3,15 +3,9 @@ import type { Metadata } from "next";
 import Link from "next/link";
 
 export const metadata: Metadata = {
-  title: "Brak dostępu - Kurs maturalny Españolita",
+  title: "Brak dostępu - Zadania Maturalne Españolita",
   description: "Brak dostępu do tej strony.",
-  keywords: [
-    "kurs maturalny",
-    "hiszpański",
-    "matura",
-    "españolita",
-    "brak dostępu",
-  ],
+  keywords: ["zadania maturalne", "hiszpański", "españolita", "brak dostępu"],
 };
 
 export default function UnauthorizedPage() {

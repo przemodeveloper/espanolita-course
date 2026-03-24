@@ -28,7 +28,7 @@ export function TaskPageContent({ taskId }: { taskId: string }) {
   const { progress } = useProgress(taskSetIdFromRoute);
 
   useLayoutEffect(() => {
-    document.title = `${task?.title} - Kurs maturalny Españolita`;
+    document.title = `${task?.title} - Zadania Maturalne Españolita`;
   }, [task]);
 
   const completedTasksCount = taskSetIdFromRoute

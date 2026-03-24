@@ -2,15 +2,9 @@ import { LoginForm } from "@/components/login-form";
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: "Logowanie - Kurs maturalny Españolita",
+  title: "Logowanie - Zadania Maturalne Españolita",
   description: "Zaloguj się do swojego konta, aby rozpocząć naukę.",
-  keywords: [
-    "kurs maturalny",
-    "hiszpański",
-    "matura",
-    "españolita",
-    "logowanie",
-  ],
+  keywords: ["zadania maturalne", "hiszpański", "españolita", "logowanie"],
 };
 
 export default function LoginPage() {
