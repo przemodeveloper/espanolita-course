@@ -20,6 +20,11 @@ const benefits = [
     description:
       "Dostępne są również zadania bonusowe, które pomogą Ci dodatkowo przećwiczyć sprawdzić swoją wiedzę przed egzaminem.",
   },
+  {
+    title: "Wsparcie AI przy pisaniu wypracowania",
+    description:
+      "Dostępne jest wsparcie AI przy pisaniu wypracowania, które pomogą Ci napisać wypracowanie w sposób sprawny i zrozumiały.",
+  },
 ];
 
 export function CheckoutPageContent() {
