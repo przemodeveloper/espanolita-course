@@ -6,6 +6,7 @@ import { NavbarContainer } from "@/components/navbar-container";
 import { NotificationContextProvider } from "@/context/notification-context";
 import { Analytics } from "@vercel/analytics/next";
 import { SpeedInsights } from "@vercel/speed-insights/next";
+import { Footer } from "@/components/footer";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -18,10 +19,9 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Kurs maturalny Españolita",
-  description:
-    "Kurs maturalny Españolita, zadania maturalne w języku hiszpańskim",
-  keywords: ["kurs maturalny", "hiszpański", "matura", "españolita", "zadania"],
+  title: "Matura Españolita",
+  description: "Matura Españolita, zadania maturalne w języku hiszpańskim",
+  keywords: ["matura", "hiszpański", "españolita", "zadania"],
 };
 
 export default function RootLayout({
@@ -38,6 +38,7 @@ export default function RootLayout({
           <NotificationContextProvider>
             <NavbarContainer />
             <main className="flex-1 pt-[64px]">{children}</main>
+            <Footer />
           </NotificationContextProvider>
         </CourseContext>
         <Analytics />
