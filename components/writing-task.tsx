@@ -98,7 +98,7 @@ export default function WritingTask({
           </p>
         </div>
       )}
-      <div className="flex justify-end gap-2">
+      <div className="flex flex-wrap justify-end gap-2">
         <Button
           variant="outline"
           disabled={Boolean(attempt?.attemptId) || isSubmitting || isDeleting}

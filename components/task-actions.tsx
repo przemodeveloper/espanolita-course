@@ -16,7 +16,7 @@ export function TaskActions({
   attemptId: string | null;
 }) {
   return (
-    <div className="flex justify-end gap-2">
+    <div className="flex flex-wrap justify-end gap-2">
       <Button
         onClick={onSubmit}
         disabled={disabled || Boolean(attemptId) || isSubmitting || isDeleting}
