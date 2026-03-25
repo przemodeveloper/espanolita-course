@@ -175,7 +175,7 @@ export function LandingPageContent() {
                 href="/checkout"
                 className="bg-white text-red-600 px-4 py-2 rounded-md hover:bg-red-700 hover:text-white transition-all duration-200"
               >
-                Przejdź do zakupu kursu
+                Przejdź do zakupu zadań maturalnych
               </Link>
             </CardContent>
           </Card>
