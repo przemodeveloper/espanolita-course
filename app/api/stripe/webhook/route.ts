@@ -60,6 +60,29 @@ export async function POST(req: Request) {
         },
       });
 
+      try {
+        const emailRes = await fetch(
+          `${process.env.NEXT_PUBLIC_SITE_URL}/api/thank-you`,
+          {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+              customerEmail: session.customer_details?.email,
+              customerName: session.customer_details?.name,
+              courseUrl: `${process.env.NEXT_PUBLIC_SITE_URL}/register`,
+            }),
+          },
+        );
+
+        if (!emailRes.ok) {
+          console.error("[Thank-you email] Failed:", await emailRes.text());
+        }
+      } catch (err) {
+        console.error("[Thank-you email] Threw:", err);
+      }
+
       console.log("✅ Purchase stored:", session.id);
       break;
     }
