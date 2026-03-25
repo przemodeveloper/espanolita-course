@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { prisma } from "@/lib/prisma";
 import { supabaseAdmin } from "@/lib/supabase/admin";
 
 async function verifyTurnstile(token: string): Promise<boolean> {
@@ -31,6 +32,8 @@ export async function POST(req: Request) {
       );
     }
 
+    const normalizedEmail = email.toLowerCase().trim();
+
     if (password.length < 8) {
       return NextResponse.json(
         { error: "Password must be at least 8 characters." },
@@ -54,25 +57,34 @@ export async function POST(req: Request) {
       );
     }
 
-    // 1️⃣ Check purchase exists & not claimed
-    const { data: purchase, error: purchaseError } = await supabaseAdmin
-      .from("purchases")
-      .select("*")
-      .eq("email", email)
-      .is("user_id", null)
-      .single();
+    // 1️⃣ Check purchase exists & not claimed (case-insensitive email)
+    const purchase = await prisma.purchases.findFirst({
+      where: {
+        email: { equals: normalizedEmail, mode: "insensitive" },
+      },
+    });
 
-    if (purchaseError || !purchase) {
+    if (!purchase) {
       return NextResponse.json(
         { error: "No valid purchase found for this email." },
         { status: 403 },
       );
     }
 
+    if (purchase.user_id) {
+      return NextResponse.json(
+        {
+          error:
+            "An account with this email already exists. Please sign in instead.",
+        },
+        { status: 409 },
+      );
+    }
+
     // 3️⃣ Create user
     const { data: authData, error: authError } =
       await supabaseAdmin.auth.admin.createUser({
-        email: email.toLowerCase().trim(),
+        email: normalizedEmail,
         password,
         email_confirm: true,
         user_metadata: {
@@ -85,6 +97,21 @@ export async function POST(req: Request) {
 
     if (authError) {
       console.error("Auth error:", authError);
+      const msg = authError.message.toLowerCase();
+      const duplicateEmail =
+        msg.includes("already been registered") ||
+        msg.includes("already registered") ||
+        msg.includes("user already exists") ||
+        msg.includes("duplicate");
+      if (duplicateEmail) {
+        return NextResponse.json(
+          {
+            error:
+              "An account with this email already exists. Please sign in instead.",
+          },
+          { status: 409 },
+        );
+      }
       return NextResponse.json({ error: authError.message }, { status: 400 });
     }
 
