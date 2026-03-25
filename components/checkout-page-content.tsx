@@ -23,7 +23,7 @@ const benefits = [
   {
     title: "Wsparcie AI przy pisaniu wypracowania",
     description:
-      "Dostępne jest wsparcie AI przy pisaniu wypracowania, które pomogą Ci napisać wypracowanie w sposób sprawny i zrozumiały.",
+      "Dostępne jest wsparcie AI przy pisaniu wypracowania, które pomoże Ci napisać wypracowanie w sposób sprawny i zrozumiały.",
   },
 ];
 
