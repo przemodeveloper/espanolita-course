@@ -22,7 +22,7 @@ export default function DraggableOption({
       style={style}
       {...listeners}
       {...attributes}
-      className={`flex items-center gap-2 cursor-grab rounded-lg bg-white border border-gray-200 p-2 shadow-sm hover:shadow-md ${disabled ? "opacity-50 pointer-events-none" : ""}`}
+      className={`flex touch-none items-center gap-2 cursor-grab rounded-lg bg-white border border-gray-200 p-2 shadow-sm hover:shadow-md active:cursor-grabbing ${disabled ? "opacity-50 pointer-events-none" : ""}`}
     >
       <strong className="text-lg inline-flex items-center justify-center rounded-full bg-orange-100 w-8 h-8 text-orange-700 leading-none font-semibold flex-shrink-0 text-xs">
         {option.label}

@@ -1,6 +1,12 @@
 "use client";
 
-import { DndContext, type DragEndEvent } from "@dnd-kit/core";
+import {
+  DndContext,
+  PointerSensor,
+  useSensor,
+  useSensors,
+  type DragEndEvent,
+} from "@dnd-kit/core";
 import { useDroppable } from "@dnd-kit/core";
 import { useMemo, useState } from "react";
 import DraggableOption from "./draggable-option";
@@ -119,6 +125,12 @@ export function HeadingMatchTask({
   const { mutate: deleteAttempt, isPending: isDeleting } =
     useDeleteAttempt(taskId);
 
+  const sensors = useSensors(
+    useSensor(PointerSensor, {
+      activationConstraint: { distance: 10 },
+    }),
+  );
+
   const [assignments, setAssignments] = useState<Record<string, string | null>>(
     () => buildInitialAssignments(sortedQuestions, attempt),
   );
@@ -174,7 +186,7 @@ export function HeadingMatchTask({
   );
 
   return (
-    <DndContext onDragEnd={handleDragEnd}>
+    <DndContext sensors={sensors} onDragEnd={handleDragEnd}>
       <div className="space-y-4 mb-4">
         {sortedQuestions.map((question) => {
           const label = assignments[question.id];

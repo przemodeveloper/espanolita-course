@@ -1,6 +1,12 @@
 "use client";
 
-import { DndContext, type DragEndEvent } from "@dnd-kit/core";
+import {
+  DndContext,
+  PointerSensor,
+  useSensor,
+  useSensors,
+  type DragEndEvent,
+} from "@dnd-kit/core";
 import { useMemo, useState } from "react";
 import DraggableOption from "./draggable-option";
 import Gap from "./gap";
@@ -51,6 +57,12 @@ export function GapFillSharedTask({
     useSubmitResponse(taskId);
   const { mutate: deleteAttempt, isPending: isDeleting } =
     useDeleteAttempt(taskId);
+
+  const sensors = useSensors(
+    useSensor(PointerSensor, {
+      activationConstraint: { distance: 10 },
+    }),
+  );
 
   const questionMap = useMemo(
     () => new Map(questions.map((q) => [q.gap_index, q.id])),
@@ -130,7 +142,7 @@ export function GapFillSharedTask({
     optionId ? (optionMap.get(optionId)?.text ?? null) : null;
 
   return (
-    <DndContext onDragEnd={handleDragEnd}>
+    <DndContext sensors={sensors} onDragEnd={handleDragEnd}>
       <div className="space-y-6">
         <div className="flex items-center justify-between">
           <p className="leading-relaxed">
