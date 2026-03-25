@@ -42,10 +42,12 @@ export async function POST(req: Request) {
     to: customerEmail.trim(),
     subject:
       "Dziękujemy za kupienie dostępu do zadań maturalnych Españolita! 🎉",
-    react: ThankYouEmail({
-      customerName: customerName?.trim() || "Kliencie",
-      courseUrl: courseUrl.trim(),
-    }),
+    react: (
+      <ThankYouEmail
+        customerName={customerName?.trim() || "Kliencie"}
+        courseUrl={courseUrl.trim()}
+      />
+    ),
   });
 
   if (error) {
