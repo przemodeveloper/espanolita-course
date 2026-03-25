@@ -107,7 +107,11 @@ export function CheckoutPageContent() {
               </Button>
 
               <p className="text-xs text-center text-gray-400">
-                14-dniowa gwarancja zwrotu pieniędzy
+                14-dniowa gwarancja zwrotu pieniędzy (obowiązują warunki i
+                regulamin)
+              </p>
+              <p className="text-xs text-center text-gray-400">
+                Dokonując zakupu akceptujesz warunki i regulamin.
               </p>
             </CardContent>
           </Card>
