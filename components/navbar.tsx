@@ -82,6 +82,13 @@ export function Navbar({ user }: { user: User | null }) {
               Zakup zadań maturalnych
             </Link>
           )}
+          <Link
+            href="https://espanolita.pl/kontakt/"
+            target="_blank"
+            className="text-sm font-medium transition-colors hover:text-foreground"
+          >
+            Kontakt
+          </Link>
           {isAuthenticated && (
             <Button variant="outline" size="sm" onClick={() => logout()}>
               Wyloguj się
