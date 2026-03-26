@@ -37,7 +37,7 @@ export function LandingPageContent() {
               <Link href="/checkout">Zacznij już dziś</Link>
             </Button>
             <Button variant="outline" className="px-8 py-6 rounded-xl">
-              Nasze zadania
+              <Link href="/our-tasks">Nasze zadania</Link>
             </Button>
           </div>
         </motion.div>
