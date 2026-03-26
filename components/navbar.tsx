@@ -78,28 +78,30 @@ export function Navbar({ user }: { user: User | null }) {
             </Link>
           )}
           {!isAuthenticated && (
-            <Link href="/checkout" className={linkClass("/checkout")}>
-              Zakup zadań maturalnych
-            </Link>
+            <>
+              <Link href="/checkout" className={linkClass("/checkout")}>
+                Zakup zadań maturalnych
+              </Link>
+              <Link href="/our-tasks" className={linkClass("/our-tasks")}>
+                Nasze zadania
+              </Link>
+              <Link
+                href="https://espanolita.pl/o-szkole/"
+                target="_blank"
+                className="text-sm font-medium transition-colors hover:text-foreground"
+              >
+                O nas
+              </Link>
+              <Link
+                href="https://espanolita.pl/kontakt/"
+                target="_blank"
+                className="text-sm font-medium transition-colors hover:text-foreground"
+              >
+                Kontakt
+              </Link>
+            </>
           )}
-          {!isAuthenticated && (
-            <Link
-              href="https://espanolita.pl/o-szkole/"
-              target="_blank"
-              className="text-sm font-medium transition-colors hover:text-foreground"
-            >
-              O nas
-            </Link>
-          )}
-          {!isAuthenticated && (
-            <Link
-              href="https://espanolita.pl/kontakt/"
-              target="_blank"
-              className="text-sm font-medium transition-colors hover:text-foreground"
-            >
-              Kontakt
-            </Link>
-          )}
+
           {isAuthenticated && (
             <Button variant="outline" size="sm" onClick={() => logout()}>
               Wyloguj się
@@ -168,14 +170,38 @@ export function Navbar({ user }: { user: User | null }) {
                   </Link>
                 )}
                 {!isAuthenticated && (
-                  <Link
-                    href="/checkout"
-                    className={cn("font-semibold", linkClass("/checkout"))}
-                    onClick={closeMobile}
-                  >
-                    Zakup zadań maturalnych
-                  </Link>
+                  <>
+                    <Link
+                      href="/checkout"
+                      className={cn("font-semibold", linkClass("/checkout"))}
+                      onClick={closeMobile}
+                    >
+                      Zakup zadań maturalnych
+                    </Link>
+                    <Link
+                      href="/our-tasks"
+                      className={linkClass("/our-tasks")}
+                      onClick={closeMobile}
+                    >
+                      Nasze zadania
+                    </Link>
+                    <Link
+                      href="https://espanolita.pl/o-szkole/"
+                      target="_blank"
+                      className="text-sm font-medium transition-colors hover:text-foreground"
+                    >
+                      O nas
+                    </Link>
+                    <Link
+                      href="https://espanolita.pl/kontakt/"
+                      target="_blank"
+                      className="text-sm font-medium transition-colors hover:text-foreground"
+                    >
+                      Kontakt
+                    </Link>
+                  </>
                 )}
+
                 {isAuthenticated && (
                   <Button
                     variant="outline"
