@@ -14,9 +14,12 @@ export async function POST(req: Request) {
 
     const supabase = await createSupabaseServerClient();
 
-    const { error } = await supabase.auth.resetPasswordForEmail(email, {
-      redirectTo: `${process.env.NEXT_PUBLIC_APP_URL}/api/confirm?next=/reset-password`,
-    });
+    const { error } = await supabase.auth.resetPasswordForEmail(
+      email.toLowerCase().trim(),
+      {
+        redirectTo: `${process.env.NEXT_PUBLIC_SITE_URL}/api/confirm?next=/reset-password`,
+      },
+    );
 
     if (error) console.error("Reset password error:", error);
 

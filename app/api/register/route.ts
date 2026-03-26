@@ -1,23 +1,7 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { supabaseAdmin } from "@/lib/supabase/admin";
-
-async function verifyTurnstile(token: string): Promise<boolean> {
-  const res = await fetch(
-    "https://challenges.cloudflare.com/turnstile/v0/siteverify",
-    {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        secret: process.env.TURNSTILE_SECRET_KEY,
-        response: token,
-      }),
-    },
-  );
-
-  const data = await res.json();
-  return data.success === true;
-}
+import { verifyTurnstile } from "@/lib/turnstile/verifyTurnstile";
 
 export async function POST(req: Request) {
   try {
@@ -27,7 +11,7 @@ export async function POST(req: Request) {
     // Validation
     if (!firstName || !lastName || !email || !password) {
       return NextResponse.json(
-        { error: "Email and password are required." },
+        { error: "Missing required fields." },
         { status: 400 },
       );
     }
