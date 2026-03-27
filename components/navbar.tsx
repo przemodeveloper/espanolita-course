@@ -79,13 +79,7 @@ export function Navbar({ user }: { user: User | null }) {
           )}
           {!isAuthenticated && (
             <>
-              <Link
-                href="/checkout"
-                className={cn(
-                  "border-2 border-red-500 rounded-md p-1",
-                  linkClass("/checkout"),
-                )}
-              >
+              <Link href="/checkout" className={linkClass("/checkout")}>
                 Zakup zadań maturalnych
               </Link>
               <Link href="/our-tasks" className={linkClass("/our-tasks")}>
@@ -179,10 +173,7 @@ export function Navbar({ user }: { user: User | null }) {
                   <>
                     <Link
                       href="/checkout"
-                      className={cn(
-                        "font-semibold border-2 border-red-500 rounded-md p-1",
-                        linkClass("/checkout"),
-                      )}
+                      className={linkClass("/checkout")}
                       onClick={closeMobile}
                     >
                       Zakup zadań maturalnych
