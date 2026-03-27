@@ -11,7 +11,7 @@ export const metadata: Metadata = {
 export default function UnauthorizedPage() {
   return (
     <div className="flex flex-col items-center justify-center h-screen">
-      <h1 className="text-2xl font-bold">Nie jesteś zalogowany</h1>
+      <h1 className="text-2xl font-semibold">Nie jesteś zalogowany</h1>
       <p className="text-lg text-muted-foreground mb-4">
         Aby uzyskać dostęp do tej strony, musisz się zalogować.
       </p>

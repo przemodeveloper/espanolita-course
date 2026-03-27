@@ -90,7 +90,9 @@ export default function OpenTextGapsTask({
 
   return (
     <div>
-      {title && <h2 className="text-lg text-center font-bold mb-2">{title}</h2>}
+      {title && (
+        <h2 className="text-lg text-center font-semibold mb-2">{title}</h2>
+      )}
       <div className="mb-4">
         {sortedQuestions.map((question, index) => (
           <Fragment key={question.id}>

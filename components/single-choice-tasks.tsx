@@ -66,7 +66,9 @@ export default function SingleChoiceTasks({
 
   return (
     <div>
-      {title && <h2 className="text-lg text-center font-bold mb-2">{title}</h2>}
+      {title && (
+        <h2 className="text-lg text-center font-semibold mb-2">{title}</h2>
+      )}
       {text && <p className="mb-4">{text}</p>}
       <div className="space-y-4 mb-4">
         {questions?.map((question) => (

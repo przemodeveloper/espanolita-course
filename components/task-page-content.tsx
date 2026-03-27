@@ -47,7 +47,7 @@ export function TaskPageContent({ taskId }: { taskId: string }) {
     case "single_choice":
       taskBody = (
         <>
-          <h1 className="text-lg font-bold mb-2">{task?.title}</h1>
+          <h1 className="text-lg font-semibold mb-2">{task?.title}</h1>
           <Instructions className="mb-4">{task?.instructions}</Instructions>
           <SingleChoiceTasks
             key={attempt?.attemptId ?? "new"}
@@ -63,7 +63,7 @@ export function TaskPageContent({ taskId }: { taskId: string }) {
     case "gap_fill_shared":
       taskBody = (
         <>
-          <h1 className="text-lg font-bold mb-2">{task?.title}</h1>
+          <h1 className="text-lg font-semibold mb-2">{task?.title}</h1>
           <Instructions className="mb-4">{task?.instructions}</Instructions>
           <GapFillSharedTask
             key={attempt?.attemptId ?? "new"}
@@ -79,7 +79,7 @@ export function TaskPageContent({ taskId }: { taskId: string }) {
     case "open_text":
       taskBody = (
         <>
-          <h1 className="text-lg font-bold mb-2">{task?.title}</h1>
+          <h1 className="text-lg font-semibold mb-2">{task?.title}</h1>
           <Instructions className="mb-4">{task?.instructions}</Instructions>
           <OpenTextTasks
             taskId={taskId}
@@ -93,7 +93,7 @@ export function TaskPageContent({ taskId }: { taskId: string }) {
     case "writing":
       taskBody = (
         <>
-          <h1 className="text-lg font-bold mb-4">{task?.title}</h1>
+          <h1 className="text-lg font-semibold mb-4">{task?.title}</h1>
           <Instructions className="mb-4">
             <p className="mb-4">{task?.instructions}</p>
             <ul>
@@ -143,7 +143,7 @@ export function TaskPageContent({ taskId }: { taskId: string }) {
     case "open_text_gaps":
       taskBody = (
         <>
-          <h1 className="text-lg font-bold mb-2">{task?.title}</h1>
+          <h1 className="text-lg font-semibold mb-2">{task?.title}</h1>
           <Instructions className="mb-4">{task?.instructions}</Instructions>
           <OpenTextGapsTask
             key={attempt?.attemptId ?? "new"}
@@ -159,7 +159,7 @@ export function TaskPageContent({ taskId }: { taskId: string }) {
     case "heading_match":
       taskBody = (
         <>
-          <h1 className="text-lg font-bold mb-2">{task?.title}</h1>
+          <h1 className="text-lg font-semibold mb-2">{task?.title}</h1>
           <Instructions className="mb-4">{task?.instructions}</Instructions>
           <HeadingMatchTask
             key={attempt?.attemptId ?? "new"}
