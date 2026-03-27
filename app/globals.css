@@ -116,7 +116,7 @@ body {
 body {
   background-color: var(--background);
   color: var(--foreground);
-  font-family: var(--font-sans);
+  font-family: var(--font-inter);
   line-height: 1.5;
   -webkit-font-smoothing: antialiased;
 }
@@ -217,6 +217,19 @@ video {
   --sidebar-border: oklch(1 0 0 / 10%);
 
   --sidebar-ring: oklch(0.556 0 0);
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  font-family: var(--font-poppins);
+}
+
+button {
+  font-family: var(--font-poppins);
 }
 
 @layer base {

@@ -24,7 +24,7 @@ export function LandingPageContent() {
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6 }}
         >
-          <h1 className="text-4xl md:text-5xl font-bold leading-tight">
+          <h1 className="text-4xl md:text-5xl font-semibold leading-tight">
             Przygotuj się do matury z pewnością siebie <br /> dzięki zadaniom
             maturalnym Españolita
           </h1>
@@ -33,10 +33,10 @@ export function LandingPageContent() {
             zadań, które pojawią się na maturze.
           </p>
           <div className="mt-8 flex gap-4">
-            <Button className="px-8 py-6 text-base rounded-xl">
+            <Button asChild className="px-8 py-6 text-base rounded-xl">
               <Link href="/checkout">Zacznij już dziś</Link>
             </Button>
-            <Button variant="outline" className="px-8 py-6 rounded-xl">
+            <Button asChild variant="outline" className="px-8 py-6 rounded-xl">
               <Link href="/our-tasks">Nasze zadania</Link>
             </Button>
           </div>
@@ -92,7 +92,7 @@ export function LandingPageContent() {
               <Card className="rounded-2xl shadow-sm text-center h-full">
                 <CardContent className="p-8">
                   <stat.icon className="w-8 h-8 text-red-500 mx-auto mb-4" />
-                  <p className="text-4xl font-bold mb-2">{stat.value}</p>
+                  <p className="text-4xl font-semibold mb-2">{stat.value}</p>
                   <p className="text-gray-600">{stat.label}</p>
                 </CardContent>
               </Card>
@@ -108,7 +108,7 @@ export function LandingPageContent() {
             initial={{ opacity: 0 }}
             whileInView={{ opacity: 1 }}
             viewport={{ once: true }}
-            className="text-3xl font-bold text-center mb-16"
+            className="text-3xl font-semibold text-center mb-16"
           >
             Dlaczego warto zdawać maturę z hiszpańskiego?
           </motion.h2>
@@ -164,19 +164,21 @@ export function LandingPageContent() {
           <Card className="rounded-3xl bg-gradient-to-r from-red-500 to-red-600 text-white shadow-xl">
             <CardContent className="p-12 text-center">
               <CheckCircle className="mx-auto mb-4 w-10 h-10" />
-              <h2 className="text-3xl font-bold mb-4">
+              <h2 className="text-3xl font-semibold mb-4">
                 Chcesz zdać maturę bez stresu?
               </h2>
               <p className="text-white/90 mb-8">
                 Sprawdź nasze zadania i naucz się dokładnie tego, co pojawi się
                 na maturze.
               </p>
-              <Link
-                href="/checkout"
+              <Button
+                asChild
                 className="bg-white text-red-600 px-4 py-2 rounded-md hover:bg-red-700 hover:text-white transition-all duration-200"
               >
-                Przejdź do zakupu zadań maturalnych
-              </Link>
+                <Link href="/checkout">
+                  Przejdź do zakupu zadań maturalnych
+                </Link>
+              </Button>
             </CardContent>
           </Card>
         </motion.div>

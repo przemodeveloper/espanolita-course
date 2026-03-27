@@ -53,7 +53,7 @@ export function Navbar({ user }: { user: User | null }) {
             height={40}
             className="size-10 shrink-0"
           />
-          <span className="truncate font-bold text-lg">
+          <span className="truncate font-semibold text-lg">
             Zadania Maturalne Españolita
           </span>
         </Link>

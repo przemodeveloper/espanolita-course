@@ -68,7 +68,7 @@ export function OurTasksPageContent() {
               <Sparkles className="w-4 h-4" aria-hidden />
               Pełny arkusz maturalny
             </div>
-            <h1 className="text-4xl md:text-5xl font-bold leading-tight">
+            <h1 className="text-4xl md:text-5xl font-semibold leading-tight">
               Nasze zadania maturalne
             </h1>
             <p className="mt-6 text-lg text-gray-600">
