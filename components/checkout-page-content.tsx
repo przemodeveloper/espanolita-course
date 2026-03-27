@@ -25,6 +25,11 @@ const benefits = [
     description:
       "Dostępne jest wsparcie AI przy pisaniu wypracowania, które pomoże Ci napisać wypracowanie w sposób sprawny i zrozumiały.",
   },
+  {
+    title: "Przyszłe aktualizacje - nowe arkusze i zadania bonusowe",
+    description:
+      "Przyszłe aktualizacje - nowe arkusze i zadania bonusowe, które pomogą Ci dodatkowo przećwiczyć sprawdzić swoją wiedzę przed egzaminem.",
+  },
 ];
 
 export function CheckoutPageContent() {
@@ -97,6 +102,9 @@ export function CheckoutPageContent() {
                 <li>✔ 12 zadań</li>
                 <li>✔ Zadania bonusowe</li>
                 <li>✔ Wsparcie AI przy pisaniu wypracowania</li>
+                <li>
+                  ✔ Przyszłe aktualizacje - nowe arkusze i zadania bonusowe
+                </li>
               </ul>
 
               <Button
