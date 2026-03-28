@@ -32,7 +32,7 @@ export function LandingPageContent() {
             Skuteczne przygotowanie do matury z hiszpańskiego — wszystkie typy
             zadań, które pojawią się na maturze.
           </p>
-          <div className="mt-8 flex gap-4">
+          <div className="mt-8 flex flex-wrap gap-4">
             <Button asChild className="px-8 py-6 text-base rounded-xl">
               <Link href="/checkout">Zacznij już dziś</Link>
             </Button>
@@ -173,11 +173,9 @@ export function LandingPageContent() {
               </p>
               <Button
                 asChild
-                className="bg-white text-red-600 px-4 py-2 rounded-md hover:bg-red-700 hover:text-white transition-all duration-200"
+                className="bg-white text-red-600 p-4 rounded-md hover:bg-red-700 hover:text-white transition-all duration-200"
               >
-                <Link href="/checkout">
-                  Przejdź do zakupu zadań maturalnych
-                </Link>
+                <Link href="/checkout">Zakup zadań maturalnych</Link>
               </Button>
             </CardContent>
           </Card>
