@@ -17,10 +17,16 @@ export interface Task {
     | "open_text"
     | "writing"
     | "open_text_gaps"
-    | "heading_match";
+    | "heading_match"
+    | "audio_single_choice";
   questions: Question[];
   sharedOptions?: Option[];
   content: {
+    texts?: {
+      sections: string[];
+      label: string;
+    }[];
+    audio_url?: string;
     headings?: HeadingItem[];
     text?: string;
     title?: string;

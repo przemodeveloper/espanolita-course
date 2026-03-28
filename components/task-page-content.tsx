@@ -17,6 +17,7 @@ import OpenTextGapsTask from "./open-text-gaps-task";
 import { HeadingMatchTask } from "./heading-match-task";
 import TaskSetProgressBar from "./task-set-progress-bar";
 import { useProgress } from "@/queries/useProgress";
+import AudioSingleChoiceTasks from "./audio-single-choice-tasks";
 
 export function TaskPageContent({ taskId }: { taskId: string }) {
   const params = useParams<{ taskSetId: string }>();
@@ -152,6 +153,21 @@ export function TaskPageContent({ taskId }: { taskId: string }) {
             text={task?.content?.text ?? ""}
             questions={task?.questions}
             attempt={attempt}
+          />
+        </>
+      );
+      break;
+    case "audio_single_choice":
+      taskBody = (
+        <>
+          <h1 className="text-lg font-semibold mb-2">{task?.title}</h1>
+          <Instructions className="mb-4">{task?.instructions}</Instructions>
+          <AudioSingleChoiceTasks
+            taskId={taskId}
+            questions={task?.questions}
+            attempt={attempt}
+            audioUrl={task?.content?.audio_url ?? ""}
+            texts={task?.content?.texts ?? []}
           />
         </>
       );
