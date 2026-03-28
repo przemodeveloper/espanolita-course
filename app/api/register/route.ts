@@ -55,14 +55,27 @@ export async function POST(req: Request) {
       );
     }
 
+    // 2️⃣ If purchase has a user_id, verify the auth user actually exists
     if (purchase.user_id) {
-      return NextResponse.json(
-        {
-          error:
-            "An account with this email already exists. Please sign in instead.",
-        },
-        { status: 409 },
+      const { data: existingUser } = await supabaseAdmin.auth.admin.getUserById(
+        purchase.user_id,
       );
+
+      if (existingUser.user) {
+        return NextResponse.json(
+          {
+            error:
+              "An account with this email already exists. Please sign in instead.",
+          },
+          { status: 409 },
+        );
+      }
+
+      // Auth user was deleted but purchase wasn't cleaned up — reset it
+      await supabaseAdmin
+        .from("purchases")
+        .update({ user_id: null, claimed_at: null })
+        .eq("id", purchase.id);
     }
 
     // 3️⃣ Create user
@@ -117,7 +130,7 @@ export async function POST(req: Request) {
       );
     }
 
-    // 5️⃣ Optionally create user profile
+    // 4️⃣ Optionally create user profile
     const { error: profileError } = await supabaseAdmin
       .from("profiles")
       .insert({
