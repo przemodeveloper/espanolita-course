@@ -60,7 +60,9 @@ export async function POST(
       }
 
       const isChoice =
-        task.type === "single_choice" || task.type === "gap_fill_shared";
+        task.type === "single_choice" ||
+        task.type === "gap_fill_shared" ||
+        task.type === "audio_single_choice";
 
       const isOpenText =
         task.type === "open_text" || task.type === "open_text_gaps";

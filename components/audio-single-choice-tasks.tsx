@@ -10,20 +10,6 @@ import { TaskSummary } from "./task-summary";
 import { TaskActions } from "./task-actions";
 import AudioPlayer from "./audio-player";
 
-function buildSectionToLabelMap(
-  texts: { sections: string[]; label: string }[],
-): Map<string, string> {
-  const map = new Map<string, string>();
-  for (const entry of texts) {
-    for (const section of entry.sections) {
-      if (!map.has(section)) {
-        map.set(section, entry.label);
-      }
-    }
-  }
-  return map;
-}
-
 export default function AudioSingleChoiceTasks({
   text,
   title,
@@ -44,7 +30,17 @@ export default function AudioSingleChoiceTasks({
     label: string;
   }[];
 }) {
-  const sectionToLabel = useMemo(() => buildSectionToLabelMap(texts), [texts]);
+  const sectionToLabel = useMemo(() => {
+    const map = new Map<string, string>();
+    for (const entry of texts) {
+      for (const section of entry.sections) {
+        if (!map.has(section)) {
+          map.set(section, entry.label);
+        }
+      }
+    }
+    return map;
+  }, [texts]);
 
   const labelsInQuestionOrder = useMemo(
     () => questions.map((q) => sectionToLabel.get(q.prompt.section ?? "")),
@@ -56,8 +52,8 @@ export default function AudioSingleChoiceTasks({
   const { mutate: deleteAttempt, isPending: isDeleting } =
     useDeleteAttempt(taskId);
 
-  const [answers, setAnswers] = useState<Attempt["answers"]>(
-    () => attempt?.answers ?? [],
+  const [answers, setAnswers] = useState<NonNullable<Attempt["answers"]>>(
+    attempt?.answers ?? [],
   );
 
   const handleSetAnswer = (
@@ -65,27 +61,24 @@ export default function AudioSingleChoiceTasks({
     optionId?: string,
     answerText?: string,
   ) => {
-    if (answers?.find((answer) => answer.questionId === questionId)) {
-      setAnswers((prev?: Attempt["answers"]) =>
-        prev?.map((answer) =>
-          answer.questionId === questionId
+    setAnswers((prev) => {
+      const exists = prev.some((a) => a.questionId === questionId);
+      if (exists) {
+        return prev.map((a) =>
+          a.questionId === questionId
             ? { questionId, optionId, answerText }
-            : answer,
-        ),
-      );
-    } else {
-      setAnswers((prev?: Attempt["answers"]) => [
-        ...(prev ?? []),
-        { questionId, optionId, answerText },
-      ]);
-    }
+            : a,
+        );
+      }
+      return [...prev, { questionId, optionId, answerText }];
+    });
   };
 
-  const handleSubmitAnswers = async () => {
-    submitResponse({ taskId, answers: answers ?? [] });
+  const handleSubmitAnswers = () => {
+    submitResponse({ taskId, answers });
   };
 
-  const handleResetAnswers = async () => {
+  const handleResetAnswers = () => {
     deleteAttempt(undefined, {
       onSuccess: () => {
         setAnswers([]);
