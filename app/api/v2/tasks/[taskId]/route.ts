@@ -62,13 +62,10 @@ export async function GET(
   const taskSetTitle = task_set_items[0]?.task_sets?.title ?? null;
 
   if (task.type === "gap_fill_shared") {
-    const sharedOptions = task.questions[0]?.options ?? [];
-
     return NextResponse.json({
       ...taskBase,
       taskSetId,
       taskSetTitle,
-      sharedOptions,
       questions: task.questions.map((q) => ({
         id: q.id,
         gap_index: q.gap_index,
