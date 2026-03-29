@@ -159,7 +159,7 @@ export async function POST(
         let isCorrect: boolean | null = null;
 
         // -------------------------
-        // gap_fill_shared (letter vs questions.correct_key)
+        // gap_fill_shared (option label vs questions.correct_key)
         // -------------------------
         if (task.type === "gap_fill_shared" && a.answerText) {
           const q = await tx.questions.findUnique({

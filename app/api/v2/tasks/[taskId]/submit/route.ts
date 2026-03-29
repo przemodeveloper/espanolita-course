@@ -82,7 +82,7 @@ export async function POST(
         (isHeadingMatch || isGapFillShared) &&
         !answers.every((a) => a.answerText !== undefined)
       ) {
-        throw new Error("Missing answerText for heading / gap fill task");
+        throw new Error("Missing answerText for heading match or gap fill shared");
       }
 
       // ---------------------------------
@@ -172,7 +172,7 @@ export async function POST(
         }
 
         // ================================
-        // heading match | gap_fill_shared (letter vs questions.correct_key)
+        // heading match | gap_fill_shared (label vs questions.correct_key)
         // ================================
         if (isHeadingMatch || isGapFillShared) {
           const userRaw = a.answerText ?? "";

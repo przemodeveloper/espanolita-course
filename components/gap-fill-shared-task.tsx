@@ -43,9 +43,9 @@ function buildInitialAnswers(
     const gap = questionIdToGap.get(a.questionId);
     if (gap === undefined || gap === null) continue;
 
-    const letter = a.answerText?.trim().toUpperCase();
-    if (letter) {
-      initial[gap] = letter;
+    const label = a.answerText?.trim().toUpperCase();
+    if (label) {
+      initial[gap] = label;
     }
   }
 
@@ -110,20 +110,20 @@ export function GapFillSharedTask({
   function handleSubmitAnswers() {
     const formatted = Object.entries(answers)
       .filter((entry): entry is [string, string] => entry[1] != null)
-      .flatMap(([gapIndex, letter]) => {
+      .flatMap(([gapIndex, label]) => {
         const questionId = questionMap.get(Number(gapIndex));
         if (questionId === undefined) return [];
-        return [{ questionId, answerText: letter }];
+        return [{ questionId, answerText: label }];
       });
 
     submitResponse({ taskId, answers: formatted });
   }
 
   function handleDragEnd(event: DragEndEvent) {
-    const letter = parseOptionDragId(String(event.active.id));
+    const label = parseOptionDragId(String(event.active.id));
     const overId = event.over?.id as string | undefined;
 
-    if (!letter || !overId) return;
+    if (!label || !overId) return;
 
     const gapIndex = Number(overId.replace("gap-", ""));
 
@@ -131,10 +131,10 @@ export function GapFillSharedTask({
       const next = { ...prev };
 
       Object.keys(next).forEach((k) => {
-        if (next[Number(k)] === letter) next[Number(k)] = null;
+        if (next[Number(k)] === label) next[Number(k)] = null;
       });
 
-      next[gapIndex] = letter;
+      next[gapIndex] = label;
 
       return next;
     });
@@ -154,8 +154,8 @@ export function GapFillSharedTask({
     [options],
   );
 
-  const getDisplayValue = (letter: string | null) =>
-    letter ? (optionByLabel.get(letter)?.text ?? null) : null;
+  const getDisplayValue = (label: string | null) =>
+    label ? (optionByLabel.get(label)?.text ?? null) : null;
 
   return (
     <DndContext sensors={sensors} onDragEnd={handleDragEnd}>
