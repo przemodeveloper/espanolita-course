@@ -20,8 +20,8 @@ export interface Task {
     | "heading_match"
     | "audio_single_choice";
   questions: Question[];
-  sharedOptions?: Option[];
   content: {
+    options?: Option[];
     texts?: {
       sections: string[];
       label: string;

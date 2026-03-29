@@ -60,14 +60,14 @@ export async function POST(
       }
 
       const isChoice =
-        task.type === "single_choice" ||
-        task.type === "gap_fill_shared" ||
-        task.type === "audio_single_choice";
+        task.type === "single_choice" || task.type === "audio_single_choice";
 
       const isOpenText =
         task.type === "open_text" || task.type === "open_text_gaps";
 
       const isHeadingMatch = task.type === "heading_match";
+
+      const isGapFillShared = task.type === "gap_fill_shared";
 
       // 2. Required fields
       if (isChoice && !answers.every((a) => a.optionId)) {
@@ -78,8 +78,11 @@ export async function POST(
         throw new Error("Missing answerText for open text task");
       }
 
-      if (isHeadingMatch && !answers.every((a) => a.answerText !== undefined)) {
-        throw new Error("Missing answerText for heading match task");
+      if (
+        (isHeadingMatch || isGapFillShared) &&
+        !answers.every((a) => a.answerText !== undefined)
+      ) {
+        throw new Error("Missing answerText for heading match or gap fill shared");
       }
 
       // ---------------------------------
@@ -169,9 +172,9 @@ export async function POST(
         }
 
         // ================================
-        // heading match (letter vs questions.correct_key)
+        // heading match | gap_fill_shared (label vs questions.correct_key)
         // ================================
-        if (isHeadingMatch) {
+        if (isHeadingMatch || isGapFillShared) {
           const userRaw = a.answerText ?? "";
           const normalizedUser = normalize(userRaw);
           const key = q?.correct_key;
@@ -229,7 +232,8 @@ export async function POST(
           attempt_id: attempt.id,
           user_id: user.id,
           question_id: a.questionId,
-          option_id: a.optionId ?? null,
+          option_id:
+            isGapFillShared || isHeadingMatch ? null : (a.optionId ?? null),
           answer_text: a.answerText ?? null,
           is_correct: isCorrect,
           points_awarded: points,

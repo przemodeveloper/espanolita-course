@@ -70,7 +70,7 @@ export function TaskPageContent({ taskId }: { taskId: string }) {
             key={attempt?.attemptId ?? "new"}
             taskId={taskId}
             text={task?.content?.text ?? ""}
-            options={task?.sharedOptions}
+            options={task?.content?.options}
             questions={task?.questions}
             attempt={attempt}
           />
