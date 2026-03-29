@@ -17,7 +17,16 @@ import { useDeleteAttempt } from "@/queries/useDeleteAttempt";
 import { TaskSummary } from "./task-summary";
 import { TaskActions } from "./task-actions";
 
-type Option = { text: string; id: string; label: string };
+type Option = { text: string; label: string; id?: string };
+
+function optionDragId(label: string) {
+  return `gfs-${label.toUpperCase()}`;
+}
+
+function parseOptionDragId(id: string): string | null {
+  if (!id.startsWith("gfs-")) return null;
+  return id.slice("gfs-".length).toUpperCase();
+}
 
 function buildInitialAnswers(
   emptyAnswers: Record<number, string | null>,
@@ -32,8 +41,11 @@ function buildInitialAnswers(
 
   for (const a of attempt.answers) {
     const gap = questionIdToGap.get(a.questionId);
-    if (gap !== undefined && gap !== null) {
-      initial[gap] = a.optionId ?? null;
+    if (gap === undefined || gap === null) continue;
+
+    const letter = a.answerText?.trim().toUpperCase();
+    if (letter) {
+      initial[gap] = letter;
     }
   }
 
@@ -98,20 +110,20 @@ export function GapFillSharedTask({
   function handleSubmitAnswers() {
     const formatted = Object.entries(answers)
       .filter((entry): entry is [string, string] => entry[1] != null)
-      .flatMap(([gapIndex, optionId]) => {
+      .flatMap(([gapIndex, letter]) => {
         const questionId = questionMap.get(Number(gapIndex));
         if (questionId === undefined) return [];
-        return [{ questionId, optionId }];
+        return [{ questionId, answerText: letter }];
       });
 
     submitResponse({ taskId, answers: formatted });
   }
 
   function handleDragEnd(event: DragEndEvent) {
-    const optionKey = event.active.id as string;
+    const letter = parseOptionDragId(String(event.active.id));
     const overId = event.over?.id as string | undefined;
 
-    if (!overId) return;
+    if (!letter || !overId) return;
 
     const gapIndex = Number(overId.replace("gap-", ""));
 
@@ -119,27 +131,31 @@ export function GapFillSharedTask({
       const next = { ...prev };
 
       Object.keys(next).forEach((k) => {
-        if (next[Number(k)] === optionKey) next[Number(k)] = null;
+        if (next[Number(k)] === letter) next[Number(k)] = null;
       });
 
-      next[gapIndex] = optionKey;
+      next[gapIndex] = letter;
 
       return next;
     });
   }
 
   const usedSet = new Set(Object.values(answers).filter(Boolean));
-  const availableOptions = options?.filter((o) => !usedSet.has(o.id)) ?? [];
+  const availableOptions =
+    options?.filter((o) => !usedSet.has(o.label.toUpperCase())) ?? [];
 
   const parts = text.split(/7\.\d+\.\s*_____?/g);
 
-  const optionMap = useMemo(
-    () => new Map(options?.map((o) => [o.id, o]) ?? []),
+  const optionByLabel = useMemo(
+    () =>
+      new Map(
+        options?.map((o) => [o.label.toUpperCase(), o] as const) ?? [],
+      ),
     [options],
   );
 
-  const getDisplayValue = (optionId: string | null) =>
-    optionId ? (optionMap.get(optionId)?.text ?? null) : null;
+  const getDisplayValue = (letter: string | null) =>
+    letter ? (optionByLabel.get(letter)?.text ?? null) : null;
 
   return (
     <DndContext sensors={sensors} onDragEnd={handleDragEnd}>
@@ -178,8 +194,12 @@ export function GapFillSharedTask({
         <div className="flex flex-wrap gap-3 mb-4">
           {availableOptions.map((option) => (
             <DraggableOption
-              key={option.id}
-              option={option}
+              key={optionDragId(option.label)}
+              option={{
+                id: optionDragId(option.label),
+                label: option.label,
+                text: option.text,
+              }}
               disabled={
                 Boolean(attempt?.attemptId) || isSubmitting || isDeleting
               }

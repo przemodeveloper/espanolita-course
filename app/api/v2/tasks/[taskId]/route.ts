@@ -151,14 +151,33 @@ export async function POST(
 
       const rows = [];
 
+      const normalizeKey = (s: string) =>
+        s.trim().toLowerCase().replace(/\s+/g, " ");
+
       for (const a of answers) {
         let points = 0;
         let isCorrect: boolean | null = null;
 
         // -------------------------
-        // single choice / gap fill
+        // gap_fill_shared (letter vs questions.correct_key)
         // -------------------------
-        if (a.optionId) {
+        if (task.type === "gap_fill_shared" && a.answerText) {
+          const q = await tx.questions.findUnique({
+            where: { id: a.questionId },
+          });
+
+          const key = q?.correct_key;
+          if (key != null && key !== "") {
+            isCorrect = normalizeKey(key) === normalizeKey(a.answerText);
+          } else {
+            isCorrect = false;
+          }
+
+          points = isCorrect ? (q?.points ?? 1) : 0;
+        } else if (a.optionId) {
+          // -------------------------
+          // single choice (option.is_correct)
+          // -------------------------
           const option = await tx.options.findUnique({
             where: { id: a.optionId },
             include: { questions: true },
@@ -166,19 +185,16 @@ export async function POST(
 
           isCorrect = option?.is_correct ?? false;
           points = isCorrect ? (option?.questions.points ?? 1) : 0;
-        }
-
-        // -------------------------
-        // open text
-        // -------------------------
-        if (a.answerText) {
+        } else if (a.answerText) {
+          // -------------------------
+          // open text
+          // -------------------------
           const q = await tx.questions.findUnique({
             where: { id: a.questionId },
           });
 
           isCorrect =
-            a.answerText.trim().toLowerCase() ===
-            q?.correct_key?.trim().toLowerCase();
+            normalizeKey(a.answerText) === normalizeKey(q?.correct_key ?? "");
 
           points = isCorrect ? (q?.points ?? 1) : 0;
         }

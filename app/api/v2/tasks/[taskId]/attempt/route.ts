@@ -87,17 +87,44 @@ export async function GET(
     ).map((q) => [q.id, q.order_index]),
   );
 
+  const optionLabelById =
+    task.type === "gap_fill_shared"
+      ? new Map(
+          (
+            await prisma.options.findMany({
+              where: {
+                id: {
+                  in: answersRaw
+                    .map((a) => a.option_id)
+                    .filter((id): id is string => id != null),
+                },
+              },
+              select: { id: true, label: true },
+            })
+          ).map((o) => [o.id, o.label]),
+        )
+      : null;
+
   const answers = answersRaw
     .sort(
       (a, b) =>
         (questionOrder.get(a.question_id) ?? 0) -
         (questionOrder.get(b.question_id) ?? 0),
     )
-    .map((a) => ({
-      questionId: a.question_id,
-      optionId: a.option_id,
-      answerText: a.answer_text,
-    }));
+    .map((a) => {
+      const fromOption =
+        optionLabelById && a.option_id
+          ? (optionLabelById.get(a.option_id) ?? "").trim().toUpperCase()
+          : "";
+
+      return {
+        questionId: a.question_id,
+        optionId: a.option_id,
+        answerText:
+          a.answer_text ??
+          (fromOption !== "" ? fromOption : null),
+      };
+    });
 
   const correctQuestionIds = answersRaw
     .filter((a) => a.is_correct === true)
