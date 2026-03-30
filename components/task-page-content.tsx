@@ -1,23 +1,53 @@
 "use client";
 
 import { useTask } from "@/queries/useTask";
-import { GapFillSharedTask } from "./gap-fill-shared-task";
 import LoadingSpinner from "./loading-spinner";
-import WritingTask from "./writing-task";
-import SingleChoiceTasks from "./single-choice-tasks";
 import { useLayoutEffect } from "react";
 import { useParams } from "next/navigation";
+import dynamic from "next/dynamic";
 import { useAttempt } from "@/queries/useAttempt";
-import OpenTextTasks from "./open-text-tasks";
 import { Instructions } from "./instructions";
 import { Criterion } from "./criterion";
 import { TaskLabel } from "./task-label";
 import { formatPoints } from "@/lib/utils";
-import OpenTextGapsTask from "./open-text-gaps-task";
-import { HeadingMatchTask } from "./heading-match-task";
 import TaskSetProgressBar from "./task-set-progress-bar";
 import { useProgress } from "@/queries/useProgress";
-import AudioSingleChoiceTasks from "./audio-single-choice-tasks";
+import SingleChoiceTasks from "./single-choice-tasks";
+import OpenTextTasks from "./open-text-tasks";
+import OpenTextGapsTask from "./open-text-gaps-task";
+
+function TaskTypeChunkFallback() {
+  return (
+    <div className="flex justify-center items-center min-h-[40vh] w-full">
+      <LoadingSpinner />
+    </div>
+  );
+}
+
+const GapFillSharedTask = dynamic(
+  () =>
+    import("./gap-fill-shared-task").then((m) => ({
+      default: m.GapFillSharedTask,
+    })),
+  { loading: TaskTypeChunkFallback },
+);
+
+const WritingTask = dynamic(() => import("./writing-task"), {
+  loading: TaskTypeChunkFallback,
+});
+
+const AudioSingleChoiceTasks = dynamic(
+  () => import("./audio-single-choice-tasks"),
+  { loading: TaskTypeChunkFallback },
+);
+
+const HeadingMatchTask = dynamic(
+  () =>
+    import("./heading-match-task").then((m) => ({
+      default: m.HeadingMatchTask,
+    })),
+  { loading: TaskTypeChunkFallback },
+);
 
 export function TaskPageContent({ taskId }: { taskId: string }) {
   const params = useParams<{ taskSetId: string }>();
