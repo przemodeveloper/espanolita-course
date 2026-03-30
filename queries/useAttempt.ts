@@ -6,6 +6,7 @@ export const useAttempt = (taskId: string) => {
   const { data, isLoading, error } = useQuery({
     queryKey: [QUERY_KEYS.ATTEMPT, taskId],
     queryFn: () => getAttempt(taskId),
+    staleTime: Infinity,
   });
   return { attempt: data, isLoading, error };
 };
