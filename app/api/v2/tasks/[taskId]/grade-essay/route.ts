@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { openai } from "@/lib/openai";
-import { buildGradingPrompt } from "@/lib/buildGradingPrompt";
+import { buildEssayGradingPrompt } from "@/lib/buildEssayGradingPrompt";
 import type { GradeEssayRequest } from "@/models/grading";
 import { prisma } from "@/lib/prisma";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
@@ -43,7 +43,7 @@ export async function POST(
       );
     }
 
-    const prompt = buildGradingPrompt(body);
+    const prompt = buildEssayGradingPrompt(body);
 
     const completion = await openai.chat.completions.create({
       model: GRADING_MODEL,
