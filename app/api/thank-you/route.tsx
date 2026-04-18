@@ -7,7 +7,7 @@ const resend = new Resend(process.env.RESEND_API_KEY);
 export async function POST(req: Request) {
   if (!process.env.RESEND_API_KEY) {
     return NextResponse.json(
-      { error: "RESEND_API_KEY is not configured" },
+      { error: "RESEND_API_KEY nie jest skonfigurowany" },
       { status: 500 },
     );
   }
@@ -15,7 +15,7 @@ export async function POST(req: Request) {
   try {
     body = await req.json();
   } catch {
-    return NextResponse.json({ error: "Invalid JSON" }, { status: 400 });
+    return NextResponse.json({ error: "Nieprawidłowy JSON" }, { status: 400 });
   }
 
   const { customerEmail, customerName, courseUrl } = body as {

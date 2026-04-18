@@ -7,7 +7,7 @@ export async function POST(req: Request) {
 
     if (!password || password.length < 8) {
       return NextResponse.json(
-        { error: "Password must be at least 8 characters." },
+        { error: "Hasło musi mieć co najmniej 8 znaków." },
         { status: 400 },
       );
     }
@@ -23,6 +23,9 @@ export async function POST(req: Request) {
     return NextResponse.json({ success: true });
   } catch (err) {
     console.error(err);
-    return NextResponse.json({ error: "Unexpected error." }, { status: 500 });
+    return NextResponse.json(
+      { error: "Wystąpił nieoczekiwany błąd." },
+      { status: 500 },
+    );
   }
 }

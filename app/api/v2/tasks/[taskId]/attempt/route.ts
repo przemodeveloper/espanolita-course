@@ -14,7 +14,7 @@ export async function GET(
   } = await supabase.auth.getUser();
 
   if (!user) {
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    return NextResponse.json({ error: "Nieautoryzowany" }, { status: 401 });
   }
 
   const { taskId } = await params;
@@ -25,7 +25,10 @@ export async function GET(
   });
 
   if (!task) {
-    return NextResponse.json({ error: "Task not found" }, { status: 404 });
+    return NextResponse.json(
+      { error: "Zadanie nie znalezione" },
+      { status: 404 },
+    );
   }
 
   const attempt = await prisma.task_attempts.findFirst({
@@ -120,9 +123,7 @@ export async function GET(
       return {
         questionId: a.question_id,
         optionId: a.option_id,
-        answerText:
-          a.answer_text ??
-          (fromOption !== "" ? fromOption : null),
+        answerText: a.answer_text ?? (fromOption !== "" ? fromOption : null),
       };
     });
 
@@ -159,7 +160,7 @@ export async function DELETE(
   } = await supabase.auth.getUser();
 
   if (!user) {
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    return NextResponse.json({ error: "Nieautoryzowany" }, { status: 401 });
   }
 
   const { taskId } = await params;

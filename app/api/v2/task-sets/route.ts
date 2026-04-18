@@ -9,7 +9,7 @@ export async function GET() {
   } = await supabase.auth.getUser();
 
   if (!user) {
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    return NextResponse.json({ error: "Nieautoryzowany" }, { status: 401 });
   }
 
   const sets = await prisma.task_sets.findMany({
@@ -35,7 +35,10 @@ export async function GET() {
   });
 
   if (!sets) {
-    return NextResponse.json({ error: "No task sets found" }, { status: 404 });
+    return NextResponse.json(
+      { error: "Nie znaleziono zestawów zadań" },
+      { status: 404 },
+    );
   }
 
   const result = sets.map((set) => ({

@@ -8,11 +8,13 @@ export async function proxy(req: NextRequest) {
 
   const supabase = await createSupabaseServerClient();
 
-  const { data: { user } } = await supabase.auth.getUser();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
 
   if (!user) {
     if (isApiRoute) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+      return NextResponse.json({ error: "Nieautoryzowany" }, { status: 401 });
     }
 
     const redirectUrl = new URL("/unauthorized", req.url);

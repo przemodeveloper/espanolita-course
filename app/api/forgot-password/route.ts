@@ -7,7 +7,7 @@ export async function POST(req: Request) {
 
     if (!email) {
       return NextResponse.json(
-        { error: "Email is required." },
+        { error: "Email jest wymagany." },
         { status: 400 },
       );
     }
@@ -26,6 +26,9 @@ export async function POST(req: Request) {
     return NextResponse.json({ success: true });
   } catch (err) {
     console.error(err);
-    return NextResponse.json({ error: "Unexpected error." }, { status: 500 });
+    return NextResponse.json(
+      { error: "Wystąpił nieoczekiwany błąd." },
+      { status: 500 },
+    );
   }
 }

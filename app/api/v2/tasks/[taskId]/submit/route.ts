@@ -18,7 +18,7 @@ export async function POST(
   } = await supabase.auth.getUser();
 
   if (!user) {
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    return NextResponse.json({ error: "Nieautoryzowany" }, { status: 401 });
   }
 
   const { taskId } = await params;
@@ -34,7 +34,7 @@ export async function POST(
         select: { type: true },
       });
 
-      if (!task) throw new Error("Task not found");
+      if (!task) throw new Error("Zadanie nie znalezione");
 
       const answers: {
         questionId: string;
@@ -43,7 +43,7 @@ export async function POST(
       }[] = body.answers ?? [];
 
       if (!answers.length) {
-        throw new Error("No answers provided");
+        throw new Error("Brak odpowiedzi");
       }
 
       // ---------------------------------
@@ -54,7 +54,7 @@ export async function POST(
       const seen = new Set<string>();
       for (const a of answers) {
         if (seen.has(a.questionId)) {
-          throw new Error(`Duplicate answer for question ${a.questionId}`);
+          throw new Error(`Duplikat odpowiedzi dla pytania ${a.questionId}`);
         }
         seen.add(a.questionId);
       }
@@ -71,18 +71,20 @@ export async function POST(
 
       // 2. Required fields
       if (isChoice && !answers.every((a) => a.optionId)) {
-        throw new Error("Missing optionId for choice task");
+        throw new Error("Brak optionId dla zadania wyboru");
       }
 
       if (isOpenText && !answers.every((a) => a.answerText !== undefined)) {
-        throw new Error("Missing answerText for open text task");
+        throw new Error("Brak answerText dla zadania otwartego tekstu");
       }
 
       if (
         (isHeadingMatch || isGapFillShared) &&
         !answers.every((a) => a.answerText !== undefined)
       ) {
-        throw new Error("Missing answerText for heading match or gap fill shared");
+        throw new Error(
+          "Brak answerText dla zadania dopasowania nagłówka lub wypełniania luk współdzielonych",
+        );
       }
 
       // ---------------------------------
@@ -182,7 +184,7 @@ export async function POST(
           if (key != null && key !== "") {
             isCorrect = normalize(key) === normalizedUser;
           } else {
-            console.warn(`Missing correct_key for question ${a.questionId}`);
+            console.warn(`Brak correct_key dla pytania ${a.questionId}`);
             isCorrect = false;
           }
 
@@ -219,7 +221,7 @@ export async function POST(
               isCorrect = normalize(key) === normalizedUser;
             } else {
               console.warn(
-                `No acceptable answers for question ${a.questionId}`,
+                `Brak akceptowanych odpowiedzi dla pytania ${a.questionId}`,
               );
               isCorrect = false;
             }
@@ -268,6 +270,9 @@ export async function POST(
     return NextResponse.json(result);
   } catch (err) {
     console.error(err);
-    return NextResponse.json({ error: "Submission failed" }, { status: 500 });
+    return NextResponse.json(
+      { error: "Nie udało się złożyć zgłoszenia" },
+      { status: 500 },
+    );
   }
 }

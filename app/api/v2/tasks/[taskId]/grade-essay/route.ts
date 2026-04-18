@@ -4,6 +4,10 @@ import { buildGradingPrompt } from "@/lib/buildGradingPrompt";
 import type { GradeEssayRequest } from "@/models/grading";
 import { prisma } from "@/lib/prisma";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
+import { countAiUsageSince, logAiUsage, startOfTodayUtc } from "@/lib/aiUsage";
+
+const ESSAY_GRADING_DAILY_LIMIT = 3;
+const GRADING_MODEL = "gpt-4.1";
 
 export async function POST(
   req: Request,
@@ -22,10 +26,27 @@ export async function POST(
 
     const { taskId } = await params;
 
+    const usedToday = await countAiUsageSince(
+      user.id,
+      "essay_grading",
+      startOfTodayUtc(),
+    );
+
+    if (usedToday >= ESSAY_GRADING_DAILY_LIMIT) {
+      return NextResponse.json(
+        {
+          error: "Osiągnięto dzienny limit oceniania. Spróbuj ponownie jutro.",
+          limit: ESSAY_GRADING_DAILY_LIMIT,
+          used: usedToday,
+        },
+        { status: 429 },
+      );
+    }
+
     const prompt = buildGradingPrompt(body);
 
     const completion = await openai.chat.completions.create({
-      model: "gpt-4.1",
+      model: GRADING_MODEL,
       temperature: 0,
       response_format: { type: "json_object" },
 
@@ -44,10 +65,19 @@ export async function POST(
     const content = completion.choices[0].message.content;
 
     if (!content) {
-      throw new Error("Empty grading response");
+      throw new Error("Pusta odpowiedź oceniania");
     }
 
     const grading = JSON.parse(content);
+
+    await logAiUsage({
+      userId: user.id,
+      kind: "essay_grading",
+      taskId,
+      model: GRADING_MODEL,
+      promptTokens: completion.usage?.prompt_tokens ?? null,
+      completionTokens: completion.usage?.completion_tokens ?? null,
+    });
 
     const result = await prisma.$transaction(async (tx) => {
       const attempt = await tx.task_attempts.create({
@@ -61,7 +91,7 @@ export async function POST(
           score: grading.totalScore,
           metadata: {
             grading: {
-              model: "gpt-4.1",
+              model: GRADING_MODEL,
               promptVersion: 1,
               result: grading,
             },
@@ -94,6 +124,6 @@ export async function POST(
   } catch (error) {
     console.error(error);
 
-    return NextResponse.json({ error: "Grading failed" }, { status: 500 });
+    return NextResponse.json({ error: "Ocena nieudana" }, { status: 500 });
   }
 }

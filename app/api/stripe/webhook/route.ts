@@ -10,13 +10,13 @@ export async function POST(req: Request) {
   const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET;
 
   if (!webhookSecret) {
-    return new NextResponse("STRIPE_WEBHOOK_SECRET is not configured", {
+    return new NextResponse("STRIPE_WEBHOOK_SECRET nie jest skonfigurowany", {
       status: 500,
     });
   }
 
   if (!signature) {
-    return new NextResponse("Missing signature", { status: 400 });
+    return new NextResponse("Brak podpisu", { status: 400 });
   }
 
   let event: Stripe.Event;
@@ -26,7 +26,7 @@ export async function POST(req: Request) {
   } catch (err: unknown) {
     const error = err as Error;
     console.error("Webhook verification failed:", error.message);
-    return new NextResponse(`Webhook Error: ${error.message}`, { status: 400 });
+    return new NextResponse(`Błąd webhook: ${error.message}`, { status: 400 });
   }
 
   // 🎯 Handle events
@@ -43,7 +43,7 @@ export async function POST(req: Request) {
       const priceId = lineItems.data[0]?.price?.id;
 
       if (!priceId) {
-        console.error("No price found for session:", session.id);
+        console.error("Nie znaleziono ceny dla sesji:", session.id);
         return new NextResponse("Missing price", { status: 400 });
       }
 
@@ -83,12 +83,12 @@ export async function POST(req: Request) {
         console.error("[Thank-you email] Threw:", err);
       }
 
-      console.log("✅ Purchase stored:", session.id);
+      console.log("✅ Zakup przechowywany:", session.id);
       break;
     }
 
     default:
-      console.log(`Unhandled event: ${event.type}`);
+      console.log(`Nieobsługiwane zdarzenie: ${event.type}`);
   }
 
   return NextResponse.json({ received: true });

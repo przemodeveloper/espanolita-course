@@ -87,7 +87,7 @@ export async function POST(
   } = await supabase.auth.getUser();
 
   if (!user) {
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    return NextResponse.json({ error: "Nieautoryzowany" }, { status: 401 });
   }
 
   const { taskId } = await params;
@@ -100,7 +100,7 @@ export async function POST(
         select: { type: true },
       });
 
-      if (!task) throw new Error("Task not found");
+      if (!task) throw new Error("Zadanie nie znalezione");
 
       // ==================================================
       // WRITING (whole answer stored on attempt)
@@ -228,6 +228,9 @@ export async function POST(
   } catch (err) {
     console.error(err);
 
-    return NextResponse.json({ error: "Submission failed" }, { status: 500 });
+    return NextResponse.json(
+      { error: "Nie udało się złożyć zgłoszenia" },
+      { status: 500 },
+    );
   }
 }

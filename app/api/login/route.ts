@@ -8,7 +8,7 @@ export async function POST(req: Request) {
 
     if (!email || !password) {
       return NextResponse.json(
-        { error: "Email and password are required." },
+        { error: "Email i hasło są wymagane." },
         { status: 400 },
       );
     }
@@ -16,7 +16,7 @@ export async function POST(req: Request) {
     // Verify Turnstile before touching auth
     if (!turnstileToken) {
       return NextResponse.json(
-        { error: "Security check token is missing." },
+        { error: "Brak tokenu sprawdzania zabezpieczeń." },
         { status: 400 },
       );
     }
@@ -24,7 +24,9 @@ export async function POST(req: Request) {
     const isHuman = await verifyTurnstile(turnstileToken);
     if (!isHuman) {
       return NextResponse.json(
-        { error: "Security check failed. Please try again." },
+        {
+          error: "Sprawdzanie zabezpieczeń nie powiodło się. Spróbuj ponownie.",
+        },
         { status: 403 },
       );
     }
@@ -50,7 +52,7 @@ export async function POST(req: Request) {
   } catch (err) {
     console.error("Login error:", err);
     return NextResponse.json(
-      { error: "Unexpected error during login." },
+      { error: "Wystąpił nieoczekiwany błąd podczas logowania." },
       { status: 500 },
     );
   }

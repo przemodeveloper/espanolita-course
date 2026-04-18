@@ -12,7 +12,7 @@ export async function GET(
   } = await supabase.auth.getUser();
 
   if (!user) {
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    return NextResponse.json({ error: "Nieautoryzowany" }, { status: 401 });
   }
 
   const { setId: id } = await params;
@@ -41,7 +41,10 @@ export async function GET(
   });
 
   if (!taskSet) {
-    return NextResponse.json({ error: "Task set not found" }, { status: 404 });
+    return NextResponse.json(
+      { error: "Zestaw zadań nie znaleziony" },
+      { status: 404 },
+    );
   }
 
   // flatten items → tasks

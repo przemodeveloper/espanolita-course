@@ -11,7 +11,7 @@ export async function POST(req: Request) {
     // Validation
     if (!firstName || !lastName || !email || !password) {
       return NextResponse.json(
-        { error: "Missing required fields." },
+        { error: "Brak wymaganych pól." },
         { status: 400 },
       );
     }
@@ -20,7 +20,7 @@ export async function POST(req: Request) {
 
     if (password.length < 8) {
       return NextResponse.json(
-        { error: "Password must be at least 8 characters." },
+        { error: "Hasło musi mieć co najmniej 8 znaków." },
         { status: 400 },
       );
     }
@@ -28,7 +28,7 @@ export async function POST(req: Request) {
     // Verify Turnstile before any DB work
     if (!turnstileToken) {
       return NextResponse.json(
-        { error: "Security check token is missing." },
+        { error: "Brak tokenu sprawdzania zabezpieczeń." },
         { status: 400 },
       );
     }
@@ -36,7 +36,9 @@ export async function POST(req: Request) {
     const isHuman = await verifyTurnstile(turnstileToken);
     if (!isHuman) {
       return NextResponse.json(
-        { error: "Security check failed. Please try again." },
+        {
+          error: "Sprawdzanie zabezpieczeń nie powiodło się. Spróbuj ponownie.",
+        },
         { status: 403 },
       );
     }
@@ -50,7 +52,10 @@ export async function POST(req: Request) {
 
     if (!purchase) {
       return NextResponse.json(
-        { error: "No valid purchase found for this email." },
+        {
+          error:
+            "Nie znaleziono prawidłowego zakupu dla tej poczty elektronicznej.",
+        },
         { status: 403 },
       );
     }
@@ -65,7 +70,7 @@ export async function POST(req: Request) {
         return NextResponse.json(
           {
             error:
-              "An account with this email already exists. Please sign in instead.",
+              "Konto z tą pocztą elektroniczną już istnieje. Zaloguj się zamiast tego.",
           },
           { status: 409 },
         );
@@ -125,7 +130,7 @@ export async function POST(req: Request) {
       await supabaseAdmin.auth.admin.deleteUser(authData.user.id);
       console.error("Purchase update error:", updateError);
       return NextResponse.json(
-        { error: "Failed to link purchase. Please try again." },
+        { error: "Nie udało się połączyć zakupu. Spróbuj ponownie." },
         { status: 500 },
       );
     }
@@ -158,7 +163,7 @@ export async function POST(req: Request) {
   } catch (error) {
     console.error("Registration error:", error);
     return NextResponse.json(
-      { error: "An unexpected error occurred. Please try again." },
+      { error: "Wystąpił nieoczekiwany błąd. Spróbuj ponownie." },
       { status: 500 },
     );
   }
