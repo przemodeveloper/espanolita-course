@@ -192,7 +192,11 @@ export function HeadingMatchTask({
 
   return (
     <DndContext sensors={sensors} onDragEnd={handleDragEnd}>
-      <div className="mb-4">{audioUrl && <AudioPlayer url={audioUrl} />}</div>
+      {audioUrl && (
+        <div className="mb-4">
+          <AudioPlayer url={audioUrl} />
+        </div>
+      )}
 
       <div className="space-y-4 mb-4">
         {sortedQuestions.map((question) => {
