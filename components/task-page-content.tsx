@@ -127,13 +127,16 @@ export function TaskPageContent({ taskId }: { taskId: string }) {
           <h1 className="text-lg font-semibold mb-4">{task?.title}</h1>
           <Instructions className="mb-4">
             <p className="mb-4">{task?.instructions}</p>
-            <ul>
+            <ul className="mb-4">
               {task?.content.requirements?.map((requirement) => (
                 <li className="list-disc list-inside ml-4" key={requirement}>
                   {requirement}
                 </li>
               ))}
             </ul>
+            <p className="text-sm text-red-500 font-semibold">
+              Uwaga: limit dzienny to 3 oceny wypracowań.
+            </p>
           </Instructions>
           <div className="border border-gray-200 p-4 rounded-lg">
             <p className="font-semibold mb-4">Kryteria oceniania</p>
