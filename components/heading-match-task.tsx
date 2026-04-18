@@ -55,7 +55,7 @@ function HeadingSectionSlot({
       )}
     >
       {label && headingText ? (
-        <div className="flex items-start gap-2">
+        <div className="flex items-center gap-2">
           <strong className="mt-0.5 inline-flex size-8 shrink-0 items-center justify-center rounded-full bg-orange-100 text-xs font-semibold text-orange-700">
             {label}
           </strong>
