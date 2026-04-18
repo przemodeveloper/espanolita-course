@@ -19,6 +19,7 @@ import { TaskActions } from "./task-actions";
 import { Button } from "./ui/button";
 import { XIcon } from "lucide-react";
 import { cn } from "@/lib/utils";
+import AudioPlayer from "./audio-player";
 
 const headingDragId = (label: string) => `heading-${label}`;
 
@@ -100,11 +101,13 @@ function buildInitialAssignments(
 }
 
 export function HeadingMatchTask({
+  audioUrl,
   headings,
   questions,
   taskId,
   attempt,
 }: {
+  audioUrl?: string;
   headings: HeadingItem[];
   questions: Question[];
   taskId: string;
@@ -185,8 +188,12 @@ export function HeadingMatchTask({
     (q) => assignments[q.id] != null && assignments[q.id] !== "",
   );
 
+  console.log(audioUrl);
+
   return (
     <DndContext sensors={sensors} onDragEnd={handleDragEnd}>
+      <div className="mb-4">{audioUrl && <AudioPlayer url={audioUrl} />}</div>
+
       <div className="space-y-4 mb-4">
         {sortedQuestions.map((question) => {
           const label = assignments[question.id];
