@@ -37,7 +37,6 @@ export async function GET(
       questions: {
         orderBy: { order_index: "asc" },
         select: {
-          gap_index: true,
           id: true,
           order_index: true,
           prompt: true,
@@ -68,7 +67,6 @@ export async function GET(
       taskSetTitle,
       questions: task.questions.map((q) => ({
         id: q.id,
-        gap_index: q.gap_index,
         order_index: q.order_index,
         prompt: q.prompt,
       })),

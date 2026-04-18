@@ -549,7 +549,6 @@ model questions {
   prompt      Json?
   points      Int?      @default(1)
   created_at  DateTime  @default(now()) @db.Timestamptz(6)
-  gap_index   Int?
   correct_key String?
   updated_at  DateTime  @default(now()) @db.Timestamptz(6)
   answers     answers[]

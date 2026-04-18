@@ -37,7 +37,7 @@ function buildInitialAnswers(
 
   if (!attempt?.answers) return initial;
 
-  const questionIdToGap = new Map(questions.map((q) => [q.id, q.gap_index]));
+  const questionIdToGap = new Map(questions.map((q) => [q.id, q.order_index]));
 
   for (const a of attempt.answers) {
     const gap = questionIdToGap.get(a.questionId);
@@ -77,7 +77,7 @@ export function GapFillSharedTask({
   );
 
   const questionMap = useMemo(
-    () => new Map(questions.map((q) => [q.gap_index, q.id])),
+    () => new Map(questions.map((q) => [q.order_index, q.id])),
     [questions],
   );
 
@@ -148,9 +148,7 @@ export function GapFillSharedTask({
 
   const optionByLabel = useMemo(
     () =>
-      new Map(
-        options?.map((o) => [o.label.toUpperCase(), o] as const) ?? [],
-      ),
+      new Map(options?.map((o) => [o.label.toUpperCase(), o] as const) ?? []),
     [options],
   );
 

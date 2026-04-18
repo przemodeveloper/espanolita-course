@@ -43,7 +43,6 @@ export interface Task {
 export interface Question {
   id: string;
   order_index: number;
-  gap_index?: number | null;
   prompt: {
     lines?: string[];
     sentence?: string;
