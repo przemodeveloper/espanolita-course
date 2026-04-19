@@ -2,7 +2,7 @@ import { useState } from "react";
 import { Button } from "./ui/button";
 import { Textarea } from "./ui/textarea";
 import type { RubricItem } from "@/models/grading";
-import { useGradeEssay } from "@/queries/useGradeEssay";
+import { useAiGradeTask } from "@/queries/useAiGradeTask";
 import { useDeleteAttempt } from "@/queries/useDeleteAttempt";
 import type { Attempt } from "@/models/attempt";
 
@@ -27,7 +27,10 @@ export default function WritingTask({
   requirements,
   rubric,
 }: WritingTaskProps) {
-  const { mutate: gradeEssay, isPending: isSubmitting } = useGradeEssay(taskId);
+  const { mutate: gradeEssay, isPending: isSubmitting } = useAiGradeTask(
+    taskId,
+    "essay_grading",
+  );
   const { mutate: deleteAttempt, isPending: isDeleting } =
     useDeleteAttempt(taskId);
   const [essay, setEssay] = useState(() => attempt?.answerText ?? "");

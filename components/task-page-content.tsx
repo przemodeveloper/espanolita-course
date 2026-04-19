@@ -15,6 +15,7 @@ import { useProgress } from "@/queries/useProgress";
 import SingleChoiceTasks from "./single-choice-tasks";
 import OpenTextTasks from "./open-text-tasks";
 import OpenTextGapsTask from "./open-text-gaps-task";
+import AudioOpenTextTasks from "./audio-open-text-tasks";
 
 function TaskTypeChunkFallback() {
   return (
@@ -218,6 +219,24 @@ export function TaskPageContent({ taskId }: { taskId: string }) {
             headings={task?.content?.headings ?? []}
             questions={task?.questions ?? []}
             attempt={attempt}
+          />
+        </>
+      );
+      break;
+    case "audio_open_text":
+      taskBody = (
+        <>
+          <h1 className="text-lg font-semibold mb-2">{task?.title}</h1>
+          <Instructions className="mb-4">{task?.instructions}</Instructions>
+          <AudioOpenTextTasks
+            key={attempt?.attemptId ?? "new"}
+            taskId={taskId}
+            audioUrl={task?.content.audio_url ?? ""}
+            questions={task?.questions ?? []}
+            attempt={attempt}
+            transcript={task?.content.transcript ?? ""}
+            taskInstructions={task?.instructions ?? ""}
+            language={task?.content.language}
           />
         </>
       );

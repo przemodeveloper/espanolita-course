@@ -1,6 +1,6 @@
 import { prisma } from "@/lib/prisma";
 
-export type AiUsageKind = "essay_grading"; // extend as needed
+export type AiUsageKind = "essay_grading" | "audio_open_text_grading"; // extend as needed
 
 export async function countAiUsageSince(
   userId: string,

@@ -18,10 +18,12 @@ export interface Task {
     | "writing"
     | "open_text_gaps"
     | "heading_match"
-    | "audio_single_choice";
+    | "audio_single_choice"
+    | "audio_open_text";
   questions: Question[];
   content: {
     options?: Option[];
+    transcript?: string;
     texts?: {
       sections: string[];
       label: string;

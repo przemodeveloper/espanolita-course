@@ -1,17 +1,20 @@
 import { useMutation } from "@tanstack/react-query";
-import { gradeEssay } from "@/services/grade-essay.service";
-import type { GradeEssayRequest } from "@/models/grading";
+import {
+  aiGradeTask,
+  type AiGradeTaskRequest,
+} from "@/services/ai-grade-task.service";
 import { QUERY_KEYS } from "./consts";
 import { useCourseContext } from "@/context/course-context";
 import { useNotificationContext } from "@/context/notification-context";
 import type { AxiosError } from "axios";
+import type { AiUsageKind } from "@/lib/aiUsage";
 
-export const useGradeEssay = (taskId: string) => {
+export const useAiGradeTask = (taskId: string, kind: AiUsageKind) => {
   const { queryClient } = useCourseContext();
   const { notify } = useNotificationContext();
   const mutation = useMutation({
-    mutationFn: (essayRequest: GradeEssayRequest) =>
-      gradeEssay(taskId, essayRequest),
+    mutationFn: (request: AiGradeTaskRequest) =>
+      aiGradeTask(taskId, kind, request),
     onSettled: () => {
       queryClient.invalidateQueries({ queryKey: [QUERY_KEYS.ATTEMPT, taskId] });
       queryClient.invalidateQueries({ queryKey: [QUERY_KEYS.PROGRESS] });
