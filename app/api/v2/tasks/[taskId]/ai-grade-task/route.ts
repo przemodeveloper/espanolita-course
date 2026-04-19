@@ -22,7 +22,6 @@ export async function POST(
   }: {
     params: Promise<{
       taskId: string;
-      kind: "essay_grading" | "audio_open_text_grading";
     }>;
   },
 ) {
