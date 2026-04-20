@@ -44,7 +44,7 @@ export function CheckoutPageContent() {
           transition={{ duration: 0.6 }}
           className="text-4xl md:text-5xl font-semibold mb-4"
         >
-          Zadania Maturalne Españolita
+          Matura Españolita
         </motion.h1>
         <motion.p
           initial={{ opacity: 0, y: 20 }}
