@@ -18,7 +18,7 @@ export async function generateMetadata({
 
   if (task) {
     return {
-      title: `${task.title} - Zadania Maturalne Españolita`,
+      title: `${task.title} - Matura Españolita`,
       description: `Zadanie: ${task.title}`,
       keywords: [
         "zadania maturalne",
@@ -31,8 +31,8 @@ export async function generateMetadata({
   }
 
   return {
-    title: "Zadanie - Zadania Maturalne Españolita",
-    description: "Zadania Maturalne Españolita - Zadanie",
+    title: "Zadanie - Matura Españolita",
+    description: "Matura Españolita - Zadanie",
     keywords: ["zadania maturalne", "hiszpański", "españolita", "zadania"],
   };
 }

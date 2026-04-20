@@ -54,7 +54,7 @@ export function Navbar({ user }: { user: User | null }) {
             className="size-10 shrink-0"
           />
           <span className="truncate font-semibold text-lg">
-            Zadania Maturalne Españolita
+            Matura Españolita
           </span>
         </Link>
 
@@ -134,7 +134,7 @@ export function Navbar({ user }: { user: User | null }) {
                     className="size-10 shrink-0"
                   />
                   <span className="truncate font-bold text-sm">
-                    Zadania Maturalne Españolita
+                    Matura Españolita
                   </span>
                 </Link>
                 {!isAuthenticated && (

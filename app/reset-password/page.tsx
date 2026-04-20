@@ -2,7 +2,7 @@ import { ResetPasswordForm } from "@/components/reset-password-form";
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: "Reset hasła - Zadania Maturalne Españolita",
+  title: "Reset hasła - Matura Españolita",
   description: "Ustaw nowe hasło do swojego konta.",
   keywords: ["zadania maturalne", "hiszpański", "españolita", "reset hasła"],
 };

@@ -41,7 +41,7 @@ export function AppSidebar() {
       <SidebarContent>
         <SidebarGroup>
           <SidebarGroupLabel className="uppercase">
-            Zadania Maturalne Españolita
+            Matura Españolita
           </SidebarGroupLabel>
           <SidebarGroupContent>
             <SidebarMenu>
