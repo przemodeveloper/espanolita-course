@@ -94,7 +94,7 @@ export function CheckoutPageContent() {
                 <p className="text-sm text-gray-500">
                   Dostęp do arkusza i zadań bonusowych
                 </p>
-                <p className="text-3xl font-semibold">199 zł</p>
+                <p className="text-3xl font-semibold">159,99 zł</p>
               </div>
 
               <ul className="space-y-3 text-sm text-gray-600">
