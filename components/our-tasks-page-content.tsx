@@ -66,21 +66,14 @@ export function OurTasksPageContent() {
           <div className="max-w-2xl">
             <div className="inline-flex items-center gap-2 rounded-full bg-red-50 text-red-700 px-4 py-1.5 text-sm font-medium mb-6">
               <Sparkles className="w-4 h-4" aria-hidden />
-              Pełny arkusz maturalny
+              Arkusz maturalny
             </div>
             <h1 className="text-4xl md:text-5xl font-semibold leading-tight">
               Nasze zadania maturalne
             </h1>
             <p className="mt-6 text-lg text-gray-600">
               Oto fragmenty materiałów Españolita — każde zadanie odwzorowuje
-              format i poziom trudności egzaminu. To placeholder opisu: możesz
-              tu później dodać dokładniejszy opis pakietu, liczbę zadań i
-              korzyści dla ucznia.
-            </p>
-            <p className="mt-4 text-gray-600">
-              Drugi akapit marketingowy (placeholder): np. dostęp online,
-              aktualizacje pod nowe arkusze, wsparcie przy pisaniu — dopasuj
-              tekst do swojej oferty.
+              format i poziom trudności egzaminu.
             </p>
           </div>
           <motion.div
@@ -90,10 +83,11 @@ export function OurTasksPageContent() {
             className="shrink-0 rounded-2xl border border-gray-100 bg-white p-6 shadow-sm max-w-sm w-full"
           >
             <ClipboardList className="w-10 h-10 text-red-500 mb-4" />
-            <p className="font-semibold text-lg">12 zadań w pakiecie</p>
+            <p className="font-semibold text-lg">
+              11 zadań w pakiecie + zadania bonusowe
+            </p>
             <p className="mt-2 text-sm text-gray-600">
-              Poniżej zobaczysz przykładowe wizualizacje zadań (task_one —
-              task_eight). Uzupełnij ten box konkretnymi liczbami i USP.
+              Poniżej zobaczysz przykładowe wizualizacje zadań.
             </p>
           </motion.div>
         </motion.div>
