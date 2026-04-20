@@ -11,14 +11,13 @@ const benefits = [
     description: "Dostęp do arkusza i zadań bonusowych na zawsze.",
   },
   {
-    title: "12 zadań",
+    title: "11 zadań",
     description:
-      "Arkusz składa się z 12 zadań, które pomogą Ci zdać maturę z języka hiszpańskiego.",
+      "Arkusz składa się z 11 zadań, które pomogą Ci zdać maturę z języka hiszpańskiego.",
   },
   {
     title: "Zadania bonusowe",
-    description:
-      "Dostępne są również zadania bonusowe, które pomogą Ci dodatkowo przećwiczyć sprawdzić swoją wiedzę przed egzaminem.",
+    description: "Dostępne są również zadania bonusowe.",
   },
   {
     title: "Wsparcie AI przy pisaniu wypracowania",
@@ -28,7 +27,7 @@ const benefits = [
   {
     title: "Przyszłe aktualizacje - nowe arkusze i zadania bonusowe",
     description:
-      "Przyszłe aktualizacje - nowe arkusze i zadania bonusowe, które pomogą Ci dodatkowo przećwiczyć sprawdzić swoją wiedzę przed egzaminem.",
+      "Przyszłe aktualizacje - nowe arkusze i zadania bonusowe, które pomogą Ci dodatkowo sprawdzić swoją wiedzę przed egzaminem.",
   },
 ];
 
@@ -99,7 +98,7 @@ export function CheckoutPageContent() {
 
               <ul className="space-y-3 text-sm text-gray-600">
                 <li>✔ Dostęp na zawsze</li>
-                <li>✔ 12 zadań</li>
+                <li>✔ 11 zadań</li>
                 <li>✔ Zadania bonusowe</li>
                 <li>✔ Wsparcie AI przy pisaniu wypracowania</li>
                 <li>
