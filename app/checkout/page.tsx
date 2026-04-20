@@ -2,15 +2,9 @@ import { CheckoutPageContent } from "@/components/checkout-page-content";
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: "Zakup kursu - Kurs maturalny Españolita",
-  description: "Dokonaj zakupu kursu maturalnego Españolita",
-  keywords: [
-    "kurs maturalny",
-    "hiszpański",
-    "matura",
-    "españolita",
-    "zakup kursu",
-  ],
+  title: "Zakup zadań maturalnych - Zadania Maturalne Españolita",
+  description: "Dokonaj zakupu zadań maturalnych Españolita",
+  keywords: ["zadania maturalne", "hiszpański", "españolita", "zakup zadań"],
 };
 
 export default function CheckoutPage() {

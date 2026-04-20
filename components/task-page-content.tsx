@@ -1,89 +1,143 @@
 "use client";
 
 import { useTask } from "@/queries/useTask";
-import { GapFillSharedTask } from "./gap-fill-shared-task";
 import LoadingSpinner from "./loading-spinner";
-import WritingTask from "./writing-task";
-import SingleChoiceTasks from "./single-choice-tasks";
 import { useLayoutEffect } from "react";
+import { useParams } from "next/navigation";
+import dynamic from "next/dynamic";
 import { useAttempt } from "@/queries/useAttempt";
-import OpenTextTasks from "./open-text-tasks";
 import { Instructions } from "./instructions";
 import { Criterion } from "./criterion";
 import { TaskLabel } from "./task-label";
 import { formatPoints } from "@/lib/utils";
+import TaskSetProgressBar from "./task-set-progress-bar";
+import { useProgress } from "@/queries/useProgress";
+import SingleChoiceTasks from "./single-choice-tasks";
+import OpenTextTasks from "./open-text-tasks";
+import OpenTextGapsTask from "./open-text-gaps-task";
+import AudioOpenTextTasks from "./audio-open-text-tasks";
+
+function TaskTypeChunkFallback() {
+  return (
+    <div className="flex justify-center items-center min-h-[40vh] w-full">
+      <LoadingSpinner />
+    </div>
+  );
+}
+
+const GapFillSharedTask = dynamic(
+  () =>
+    import("./gap-fill-shared-task").then((m) => ({
+      default: m.GapFillSharedTask,
+    })),
+  { loading: TaskTypeChunkFallback },
+);
+
+const WritingTask = dynamic(() => import("./writing-task"), {
+  loading: TaskTypeChunkFallback,
+});
+
+const AudioSingleChoiceTasks = dynamic(
+  () => import("./audio-single-choice-tasks"),
+  { loading: TaskTypeChunkFallback },
+);
+
+const HeadingMatchTask = dynamic(
+  () =>
+    import("./heading-match-task").then((m) => ({
+      default: m.HeadingMatchTask,
+    })),
+  { loading: TaskTypeChunkFallback },
+);
 
 export function TaskPageContent({ taskId }: { taskId: string }) {
-  const { task, isLoading } = useTask({ taskId });
+  const params = useParams<{ taskSetId: string }>();
+  const taskSetIdFromRoute = params.taskSetId ?? "";
+
+  const { task, isPending } = useTask({ taskId });
   const { attempt } = useAttempt(taskId);
 
+  const { progress } = useProgress(taskSetIdFromRoute);
+
   useLayoutEffect(() => {
-    document.title = `${task?.title} - Kurs maturalny Españolita`;
+    document.title = `${task?.title} - Zadania Maturalne Españolita`;
   }, [task]);
 
-  if (isLoading) {
-    return (
-      <div className="flex justify-center items-center h-screen w-full">
-        <LoadingSpinner />
-      </div>
-    );
-  }
+  const completedTasksCount = taskSetIdFromRoute
+    ? (progress?.taskSets?.[taskSetIdFromRoute]?.completedTasksCount ?? 0)
+    : 0;
 
+  const totalTasksCount = taskSetIdFromRoute
+    ? (progress?.taskSets?.[taskSetIdFromRoute]?.totalTasksCount ?? 0)
+    : 0;
+
+  const taskSetTitle =
+    task?.taskSetTitle ?? progress?.taskSets?.[taskSetIdFromRoute]?.title ?? "";
+
+  let taskBody: React.ReactNode = null;
   switch (task?.type) {
     case "single_choice":
-      return (
+      taskBody = (
         <>
-          <h1 className="text-lg font-bold mb-2">{task?.title}</h1>
+          <h1 className="text-lg font-semibold mb-2">{task?.title}</h1>
           <Instructions className="mb-4">{task?.instructions}</Instructions>
           <SingleChoiceTasks
             key={attempt?.attemptId ?? "new"}
-            questions={task?.questions_v2}
+            questions={task?.questions}
             taskId={taskId}
             attempt={attempt}
+            text={task?.content.text}
+            title={task?.content.title}
           />
         </>
       );
+      break;
     case "gap_fill_shared":
-      return (
+      taskBody = (
         <>
-          <h1 className="text-lg font-bold mb-2">{task?.title}</h1>
+          <h1 className="text-lg font-semibold mb-2">{task?.title}</h1>
           <Instructions className="mb-4">{task?.instructions}</Instructions>
           <GapFillSharedTask
             key={attempt?.attemptId ?? "new"}
             taskId={taskId}
-            text={task?.content.text}
-            options={task?.sharedOptions}
-            questions={task?.questions_v2}
+            text={task?.content?.text ?? ""}
+            options={task?.content?.options}
+            questions={task?.questions}
             attempt={attempt}
           />
         </>
       );
+      break;
     case "open_text":
-      return (
+      taskBody = (
         <>
-          <h1 className="text-lg font-bold mb-2">{task?.title}</h1>
+          <h1 className="text-lg font-semibold mb-2">{task?.title}</h1>
           <Instructions className="mb-4">{task?.instructions}</Instructions>
           <OpenTextTasks
             taskId={taskId}
             key={attempt?.attemptId ?? "new"}
-            questions={task?.questions_v2}
+            questions={task?.questions}
             attempt={attempt}
           />
         </>
       );
+      break;
     case "writing":
-      return (
+      taskBody = (
         <>
-          <h1 className="text-lg font-bold mb-4">{task?.title}</h1>
+          <h1 className="text-lg font-semibold mb-4">{task?.title}</h1>
           <Instructions className="mb-4">
             <p className="mb-4">{task?.instructions}</p>
-            <ul>
+            <ul className="mb-4">
               {task?.content.requirements?.map((requirement) => (
                 <li className="list-disc list-inside ml-4" key={requirement}>
                   {requirement}
                 </li>
               ))}
             </ul>
+            <p className="text-sm text-red-500 font-semibold">
+              Uwaga: limit dzienny to 3 oceny wypracowań.
+            </p>
           </Instructions>
           <div className="border border-gray-200 p-4 rounded-lg">
             <p className="font-semibold mb-4">Kryteria oceniania</p>
@@ -120,7 +174,92 @@ export function TaskPageContent({ taskId }: { taskId: string }) {
           />
         </>
       );
+      break;
+    case "open_text_gaps":
+      taskBody = (
+        <>
+          <h1 className="text-lg font-semibold mb-2">{task?.title}</h1>
+          <Instructions className="mb-4">{task?.instructions}</Instructions>
+          <OpenTextGapsTask
+            key={attempt?.attemptId ?? "new"}
+            taskId={taskId}
+            title={task?.content?.title}
+            text={task?.content?.text ?? ""}
+            questions={task?.questions}
+            attempt={attempt}
+          />
+        </>
+      );
+      break;
+    case "audio_single_choice":
+      taskBody = (
+        <>
+          <h1 className="text-lg font-semibold mb-2">{task?.title}</h1>
+          <Instructions className="mb-4">{task?.instructions}</Instructions>
+          <AudioSingleChoiceTasks
+            key={attempt?.attemptId ?? "new"}
+            taskId={taskId}
+            questions={task?.questions}
+            attempt={attempt}
+            audioUrl={task?.content?.audio_url ?? ""}
+            texts={task?.content?.texts ?? []}
+          />
+        </>
+      );
+      break;
+    case "heading_match":
+      taskBody = (
+        <>
+          <h1 className="text-lg font-semibold mb-2">{task?.title}</h1>
+          <Instructions className="mb-4">{task?.instructions}</Instructions>
+          <HeadingMatchTask
+            audioUrl={task?.content?.audio_url}
+            key={attempt?.attemptId ?? "new"}
+            taskId={taskId}
+            headings={task?.content?.headings ?? []}
+            questions={task?.questions ?? []}
+            attempt={attempt}
+          />
+        </>
+      );
+      break;
+    case "audio_open_text":
+      taskBody = (
+        <>
+          <h1 className="text-lg font-semibold mb-2">{task?.title}</h1>
+          <Instructions className="mb-4">{task?.instructions}</Instructions>
+          <AudioOpenTextTasks
+            key={attempt?.attemptId ?? "new"}
+            taskId={taskId}
+            audioUrl={task?.content.audio_url ?? ""}
+            questions={task?.questions ?? []}
+            attempt={attempt}
+            transcript={task?.content.transcript ?? ""}
+            taskInstructions={task?.instructions ?? ""}
+            language={task?.content.language}
+          />
+        </>
+      );
+      break;
     default:
-      return null;
+      taskBody = null;
+      break;
   }
+
+  return (
+    <>
+      <TaskSetProgressBar
+        taskSetTitle={taskSetTitle}
+        completedTasksCount={completedTasksCount}
+        totalTasksCount={totalTasksCount}
+      />
+      {isPending ? (
+        <div className="flex justify-center items-center min-h-[50vh] w-full">
+          <LoadingSpinner />
+        </div>
+      ) : (
+        taskBody
+      )}
+    </>
+  );
 }

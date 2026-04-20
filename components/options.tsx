@@ -23,7 +23,10 @@ export function Options({
       disabled={disabled}
     >
       {options.map((option) => (
-        <div key={option.id} className="flex items-center gap-3">
+        <div
+          key={option.id}
+          className="flex items-center gap-3 border border-gray-200 p-2 rounded-lg"
+        >
           <RadioGroupItem value={option.id} id={option.id} />
           <Label htmlFor={option.id}>{option.text}</Label>
         </div>

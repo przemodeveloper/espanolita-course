@@ -1,7 +1,7 @@
 import { type NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
-import type { answers_v2, options_v2 } from "@prisma/client";
+import type { answers, options } from "@prisma/client";
 
 function normalize(text: string) {
   return text.trim().toLowerCase().replace(/\s+/g, " ");
@@ -18,7 +18,7 @@ export async function POST(
   } = await supabase.auth.getUser();
 
   if (!user) {
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    return NextResponse.json({ error: "Nieautoryzowany" }, { status: 401 });
   }
 
   const { taskId } = await params;
@@ -29,16 +29,13 @@ export async function POST(
       // ---------------------------------
       // Get task
       // ---------------------------------
-      const task = await tx.tasks_v2.findUnique({
+      const task = await tx.tasks.findUnique({
         where: { id: taskId },
         select: { type: true },
       });
 
-      if (!task) throw new Error("Task not found");
+      if (!task) throw new Error("Zadanie nie znalezione");
 
-      // =====================================================
-      // QUESTION BASED TASKS
-      // =====================================================
       const answers: {
         questionId: string;
         optionId?: string;
@@ -46,13 +43,54 @@ export async function POST(
       }[] = body.answers ?? [];
 
       if (!answers.length) {
-        throw new Error("No answers provided");
+        throw new Error("Brak odpowiedzi");
+      }
+
+      // ---------------------------------
+      // VALIDATION
+      // ---------------------------------
+
+      // 1. No duplicate answers per question
+      const seen = new Set<string>();
+      for (const a of answers) {
+        if (seen.has(a.questionId)) {
+          throw new Error(`Duplikat odpowiedzi dla pytania ${a.questionId}`);
+        }
+        seen.add(a.questionId);
+      }
+
+      const isChoice =
+        task.type === "single_choice" || task.type === "audio_single_choice";
+
+      const isOpenText =
+        task.type === "open_text" || task.type === "open_text_gaps";
+
+      const isHeadingMatch = task.type === "heading_match";
+
+      const isGapFillShared = task.type === "gap_fill_shared";
+
+      // 2. Required fields
+      if (isChoice && !answers.every((a) => a.optionId)) {
+        throw new Error("Brak optionId dla zadania wyboru");
+      }
+
+      if (isOpenText && !answers.every((a) => a.answerText !== undefined)) {
+        throw new Error("Brak answerText dla zadania otwartego tekstu");
+      }
+
+      if (
+        (isHeadingMatch || isGapFillShared) &&
+        !answers.every((a) => a.answerText !== undefined)
+      ) {
+        throw new Error(
+          "Brak answerText dla zadania dopasowania nagłówka lub wypełniania luk współdzielonych",
+        );
       }
 
       // ---------------------------------
       // Create attempt
       // ---------------------------------
-      const attempt = await tx.task_attempts_v2.create({
+      const attempt = await tx.task_attempts.create({
         data: {
           task_id: taskId,
           user_id: user.id,
@@ -67,23 +105,23 @@ export async function POST(
       // ---------------------------------
       // Fetch questions
       // ---------------------------------
-      const questions = await tx.questions_v2.findMany({
+      const questions = await tx.questions.findMany({
         where: { id: { in: questionIds } },
       });
 
       const questionMap = new Map(questions.map((q) => [q.id, q]));
 
       // ---------------------------------
-      // Fetch options (choice tasks)
+      // Fetch options (choice)
       // ---------------------------------
       const optionIds = answers
         .map((a) => a.optionId)
         .filter(Boolean) as string[];
 
-      let optionMap = new Map<string, options_v2>();
+      let optionMap = new Map<string, options>();
 
       if (optionIds.length) {
-        const options = await tx.options_v2.findMany({
+        const options = await tx.options.findMany({
           where: { id: { in: optionIds } },
         });
 
@@ -91,21 +129,30 @@ export async function POST(
       }
 
       // ---------------------------------
-      // Fetch acceptable answers (open_text)
+      // Fetch acceptable answers (open_text only)
       // ---------------------------------
-      let acceptableMap = new Map<string, answers_v2[]>();
+      type AcceptableAnswer = answers & { compiled?: RegExp };
 
-      if (task.type === "open_text") {
-        const acceptable = await tx.answers_v2.findMany({
+      let acceptableMap = new Map<string, AcceptableAnswer[]>();
+
+      if (isOpenText) {
+        const acceptable = await tx.answers.findMany({
           where: { question_id: { in: questionIds } },
         });
 
         acceptableMap = acceptable.reduce((map, a) => {
           const list = map.get(a.question_id) ?? [];
-          list.push(a);
+
+          list.push({
+            ...a,
+            compiled: a.regex_pattern
+              ? new RegExp(a.regex_pattern, "i")
+              : undefined,
+          });
+
           map.set(a.question_id, list);
           return map;
-        }, new Map<string, typeof acceptable>());
+        }, new Map<string, AcceptableAnswer[]>());
       }
 
       // ---------------------------------
@@ -119,34 +166,66 @@ export async function POST(
         let points = 0;
 
         // ================================
-        // single_choice + gap_fill_shared
+        // choice tasks
         // ================================
-        if (task.type === "single_choice" || task.type === "gap_fill_shared") {
+        if (isChoice) {
           isCorrect = option?.is_correct ?? false;
           points = isCorrect ? (q?.points ?? 1) : 0;
         }
 
         // ================================
-        // open_text (answers_v2 based)
+        // heading match | gap_fill_shared (label vs questions.correct_key)
         // ================================
-        if (task.type === "open_text") {
+        if (isHeadingMatch || isGapFillShared) {
+          const userRaw = a.answerText ?? "";
+          const normalizedUser = normalize(userRaw);
+          const key = q?.correct_key;
+
+          if (key != null && key !== "") {
+            isCorrect = normalize(key) === normalizedUser;
+          } else {
+            console.warn(`Brak correct_key dla pytania ${a.questionId}`);
+            isCorrect = false;
+          }
+
+          points = isCorrect ? (q?.points ?? 1) : 0;
+        }
+
+        // ================================
+        // open text
+        // ================================
+        if (isOpenText) {
           const userRaw = a.answerText ?? "";
           const normalizedUser = normalize(userRaw);
 
           const acceptable = acceptableMap.get(a.questionId) ?? [];
 
-          isCorrect = acceptable.some((ans) => {
-            if (ans.normalized_text) {
-              if (normalizedUser === ans.normalized_text) return true;
-            }
+          if (acceptable.length) {
+            isCorrect = acceptable.some((ans) => {
+              if (
+                ans.normalized_text &&
+                normalizedUser === ans.normalized_text
+              ) {
+                return true;
+              }
 
-            if (ans.regex_pattern) {
-              const regex = new RegExp(ans.regex_pattern, "i");
-              if (regex.test(userRaw)) return true;
-            }
+              if (ans.compiled?.test(normalizedUser)) {
+                return true;
+              }
 
-            return false;
-          });
+              return false;
+            });
+          } else {
+            const key = q?.correct_key;
+            if (key != null && key !== "") {
+              isCorrect = normalize(key) === normalizedUser;
+            } else {
+              console.warn(
+                `Brak akceptowanych odpowiedzi dla pytania ${a.questionId}`,
+              );
+              isCorrect = false;
+            }
+          }
 
           points = isCorrect ? (q?.points ?? 1) : 0;
         }
@@ -155,25 +234,26 @@ export async function POST(
           attempt_id: attempt.id,
           user_id: user.id,
           question_id: a.questionId,
-          option_id: a.optionId ?? null,
+          option_id:
+            isGapFillShared || isHeadingMatch ? null : (a.optionId ?? null),
           answer_text: a.answerText ?? null,
           is_correct: isCorrect,
           points_awarded: points,
-          answered_at: new Date(),
+          created_at: new Date(),
         };
       });
 
       // ---------------------------------
       // Save answers
       // ---------------------------------
-      await tx.student_answers_v2.createMany({ data: rows });
+      await tx.student_answers.createMany({ data: rows });
 
       // ---------------------------------
       // Score
       // ---------------------------------
       const score = rows.reduce((sum, r) => sum + r.points_awarded, 0);
 
-      await tx.task_attempts_v2.update({
+      await tx.task_attempts.update({
         where: { id: attempt.id },
         data: { score },
       });
@@ -190,6 +270,9 @@ export async function POST(
     return NextResponse.json(result);
   } catch (err) {
     console.error(err);
-    return NextResponse.json({ error: "Submission failed" }, { status: 500 });
+    return NextResponse.json(
+      { error: "Nie udało się złożyć zgłoszenia" },
+      { status: 500 },
+    );
   }
 }

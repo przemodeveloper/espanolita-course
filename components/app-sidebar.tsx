@@ -21,14 +21,16 @@ import {
 } from "@/components/ui/collapsible";
 import Link from "next/link";
 import { useTask } from "@/queries/useTask";
-import { usePathname } from "next/navigation";
+import { usePathname, useParams } from "next/navigation";
 import { useTaskSets } from "@/queries/useTaskSets";
 import type { TaskSet } from "@/models/taskSets";
 import { useProgress } from "@/queries/useProgress";
 
 export function AppSidebar() {
   const { taskSets = [] } = useTaskSets();
-  const { progress } = useProgress();
+  const { taskSetId = "" } = useParams<{ taskSetId: string }>();
+  const { progress } = useProgress(taskSetId as string);
+
   const { prefetchQuery } = useTask({ enabled: false });
   const pathname = usePathname();
 
@@ -39,13 +41,14 @@ export function AppSidebar() {
       <SidebarContent>
         <SidebarGroup>
           <SidebarGroupLabel className="uppercase">
-            Kurs maturalny Españolita
+            Zadania Maturalne Españolita
           </SidebarGroupLabel>
           <SidebarGroupContent>
             <SidebarMenu>
               {taskSets.map((taskSet: TaskSet) => {
                 const isActiveSet = taskSet.tasks.some(
-                  (t) => pathname === `/course/task/${t.id}`,
+                  (t) =>
+                    pathname === `/course/task-set/${taskSet.id}/task/${t.id}`,
                 );
                 return (
                   <Collapsible
@@ -70,7 +73,7 @@ export function AppSidebar() {
                         <SidebarMenuSub>
                           {taskSet.tasks.map(
                             (task: { id: string; title: string }) => {
-                              const url = `/course/task/${task.id}`;
+                              const url = `/course/task-set/${taskSet.id}/task/${task.id}`;
                               return (
                                 <SidebarMenuSubItem key={task.id}>
                                   <SidebarMenuSubButton
@@ -81,7 +84,9 @@ export function AppSidebar() {
                                       href={url}
                                       onMouseOver={() => prefetchQuery(task.id)}
                                     >
-                                      {progress?.[task.id]?.completed ? (
+                                      {progress?.taskSets?.[
+                                        taskSet.id
+                                      ]?.completedTasks.includes(task.id) ? (
                                         <span className="text-xs text-green-500 flex items-center gap-1">
                                           <CheckCircle className="size-4" />
                                         </span>

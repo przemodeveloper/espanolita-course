@@ -1,6 +1,12 @@
 "use client";
 
-import { DndContext, type DragEndEvent } from "@dnd-kit/core";
+import {
+  DndContext,
+  PointerSensor,
+  useSensor,
+  useSensors,
+  type DragEndEvent,
+} from "@dnd-kit/core";
 import { useMemo, useState } from "react";
 import DraggableOption from "./draggable-option";
 import Gap from "./gap";
@@ -11,7 +17,16 @@ import { useDeleteAttempt } from "@/queries/useDeleteAttempt";
 import { TaskSummary } from "./task-summary";
 import { TaskActions } from "./task-actions";
 
-type Option = { text: string; id: string; label: string };
+type Option = { text: string; label: string; id?: string };
+
+function optionDragId(label: string) {
+  return `gfs-${label.toUpperCase()}`;
+}
+
+function parseOptionDragId(id: string): string | null {
+  if (!id.startsWith("gfs-")) return null;
+  return id.slice("gfs-".length).toUpperCase();
+}
 
 function buildInitialAnswers(
   emptyAnswers: Record<number, string | null>,
@@ -22,12 +37,15 @@ function buildInitialAnswers(
 
   if (!attempt?.answers) return initial;
 
-  const questionIdToGap = new Map(questions.map((q) => [q.id, q.gap_index]));
+  const questionIdToGap = new Map(questions.map((q) => [q.id, q.order_index]));
 
   for (const a of attempt.answers) {
     const gap = questionIdToGap.get(a.questionId);
-    if (gap !== undefined) {
-      initial[gap] = a.optionId ?? null;
+    if (gap === undefined || gap === null) continue;
+
+    const label = a.answerText?.trim().toUpperCase();
+    if (label) {
+      initial[gap] = label;
     }
   }
 
@@ -52,8 +70,14 @@ export function GapFillSharedTask({
   const { mutate: deleteAttempt, isPending: isDeleting } =
     useDeleteAttempt(taskId);
 
+  const sensors = useSensors(
+    useSensor(PointerSensor, {
+      activationConstraint: { distance: 10 },
+    }),
+  );
+
   const questionMap = useMemo(
-    () => new Map(questions.map((q) => [q.gap_index, q.id])),
+    () => new Map(questions.map((q) => [q.order_index, q.id])),
     [questions],
   );
 
@@ -86,20 +110,20 @@ export function GapFillSharedTask({
   function handleSubmitAnswers() {
     const formatted = Object.entries(answers)
       .filter((entry): entry is [string, string] => entry[1] != null)
-      .flatMap(([gapIndex, optionId]) => {
+      .flatMap(([gapIndex, label]) => {
         const questionId = questionMap.get(Number(gapIndex));
         if (questionId === undefined) return [];
-        return [{ questionId, optionId }];
+        return [{ questionId, answerText: label }];
       });
 
     submitResponse({ taskId, answers: formatted });
   }
 
   function handleDragEnd(event: DragEndEvent) {
-    const optionKey = event.active.id as string;
+    const label = parseOptionDragId(String(event.active.id));
     const overId = event.over?.id as string | undefined;
 
-    if (!overId) return;
+    if (!label || !overId) return;
 
     const gapIndex = Number(overId.replace("gap-", ""));
 
@@ -107,33 +131,35 @@ export function GapFillSharedTask({
       const next = { ...prev };
 
       Object.keys(next).forEach((k) => {
-        if (next[Number(k)] === optionKey) next[Number(k)] = null;
+        if (next[Number(k)] === label) next[Number(k)] = null;
       });
 
-      next[gapIndex] = optionKey;
+      next[gapIndex] = label;
 
       return next;
     });
   }
 
   const usedSet = new Set(Object.values(answers).filter(Boolean));
-  const availableOptions = options?.filter((o) => !usedSet.has(o.id)) ?? [];
+  const availableOptions =
+    options?.filter((o) => !usedSet.has(o.label.toUpperCase())) ?? [];
 
   const parts = text.split(/7\.\d+\.\s*_____?/g);
 
-  const optionMap = useMemo(
-    () => new Map(options?.map((o) => [o.id, o]) ?? []),
+  const optionByLabel = useMemo(
+    () =>
+      new Map(options?.map((o) => [o.label.toUpperCase(), o] as const) ?? []),
     [options],
   );
 
-  const getDisplayValue = (optionId: string | null) =>
-    optionId ? (optionMap.get(optionId)?.text ?? null) : null;
+  const getDisplayValue = (label: string | null) =>
+    label ? (optionByLabel.get(label)?.text ?? null) : null;
 
   return (
-    <DndContext onDragEnd={handleDragEnd}>
+    <DndContext sensors={sensors} onDragEnd={handleDragEnd}>
       <div className="space-y-6">
         <div className="flex items-center justify-between">
-          <p className="max-w-3xl leading-relaxed text-muted-foreground">
+          <p className="leading-relaxed">
             {parts.map((part, index) => {
               if (index === parts.length - 1) return part;
 
@@ -163,30 +189,34 @@ export function GapFillSharedTask({
           </p>
         </div>
 
-        <div className="max-w-3xl space-y-4">
-          <div className="flex flex-wrap gap-3">
-            {availableOptions.map((option) => (
-              <DraggableOption
-                key={option.id}
-                option={option}
-                disabled={
-                  Boolean(attempt?.attemptId) || isSubmitting || isDeleting
-                }
-              />
-            ))}
-          </div>
-          {attempt?.attemptId && <TaskSummary score={attempt.score} />}
-          <TaskActions
-            onSubmit={handleSubmitAnswers}
-            onReset={resetAnswers}
-            isSubmitting={isSubmitting}
-            isDeleting={isDeleting}
-            attemptId={attempt?.attemptId ?? null}
-            disabled={
-              Object.values(answers).filter(Boolean).length !== questions.length
-            }
-          />
+        <div className="flex flex-wrap gap-3 mb-4">
+          {availableOptions.map((option) => (
+            <DraggableOption
+              key={optionDragId(option.label)}
+              option={{
+                id: optionDragId(option.label),
+                label: option.label,
+                text: option.text,
+              }}
+              disabled={
+                Boolean(attempt?.attemptId) || isSubmitting || isDeleting
+              }
+            />
+          ))}
         </div>
+        {attempt?.attemptId && (
+          <TaskSummary score={attempt.score} className="mb-4" />
+        )}
+        <TaskActions
+          onSubmit={handleSubmitAnswers}
+          onReset={resetAnswers}
+          isSubmitting={isSubmitting}
+          isDeleting={isDeleting}
+          attemptId={attempt?.attemptId ?? null}
+          disabled={
+            Object.values(answers).filter(Boolean).length !== questions.length
+          }
+        />
       </div>
     </DndContext>
   );

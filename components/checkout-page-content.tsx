@@ -8,21 +8,32 @@ import { useCheckout } from "@/queries/useCheckout";
 const benefits = [
   {
     title: "Dostęp na zawsze",
-    description: "Dostęp do kursu na zawsze.",
+    description: "Dostęp do arkusza i zadań bonusowych na zawsze.",
   },
   {
-    title: "20 zadań",
+    title: "12 zadań",
     description:
-      "Kurs składa się z 20 zadań, które pomogą Ci zdać maturę z języka hiszpańskiego.",
+      "Arkusz składa się z 12 zadań, które pomogą Ci zdać maturę z języka hiszpańskiego.",
   },
   {
-    title: "Certyfikat",
-    description: "Po zakończeniu kursu otrzymasz certyfikat.",
+    title: "Zadania bonusowe",
+    description:
+      "Dostępne są również zadania bonusowe, które pomogą Ci dodatkowo przećwiczyć sprawdzić swoją wiedzę przed egzaminem.",
+  },
+  {
+    title: "Wsparcie AI przy pisaniu wypracowania",
+    description:
+      "Dostępne jest wsparcie AI przy pisaniu wypracowania, które pomoże Ci napisać wypracowanie w sposób sprawny i zrozumiały.",
+  },
+  {
+    title: "Przyszłe aktualizacje - nowe arkusze i zadania bonusowe",
+    description:
+      "Przyszłe aktualizacje - nowe arkusze i zadania bonusowe, które pomogą Ci dodatkowo przećwiczyć sprawdzić swoją wiedzę przed egzaminem.",
   },
 ];
 
 export function CheckoutPageContent() {
-  const { mutateAsync } = useCheckout();
+  const { mutate } = useCheckout();
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -32,9 +43,9 @@ export function CheckoutPageContent() {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6 }}
-          className="text-4xl md:text-5xl font-bold mb-4"
+          className="text-4xl md:text-5xl font-semibold mb-4"
         >
-          Kurs maturalny Españolita
+          Zadania Maturalne Españolita
         </motion.h1>
         <motion.p
           initial={{ opacity: 0, y: 20 }}
@@ -42,12 +53,12 @@ export function CheckoutPageContent() {
           transition={{ delay: 0.1, duration: 0.6 }}
           className="text-lg text-gray-600 max-w-2xl"
         >
-          Kup kurs maturalny Españolita i zacznij naukę już dziś.
+          Kup Zadania Maturalne Españolita i zacznij naukę już dziś.
         </motion.p>
       </section>
 
       {/* Main Content */}
-      <section className="max-w-6xl mx-auto px-6 grid md:grid-cols-3 gap-8 pb-24">
+      <section className="max-w-6xl mx-auto px-4 grid md:grid-cols-3 gap-8 pb-12">
         {/* Benefits */}
         <div className="md:col-span-2 space-y-6">
           {benefits.map((benefit, i) => (
@@ -80,25 +91,35 @@ export function CheckoutPageContent() {
           <Card className="rounded-2xl shadow-lg">
             <CardContent className="p-6 space-y-6">
               <div>
-                <p className="text-sm text-gray-500">Dostęp do kursu</p>
-                <p className="text-3xl font-bold">799 zł</p>
+                <p className="text-sm text-gray-500">
+                  Dostęp do arkusza i zadań bonusowych
+                </p>
+                <p className="text-3xl font-semibold">199 zł</p>
               </div>
 
               <ul className="space-y-3 text-sm text-gray-600">
                 <li>✔ Dostęp na zawsze</li>
-                <li>✔ 20 zadań</li>
-                <li>✔ Certyfikat</li>
+                <li>✔ 12 zadań</li>
+                <li>✔ Zadania bonusowe</li>
+                <li>✔ Wsparcie AI przy pisaniu wypracowania</li>
+                <li>
+                  ✔ Przyszłe aktualizacje - nowe arkusze i zadania bonusowe
+                </li>
               </ul>
 
               <Button
                 className="w-full rounded-xl text-base py-6"
-                onClick={() => mutateAsync()}
+                onClick={() => mutate()}
               >
-                Kup kurs
+                Kup Zadania Maturalne Españolita
               </Button>
 
               <p className="text-xs text-center text-gray-400">
-                14-dniowa gwarancja zwrotu pieniędzy
+                14-dniowa gwarancja zwrotu pieniędzy (obowiązują warunki i
+                regulamin)
+              </p>
+              <p className="text-xs text-center text-gray-400">
+                Dokonując zakupu akceptujesz warunki i regulamin.
               </p>
             </CardContent>
           </Card>

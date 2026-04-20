@@ -12,23 +12,23 @@ export async function GET(
   } = await supabase.auth.getUser();
 
   if (!user) {
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    return NextResponse.json({ error: "Nieautoryzowany" }, { status: 401 });
   }
 
   const { setId: id } = await params;
 
-  const taskSet = await prisma.task_sets_v2.findUnique({
+  const taskSet = await prisma.task_sets.findUnique({
     where: { id },
     include: {
-      task_set_items_v2: {
+      task_set_items: {
         orderBy: { order_index: "asc" },
         include: {
-          tasks_v2: {
+          tasks: {
             include: {
-              questions_v2: {
+              questions: {
                 orderBy: { order_index: "asc" },
                 include: {
-                  options_v2: {
+                  options: {
                     orderBy: { order_index: "asc" },
                   },
                 },
@@ -41,11 +41,14 @@ export async function GET(
   });
 
   if (!taskSet) {
-    return NextResponse.json({ error: "Task set not found" }, { status: 404 });
+    return NextResponse.json(
+      { error: "Zestaw zadań nie znaleziony" },
+      { status: 404 },
+    );
   }
 
   // flatten items → tasks
-  const tasks = taskSet.task_set_items_v2.map((item) => item.tasks_v2);
+  const tasks = taskSet.task_set_items.map((item) => item.tasks);
 
   return NextResponse.json({
     id: taskSet.id,

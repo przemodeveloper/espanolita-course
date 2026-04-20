@@ -10,10 +10,14 @@ import { TaskSummary } from "./task-summary";
 import { TaskActions } from "./task-actions";
 
 export default function SingleChoiceTasks({
+  text,
+  title,
   questions,
   taskId,
   attempt,
 }: {
+  text?: string;
+  title?: string;
   questions: Question[];
   taskId: string;
   attempt?: Attempt | null;
@@ -62,26 +66,38 @@ export default function SingleChoiceTasks({
 
   return (
     <div>
-      {questions?.map((question) => (
-        <SingleChoiceTask
-          value={
-            answers?.find((answer) => answer.questionId === question.id)
-              ?.optionId || ""
-          }
-          key={question.id}
-          options={question.options_v2}
-          prompt={question.prompt}
-          orderIndex={question.order_index}
-          isIncorrect={Boolean(
-            attempt?.incorrectQuestionIds?.includes(question.id),
-          )}
-          onChange={(optionId) => {
-            handleSetAnswer(question.id, optionId);
-          }}
-          disabled={Boolean(attempt?.attemptId) || isSubmitting || isDeleting}
-        />
-      ))}
-      {attempt?.attemptId && <TaskSummary score={attempt.score} />}
+      {title && (
+        <h2 className="text-lg text-center font-semibold mb-2">{title}</h2>
+      )}
+      {text && <p className="mb-4">{text}</p>}
+      <div className="space-y-4 mb-4">
+        {questions?.map((question) => (
+          <SingleChoiceTask
+            value={
+              answers?.find((answer) => answer.questionId === question.id)
+                ?.optionId || ""
+            }
+            key={question.id}
+            options={question.options}
+            prompt={question.prompt}
+            orderIndex={question.order_index}
+            isIncorrect={Boolean(
+              attempt?.incorrectQuestionIds?.includes(question.id),
+            )}
+            isCorrect={Boolean(
+              attempt?.correctQuestionIds?.includes(question.id),
+            )}
+            onChange={(optionId) => {
+              handleSetAnswer(question.id, optionId);
+            }}
+            disabled={Boolean(attempt?.attemptId) || isSubmitting || isDeleting}
+          />
+        ))}
+      </div>
+
+      {attempt?.attemptId && (
+        <TaskSummary score={attempt.score} className="mb-4" />
+      )}
       <TaskActions
         onSubmit={handleSubmitAnswers}
         onReset={handleResetAnswers}

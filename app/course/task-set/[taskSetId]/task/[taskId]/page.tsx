@@ -9,7 +9,7 @@ export async function generateMetadata({
 }): Promise<Metadata> {
   const { taskId } = await params;
 
-  const task = await prisma.tasks_v2.findUnique({
+  const task = await prisma.tasks.findUnique({
     where: { id: taskId },
     select: {
       title: true,
@@ -18,12 +18,11 @@ export async function generateMetadata({
 
   if (task) {
     return {
-      title: `${task.title} - Kurs maturalny Españolita`,
+      title: `${task.title} - Zadania Maturalne Españolita`,
       description: `Zadanie: ${task.title}`,
       keywords: [
-        "kurs maturalny",
+        "zadania maturalne",
         "hiszpański",
-        "matura",
         "españolita",
         "zadania",
         task.title,
@@ -32,15 +31,9 @@ export async function generateMetadata({
   }
 
   return {
-    title: "Zadanie - Kurs maturalny Españolita",
-    description: "Kurs maturalny Españolita - Zadanie",
-    keywords: [
-      "kurs maturalny",
-      "hiszpański",
-      "matura",
-      "españolita",
-      "zadania",
-    ],
+    title: "Zadanie - Zadania Maturalne Españolita",
+    description: "Zadania Maturalne Españolita - Zadanie",
+    keywords: ["zadania maturalne", "hiszpański", "españolita", "zadania"],
   };
 }
 

@@ -14,28 +14,38 @@ export async function GET(
   } = await supabase.auth.getUser();
 
   if (!user) {
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    return NextResponse.json({ error: "Nieautoryzowany" }, { status: 401 });
   }
 
   const { taskId } = await params;
 
-  const task = await prisma.tasks_v2.findUnique({
+  const task = await prisma.tasks.findUnique({
     where: { id: taskId },
     select: { type: true },
   });
 
   if (!task) {
-    return NextResponse.json({ error: "Task not found" }, { status: 404 });
+    return NextResponse.json(
+      { error: "Zadanie nie znalezione" },
+      { status: 404 },
+    );
   }
 
-  const attempt = await prisma.task_attempts_v2.findFirst({
+  const attempt = await prisma.task_attempts.findFirst({
     where: {
       user_id: user.id,
       task_id: taskId,
     },
     orderBy: { created_at: "desc" },
     include: {
-      student_answers_v2: true,
+      student_answers: {
+        select: {
+          question_id: true,
+          option_id: true,
+          answer_text: true,
+          is_correct: true,
+        },
+      },
     },
   });
 
@@ -49,9 +59,9 @@ export async function GET(
   if (task.type === "writing") {
     return NextResponse.json({
       attemptId: attempt.id,
-      type: "writing",
+      type: task.type,
       answerText: attempt.answer_text ?? "",
-      score: attempt.score ? Number(attempt.score) : null,
+      score: attempt.score !== null ? Number(attempt.score) : null,
       grading:
         (
           attempt.metadata as {
@@ -62,49 +72,100 @@ export async function GET(
   }
 
   // =====================================================
-  // QUESTION BASED (single_choice / gap_fill_shared / open_text)
+  // QUESTION BASED
+  // (single_choice / gap_fill_shared / open_text / open_text_gaps)
   // =====================================================
-  const answers = attempt.student_answers_v2.map((a) => ({
-    questionId: a.question_id,
-    optionId: a.option_id,
-    answerText: a.answer_text,
-  }));
 
-  const correctQuestionIds = attempt.student_answers_v2
+  const answersRaw = attempt.student_answers;
+
+  // OPTIONAL: ensure stable order (recommended for gaps)
+  const questionOrder = new Map(
+    (
+      await prisma.questions.findMany({
+        where: {
+          id: { in: answersRaw.map((a) => a.question_id) },
+        },
+        select: { id: true, order_index: true },
+      })
+    ).map((q) => [q.id, q.order_index]),
+  );
+
+  const optionLabelById =
+    task.type === "gap_fill_shared"
+      ? new Map(
+          (
+            await prisma.options.findMany({
+              where: {
+                id: {
+                  in: answersRaw
+                    .map((a) => a.option_id)
+                    .filter((id): id is string => id != null),
+                },
+              },
+              select: { id: true, label: true },
+            })
+          ).map((o) => [o.id, o.label]),
+        )
+      : null;
+
+  const answers = answersRaw
+    .sort(
+      (a, b) =>
+        (questionOrder.get(a.question_id) ?? 0) -
+        (questionOrder.get(b.question_id) ?? 0),
+    )
+    .map((a) => {
+      const fromOption =
+        optionLabelById && a.option_id
+          ? (optionLabelById.get(a.option_id) ?? "").trim().toUpperCase()
+          : "";
+
+      return {
+        questionId: a.question_id,
+        optionId: a.option_id,
+        answerText: a.answer_text ?? (fromOption !== "" ? fromOption : null),
+      };
+    });
+
+  const correctQuestionIds = answersRaw
     .filter((a) => a.is_correct === true)
     .map((a) => a.question_id);
 
-  const incorrectQuestionIds = attempt.student_answers_v2
+  const incorrectQuestionIds = answersRaw
     .filter((a) => a.is_correct === false)
     .map((a) => a.question_id);
 
   return NextResponse.json({
     attemptId: attempt.id,
     type: task.type,
-    score: attempt.score ? Number(attempt.score) : null,
+    score: attempt.score !== null ? Number(attempt.score) : null,
     answers,
     correctQuestionIds,
     incorrectQuestionIds,
   });
 }
 
+// =====================================================
+// DELETE (latest attempt only)
+// =====================================================
+
 export async function DELETE(
   _req: NextRequest,
   { params }: { params: Promise<{ taskId: string }> },
 ) {
   const supabase = await createSupabaseServerClient();
+
   const {
     data: { user },
   } = await supabase.auth.getUser();
 
-  const { taskId } = await params;
-
   if (!user) {
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    return NextResponse.json({ error: "Nieautoryzowany" }, { status: 401 });
   }
 
-  // delete latest attempt only
-  const latestAttempt = await prisma.task_attempts_v2.findFirst({
+  const { taskId } = await params;
+
+  const latestAttempt = await prisma.task_attempts.findFirst({
     where: {
       task_id: taskId,
       user_id: user.id,
@@ -117,10 +178,12 @@ export async function DELETE(
     return NextResponse.json({ success: true });
   }
 
-  await prisma.task_attempts_v2.delete({
-    where: { id: latestAttempt.id },
+  await prisma.task_attempts.deleteMany({
+    where: {
+      id: latestAttempt.id,
+      user_id: user.id,
+    },
   });
 
-  // student_answers auto delete via cascade
   return NextResponse.json({ success: true });
 }

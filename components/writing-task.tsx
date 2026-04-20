@@ -2,7 +2,7 @@ import { useState } from "react";
 import { Button } from "./ui/button";
 import { Textarea } from "./ui/textarea";
 import type { RubricItem } from "@/models/grading";
-import { useGradeEssay } from "@/queries/useGradeEssay";
+import { useAiGradeTask } from "@/queries/useAiGradeTask";
 import { useDeleteAttempt } from "@/queries/useDeleteAttempt";
 import type { Attempt } from "@/models/attempt";
 
@@ -27,8 +27,12 @@ export default function WritingTask({
   requirements,
   rubric,
 }: WritingTaskProps) {
-  const { mutate: gradeEssay } = useGradeEssay(taskId);
-  const { mutate: deleteAttempt } = useDeleteAttempt(taskId);
+  const { mutate: gradeEssay, isPending: isSubmitting } = useAiGradeTask(
+    taskId,
+    "essay_grading",
+  );
+  const { mutate: deleteAttempt, isPending: isDeleting } =
+    useDeleteAttempt(taskId);
   const [essay, setEssay] = useState(() => attempt?.answerText ?? "");
   const [error, setError] = useState<string | null>(null);
 
@@ -67,15 +71,19 @@ export default function WritingTask({
 
   return (
     <div className="flex flex-1 flex-col gap-4">
-      <Textarea
-        className="w-full h-[500px]"
-        value={essay}
-        onChange={handleChangeEssay}
-        disabled={Boolean(attempt?.attemptId)}
-      />
+      <div className="border border-gray-200 p-4 rounded-lg">
+        <p className="font-semibold text-lg mb-4">Twoja odpowiedź</p>
+        <Textarea
+          className="w-full h-[500px] bg-gray-100 resize-none"
+          value={essay}
+          onChange={handleChangeEssay}
+          disabled={Boolean(attempt?.attemptId)}
+        />
+      </div>
+
       {error && <p className="text-red-500">{error}</p>}
       {attempt?.grading && (
-        <div className="bg-green-100 p-2 rounded-md mb-2">
+        <div className="bg-green-50 border border-green-200 p-2 rounded-md mb-2">
           <p>
             <span className="font-bold">Wynik:</span>{" "}
             {attempt?.grading?.totalScore}
@@ -93,20 +101,22 @@ export default function WritingTask({
           </p>
         </div>
       )}
-      <div className="flex justify-end gap-2">
+      <div className="flex flex-wrap justify-end gap-2">
         <Button
           variant="outline"
-          disabled={Boolean(attempt?.attemptId)}
+          disabled={Boolean(attempt?.attemptId) || isSubmitting || isDeleting}
           onClick={handleGradeEssay}
         >
-          Sprawdź wypracowanie
+          {isSubmitting ? "Sprawdzam wypracowanie..." : "Sprawdź wypracowanie"}
         </Button>
         <Button
           variant="outline"
           onClick={handleResetEssay}
-          disabled={Boolean(!attempt?.attemptId) || !essay}
+          disabled={
+            Boolean(!attempt?.attemptId) || !essay || isSubmitting || isDeleting
+          }
         >
-          Zresetuj wypracowanie
+          {isDeleting ? "Resetuję wypracowanie..." : "Zresetuj wypracowanie"}
         </Button>
       </div>
     </div>

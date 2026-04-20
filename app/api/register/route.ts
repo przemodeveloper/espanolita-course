@@ -1,44 +1,92 @@
 import { NextResponse } from "next/server";
+import { prisma } from "@/lib/prisma";
 import { supabaseAdmin } from "@/lib/supabase/admin";
+import { verifyTurnstile } from "@/lib/turnstile/verifyTurnstile";
 
 export async function POST(req: Request) {
   try {
-    const { firstName, lastName, email, password } = await req.json();
+    const { firstName, lastName, email, password, turnstileToken } =
+      await req.json();
 
     // Validation
     if (!firstName || !lastName || !email || !password) {
       return NextResponse.json(
-        { error: "Email and password are required." },
+        { error: "Brak wymaganych pól." },
         { status: 400 },
       );
     }
+
+    const normalizedEmail = email.toLowerCase().trim();
 
     if (password.length < 8) {
       return NextResponse.json(
-        { error: "Password must be at least 8 characters." },
+        { error: "Hasło musi mieć co najmniej 8 znaków." },
         { status: 400 },
       );
     }
 
-    // 1️⃣ Check purchase exists & not claimed
-    const { data: purchase, error: purchaseError } = await supabaseAdmin
-      .from("purchases")
-      .select("*")
-      .eq("email", email)
-      .is("user_id", null)
-      .single();
-
-    if (purchaseError || !purchase) {
+    // Verify Turnstile before any DB work
+    if (!turnstileToken) {
       return NextResponse.json(
-        { error: "No valid purchase found for this email." },
+        { error: "Brak tokenu sprawdzania zabezpieczeń." },
+        { status: 400 },
+      );
+    }
+
+    const isHuman = await verifyTurnstile(turnstileToken);
+    if (!isHuman) {
+      return NextResponse.json(
+        {
+          error: "Sprawdzanie zabezpieczeń nie powiodło się. Spróbuj ponownie.",
+        },
         { status: 403 },
       );
+    }
+
+    // 1️⃣ Check purchase exists & not claimed (case-insensitive email)
+    const purchase = await prisma.purchases.findFirst({
+      where: {
+        email: { equals: normalizedEmail, mode: "insensitive" },
+      },
+    });
+
+    if (!purchase) {
+      return NextResponse.json(
+        {
+          error:
+            "Nie znaleziono prawidłowego zakupu dla tej poczty elektronicznej.",
+        },
+        { status: 403 },
+      );
+    }
+
+    // 2️⃣ If purchase has a user_id, verify the auth user actually exists
+    if (purchase.user_id) {
+      const { data: existingUser } = await supabaseAdmin.auth.admin.getUserById(
+        purchase.user_id,
+      );
+
+      if (existingUser.user) {
+        return NextResponse.json(
+          {
+            error:
+              "Konto z tą pocztą elektroniczną już istnieje. Zaloguj się zamiast tego.",
+          },
+          { status: 409 },
+        );
+      }
+
+      // Auth user was deleted but purchase wasn't cleaned up — reset it
+      await supabaseAdmin
+        .from("purchases")
+        .update({ user_id: null, claimed_at: null })
+        .eq("id", purchase.id);
     }
 
     // 3️⃣ Create user
     const { data: authData, error: authError } =
       await supabaseAdmin.auth.admin.createUser({
-        email: email.toLowerCase().trim(),
+        email: normalizedEmail,
         password,
         email_confirm: true,
         user_metadata: {
@@ -51,6 +99,21 @@ export async function POST(req: Request) {
 
     if (authError) {
       console.error("Auth error:", authError);
+      const msg = authError.message.toLowerCase();
+      const duplicateEmail =
+        msg.includes("already been registered") ||
+        msg.includes("already registered") ||
+        msg.includes("user already exists") ||
+        msg.includes("duplicate");
+      if (duplicateEmail) {
+        return NextResponse.json(
+          {
+            error:
+              "An account with this email already exists. Please sign in instead.",
+          },
+          { status: 409 },
+        );
+      }
       return NextResponse.json({ error: authError.message }, { status: 400 });
     }
 
@@ -67,12 +130,12 @@ export async function POST(req: Request) {
       await supabaseAdmin.auth.admin.deleteUser(authData.user.id);
       console.error("Purchase update error:", updateError);
       return NextResponse.json(
-        { error: "Failed to link purchase. Please try again." },
+        { error: "Nie udało się połączyć zakupu. Spróbuj ponownie." },
         { status: 500 },
       );
     }
 
-    // 5️⃣ Optionally create user profile
+    // 4️⃣ Optionally create user profile
     const { error: profileError } = await supabaseAdmin
       .from("profiles")
       .insert({
@@ -100,7 +163,7 @@ export async function POST(req: Request) {
   } catch (error) {
     console.error("Registration error:", error);
     return NextResponse.json(
-      { error: "An unexpected error occurred. Please try again." },
+      { error: "Wystąpił nieoczekiwany błąd. Spróbuj ponownie." },
       { status: 500 },
     );
   }

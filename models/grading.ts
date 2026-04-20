@@ -3,6 +3,12 @@ export interface RubricItem {
   weight: number; // points or %
 }
 
+interface AudioGapFillGradingGap {
+  id: string;
+  label: string;
+  sentenceWithGap: string;
+  studentAnswer: string;
+}
 export interface GradeEssayRequest {
   language: string;
 
@@ -18,6 +24,13 @@ export interface GradeEssayRequest {
   rubric: RubricItem[];
 
   essay: string;
+}
+
+export interface GradeAudioGapFillRequest {
+  language: string;
+  task: string;
+  transcript: string;
+  gaps: AudioGapFillGradingGap[];
 }
 
 export interface GradeEssayResponse {

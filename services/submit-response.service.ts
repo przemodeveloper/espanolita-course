@@ -1,3 +1,5 @@
+import axios from "axios";
+
 export const submitResponse = async (
   taskId: string,
   answers: { questionId: string; optionId?: string; answerText?: string }[],
@@ -7,9 +9,8 @@ export const submitResponse = async (
   score: number;
   maxScore: number;
 }> => {
-  const response = await fetch(`/api/v2/tasks/${taskId}/submit`, {
-    method: "POST",
-    body: JSON.stringify({ answers }),
+  const response = await axios.post(`/api/v2/tasks/${taskId}/submit`, {
+    answers,
   });
-  return response.json();
+  return response.data;
 };

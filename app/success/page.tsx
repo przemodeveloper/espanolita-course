@@ -3,12 +3,11 @@ import type { Metadata } from "next";
 import Link from "next/link";
 
 export const metadata: Metadata = {
-  title: "Płatność zakończona sukcesem - Kurs maturalny Españolita",
+  title: "Płatność zakończona sukcesem - Zadania Maturalne Españolita",
   description: "Płatność zakończona sukcesem.",
   keywords: [
-    "kurs maturalny",
+    "zadania maturalne",
     "hiszpański",
-    "matura",
     "españolita",
     "płatność",
     "sukces",
@@ -18,7 +17,9 @@ export const metadata: Metadata = {
 export default function Success() {
   return (
     <div className="flex flex-col items-center justify-center h-screen">
-      <h1 className="text-2xl font-bold">Płatność zakończona sukcesem 🎉</h1>
+      <h1 className="text-2xl font-semibold">
+        Płatność zakończona sukcesem 🎉
+      </h1>
       <p className="text-lg text-muted-foreground mb-4">
         Dziękujemy za kupienie kursu. Możesz teraz zarejestrować się klikając na
         poniższy przycisk.

@@ -18,7 +18,7 @@ export async function GET(
 
   const { taskId } = await params;
 
-  const task = await prisma.tasks_v2.findUnique({
+  const task = await prisma.tasks.findUnique({
     where: { id: taskId },
     select: {
       id: true,
@@ -26,14 +26,21 @@ export async function GET(
       instructions: true,
       content: true,
       type: true,
-      questions_v2: {
+      task_set_items: {
+        take: 1,
+        orderBy: { set_id: "asc" },
+        select: {
+          set_id: true,
+          task_sets: { select: { title: true } },
+        },
+      },
+      questions: {
         orderBy: { order_index: "asc" },
         select: {
-          gap_index: true,
           id: true,
           order_index: true,
           prompt: true,
-          options_v2: {
+          options: {
             select: {
               id: true,
               label: true,
@@ -49,22 +56,24 @@ export async function GET(
     return NextResponse.json({ error: "Task not found" }, { status: 404 });
   }
 
-  if (task.type === "gap_fill_shared") {
-    const sharedOptions = task.questions_v2[0]?.options_v2 ?? [];
+  const { task_set_items, ...taskBase } = task;
+  const taskSetId = task_set_items[0]?.set_id ?? null;
+  const taskSetTitle = task_set_items[0]?.task_sets?.title ?? null;
 
+  if (task.type === "gap_fill_shared") {
     return NextResponse.json({
-      ...task,
-      sharedOptions,
-      questions_v2: task.questions_v2.map((q) => ({
+      ...taskBase,
+      taskSetId,
+      taskSetTitle,
+      questions: task.questions.map((q) => ({
         id: q.id,
-        gap_index: q.gap_index,
         order_index: q.order_index,
         prompt: q.prompt,
       })),
     });
   }
 
-  return NextResponse.json(task);
+  return NextResponse.json({ ...taskBase, taskSetId, taskSetTitle });
 }
 
 export async function POST(
@@ -78,7 +87,7 @@ export async function POST(
   } = await supabase.auth.getUser();
 
   if (!user) {
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    return NextResponse.json({ error: "Nieautoryzowany" }, { status: 401 });
   }
 
   const { taskId } = await params;
@@ -86,12 +95,12 @@ export async function POST(
 
   try {
     const result = await prisma.$transaction(async (tx) => {
-      const task = await tx.tasks_v2.findUnique({
+      const task = await tx.tasks.findUnique({
         where: { id: taskId },
         select: { type: true },
       });
 
-      if (!task) throw new Error("Task not found");
+      if (!task) throw new Error("Zadanie nie znalezione");
 
       // ==================================================
       // WRITING (whole answer stored on attempt)
@@ -99,7 +108,7 @@ export async function POST(
       if (task.type === "writing") {
         const answerText: string = body.answerText ?? "";
 
-        const attempt = await tx.task_attempts_v2.create({
+        const attempt = await tx.task_attempts.create({
           data: {
             task_id: taskId,
             user_id: user.id,
@@ -128,7 +137,7 @@ export async function POST(
 
       if (!answers.length) throw new Error("No answers provided");
 
-      const attempt = await tx.task_attempts_v2.create({
+      const attempt = await tx.task_attempts.create({
         data: {
           task_id: taskId,
           user_id: user.id,
@@ -140,34 +149,50 @@ export async function POST(
 
       const rows = [];
 
+      const normalizeKey = (s: string) =>
+        s.trim().toLowerCase().replace(/\s+/g, " ");
+
       for (const a of answers) {
         let points = 0;
         let isCorrect: boolean | null = null;
 
         // -------------------------
-        // single choice / gap fill
+        // gap_fill_shared (option label vs questions.correct_key)
         // -------------------------
-        if (a.optionId) {
-          const option = await tx.options_v2.findUnique({
+        if (task.type === "gap_fill_shared" && a.answerText) {
+          const q = await tx.questions.findUnique({
+            where: { id: a.questionId },
+          });
+
+          const key = q?.correct_key;
+          if (key != null && key !== "") {
+            isCorrect = normalizeKey(key) === normalizeKey(a.answerText);
+          } else {
+            isCorrect = false;
+          }
+
+          points = isCorrect ? (q?.points ?? 1) : 0;
+        } else if (a.optionId) {
+          // -------------------------
+          // single choice (option.is_correct)
+          // -------------------------
+          const option = await tx.options.findUnique({
             where: { id: a.optionId },
-            include: { questions_v2: true },
+            include: { questions: true },
           });
 
           isCorrect = option?.is_correct ?? false;
-          points = isCorrect ? (option?.questions_v2.points ?? 1) : 0;
-        }
-
-        // -------------------------
-        // open text
-        // -------------------------
-        if (a.answerText) {
-          const q = await tx.questions_v2.findUnique({
+          points = isCorrect ? (option?.questions.points ?? 1) : 0;
+        } else if (a.answerText) {
+          // -------------------------
+          // open text
+          // -------------------------
+          const q = await tx.questions.findUnique({
             where: { id: a.questionId },
           });
 
           isCorrect =
-            a.answerText.trim().toLowerCase() ===
-            q?.correct_key?.trim().toLowerCase();
+            normalizeKey(a.answerText) === normalizeKey(q?.correct_key ?? "");
 
           points = isCorrect ? (q?.points ?? 1) : 0;
         }
@@ -183,11 +208,11 @@ export async function POST(
         });
       }
 
-      await tx.student_answers_v2.createMany({ data: rows });
+      await tx.student_answers.createMany({ data: rows });
 
       const total = rows.reduce((s, r) => s + r.points_awarded, 0);
 
-      await tx.task_attempts_v2.update({
+      await tx.task_attempts.update({
         where: { id: attempt.id },
         data: { score: total },
       });
@@ -203,6 +228,9 @@ export async function POST(
   } catch (err) {
     console.error(err);
 
-    return NextResponse.json({ error: "Submission failed" }, { status: 500 });
+    return NextResponse.json(
+      { error: "Nie udało się złożyć zgłoszenia" },
+      { status: 500 },
+    );
   }
 }

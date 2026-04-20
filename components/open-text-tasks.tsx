@@ -56,20 +56,28 @@ export default function OpenTextTasks({
 
   return (
     <div>
-      {questions.map((question) => (
-        <OpenTextTask
-          key={question.id}
-          orderIndex={question.order_index}
-          sentence={question.prompt.sentence}
-          keywords={question.prompt.keywords}
-          value={
-            answers.find((a) => a.questionId === question.id)?.answerText ?? ""
-          }
-          disabled={Boolean(attempt?.attemptId) || isSubmitting || isDeleting}
-          onChange={(answerText) => handleChangeAnswer(question.id, answerText)}
-        />
-      ))}
-      {attempt?.attemptId && <TaskSummary score={attempt.score} />}
+      <div className="space-y-4 mb-4">
+        {questions.map((question) => (
+          <OpenTextTask
+            key={question.id}
+            orderIndex={question.order_index}
+            sentence={question.prompt.sentence}
+            keywords={question.prompt.keywords}
+            value={
+              answers.find((a) => a.questionId === question.id)?.answerText ??
+              ""
+            }
+            disabled={Boolean(attempt?.attemptId) || isSubmitting || isDeleting}
+            onChange={(answerText) =>
+              handleChangeAnswer(question.id, answerText)
+            }
+          />
+        ))}
+      </div>
+
+      {attempt?.attemptId && (
+        <TaskSummary score={attempt.score} className="mb-4" />
+      )}
       <TaskActions
         onSubmit={handleSubmitAnswers}
         onReset={handleResetAnswers}
