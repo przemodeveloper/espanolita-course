@@ -38,7 +38,8 @@ export async function POST(req: Request) {
   }
 
   const { data, error } = await resend.emails.send({
-    from: "Españolita <biuro@espanolita.pl>",
+    from: "Españolita <noreply@matura-espanolita.pl>",
+    replyTo: "biuro@espanolita.pl",
     to: customerEmail.trim(),
     subject:
       "Dziękujemy za kupienie dostępu do zadań maturalnych Españolita! 🎉",
