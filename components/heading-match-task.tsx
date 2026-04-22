@@ -204,12 +204,12 @@ export function HeadingMatchTask({
 
       {title && (
         <div className="mb-4">
-          <h2 className="text-lg font-semibold mb-2">{title}</h2>
+          <h2 className="text-lg font-semibold mb-2 text-center">{title}</h2>
         </div>
       )}
 
       {openingText && (
-        <p className="leading-relaxed text-foreground">{openingText}</p>
+        <p className="leading-relaxed text-foreground mb-4">{openingText}</p>
       )}
 
       <div className="space-y-4 mb-4">
