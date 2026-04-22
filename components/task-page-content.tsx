@@ -213,6 +213,8 @@ export function TaskPageContent({ taskId }: { taskId: string }) {
           <h1 className="text-lg font-semibold mb-2">{task?.title}</h1>
           <Instructions className="mb-4">{task?.instructions}</Instructions>
           <HeadingMatchTask
+            title={task?.content?.title}
+            openingText={task?.content?.openingText}
             audioUrl={task?.content?.audio_url}
             key={attempt?.attemptId ?? "new"}
             taskId={taskId}
