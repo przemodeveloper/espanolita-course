@@ -35,7 +35,7 @@ export function LandingPageContent() {
             maturalnym Españolita
           </h1>
           <p className="mt-6 text-lg text-gray-600 max-w-xl">
-            Skuteczne przygotowanie do matury z hiszpańskiego — wszystkie typy
+            Skuteczne przygotowanie do matury z hiszpańskiego — typowe zadania,
             zadań, które pojawią się na maturze.
           </p>
           <div className="mt-8 flex flex-wrap gap-4">

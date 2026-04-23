@@ -7,7 +7,7 @@ const siteUrl =
 export const metadata: Metadata = {
   title: "Matura Españolita – zadania maturalne z hiszpańskiego",
   description:
-    "Matura Españolita (Espanolita) – przygotuj się do matury z języka hiszpańskiego. Wszystkie typy zadań maturalnych z rozwiązaniami i wyjaśnieniami.",
+    "Matura Españolita (Espanolita) – przygotuj się do matury z języka hiszpańskiego. Typowe zadania, które pojawią się na maturze.",
   keywords: [
     "matura espanolita",
     "matura españolita",

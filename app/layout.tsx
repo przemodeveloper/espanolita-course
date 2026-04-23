@@ -28,7 +28,7 @@ export const metadata: Metadata = {
     template: "%s | Matura Españolita",
   },
   description:
-    "Matura Españolita (Espanolita) – skuteczne przygotowanie do matury z języka hiszpańskiego. Wszystkie typy zadań maturalnych z rozwiązaniami i wyjaśnieniami.",
+    "Matura Españolita (Espanolita) – skuteczne przygotowanie do matury z języka hiszpańskiego. Typowe zadania, które pojawią się na maturze.",
   keywords: [
     "matura espanolita",
     "matura españolita",
@@ -54,7 +54,7 @@ export const metadata: Metadata = {
     siteName: "Matura Españolita",
     title: "Matura Españolita – zadania maturalne z hiszpańskiego",
     description:
-      "Skuteczne przygotowanie do matury z języka hiszpańskiego. Wszystkie typy zadań maturalnych z rozwiązaniami.",
+      "Skuteczne przygotowanie do matury z języka hiszpańskiego. Typowe zadania, które pojawią się na maturze.",
     images: [
       {
         url: "/spanish-stairs.jpg",
@@ -68,7 +68,7 @@ export const metadata: Metadata = {
     card: "summary_large_image",
     title: "Matura Españolita – zadania maturalne z hiszpańskiego",
     description:
-      "Skuteczne przygotowanie do matury z języka hiszpańskiego. Wszystkie typy zadań maturalnych z rozwiązaniami.",
+      "Skuteczne przygotowanie do matury z języka hiszpańskiego. Typowe zadania, które pojawią się na maturze.",
     images: ["/spanish-stairs.jpg"],
   },
   robots: {
