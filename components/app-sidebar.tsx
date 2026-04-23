@@ -21,7 +21,7 @@ import {
 } from "@/components/ui/collapsible";
 import Link from "next/link";
 import { useTask } from "@/queries/useTask";
-import { usePathname, useParams } from "next/navigation";
+import { usePathname, useParams, useRouter } from "next/navigation";
 import { useTaskSets } from "@/queries/useTaskSets";
 import type { TaskSet } from "@/models/taskSets";
 import { useProgress } from "@/queries/useProgress";
@@ -33,7 +33,7 @@ export function AppSidebar() {
 
   const { prefetchQuery } = useTask({ enabled: false });
   const pathname = usePathname();
-
+  const router = useRouter();
   const isActiveLink = (url: string) => pathname === url;
 
   return (
@@ -82,7 +82,15 @@ export function AppSidebar() {
                                   >
                                     <Link
                                       href={url}
-                                      onMouseOver={() => prefetchQuery(task.id)}
+                                      prefetch
+                                      onMouseEnter={() => {
+                                        router.prefetch(url);
+                                        prefetchQuery(task.id);
+                                      }}
+                                      onFocus={() => {
+                                        router.prefetch(url);
+                                        prefetchQuery(task.id);
+                                      }}
                                     >
                                       {progress?.taskSets?.[
                                         taskSet.id

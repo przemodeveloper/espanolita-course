@@ -192,8 +192,6 @@ export function HeadingMatchTask({
     (q) => assignments[q.id] != null && assignments[q.id] !== "",
   );
 
-  console.log(audioUrl);
-
   return (
     <DndContext sensors={sensors} onDragEnd={handleDragEnd}>
       {audioUrl && (
