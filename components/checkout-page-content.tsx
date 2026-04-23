@@ -7,13 +7,13 @@ import { useCheckout } from "@/queries/useCheckout";
 
 const benefits = [
   {
-    title: "Dostęp na zawsze",
-    description: "Dostęp do arkusza i zadań bonusowych na zawsze.",
+    title: "6-miesięczny dostęp",
+    description: "Dostęp do arkusza i zadań bonusowych przez 6 miesięcy.",
   },
   {
     title: "Matura na próbę",
     description:
-      "Arkusz składa się z typowych zadań, które są podobne do zadań, które pojawią się na maturze.",
+      "Arkusz składa się z typowych zadań, które są podobne do tych, które pojawią się na maturze.",
   },
   {
     title: "Zadania bonusowe",
@@ -97,7 +97,7 @@ export function CheckoutPageContent() {
               </div>
 
               <ul className="space-y-3 text-sm text-gray-600">
-                <li>✔ Dostęp na zawsze</li>
+                <li>✔ 6-miesięczny dostęp</li>
                 <li>✔ Matura na próbę</li>
                 <li>✔ Zadania bonusowe</li>
                 <li>✔ Wsparcie AI przy pisaniu wypracowania</li>
