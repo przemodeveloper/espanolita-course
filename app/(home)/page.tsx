@@ -52,7 +52,6 @@ export default function Home() {
     <>
       <script
         type="application/ld+json"
-        // biome-ignore lint/security/noDangerouslySetInnerHtml: JSON-LD requires raw JSON injection; content is fully static and serialized.
         dangerouslySetInnerHTML={{ __html: JSON.stringify(courseJsonLd) }}
       />
       <LandingPageContent />
