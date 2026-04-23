@@ -57,12 +57,12 @@ export function LandingPageContent() {
           <Image
             src="/spanish-stairs.jpg"
             alt="Hero"
-            width={1000}
-            height={1000}
-            loading="eager"
+            width={900}
+            height={1600}
             className="rounded-3xl w-full h-[600px] object-cover"
             priority
-            sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+            quality={65}
+            sizes="(min-width: 1280px) 600px, (min-width: 768px) 50vw, 100vw"
           />
         </motion.div>
       </section>
