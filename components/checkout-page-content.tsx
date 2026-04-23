@@ -57,7 +57,7 @@ export function CheckoutPageContent() {
       </section>
 
       {/* Main Content */}
-      <section className="max-w-6xl mx-auto px-4 grid md:grid-cols-3 gap-8 pb-12">
+      <section className="max-w-6xl mx-auto px-4 grid grid-cols-1 md:grid-cols-3 gap-8 pb-12">
         {/* Benefits */}
         <div className="md:col-span-2 space-y-6">
           {benefits.map((benefit, i) => (

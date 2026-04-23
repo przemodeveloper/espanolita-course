@@ -22,7 +22,7 @@ export const metadata: Metadata = {
     url: siteUrl,
     title: "Matura Españolita – zadania maturalne z hiszpańskiego",
     description:
-      "Przygotuj się do matury z języka hiszpańskiego z Matura Españolita. Wszystkie typy zadań maturalnych.",
+      "Przygotuj się do matury z języka hiszpańskiego z Matura Españolita. Typowe zadania, które pojawią się na maturze.",
   },
 };
 
@@ -33,7 +33,7 @@ export default function Home() {
     name: "Matura Españolita – zadania maturalne z hiszpańskiego",
     alternateName: "Matura Espanolita",
     description:
-      "Kurs online z zadaniami maturalnymi z języka hiszpańskiego. Wszystkie typy zadań, które pojawią się na maturze.",
+      "Kurs online z zadaniami maturalnymi z języka hiszpańskiego. Typowe zadania, które pojawią się na maturze.",
     inLanguage: "pl",
     url: siteUrl,
     provider: {
