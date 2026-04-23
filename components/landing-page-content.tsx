@@ -18,7 +18,7 @@ export function LandingPageContent() {
   return (
     <div className="min-h-screen bg-gradient-to-b from-white to-gray-50">
       {/* HERO */}
-      <section className="max-w-7xl mx-auto px-6 pt-24 pb-20 grid md:grid-cols-2 gap-12 items-center">
+      <section className="max-w-7xl mx-auto px-4 pt-12 pb-12 grid md:grid-cols-2 gap-12 items-center">
         <motion.div
           initial={{ opacity: 0, y: 30 }}
           animate={{ opacity: 1, y: 0 }}
@@ -35,7 +35,7 @@ export function LandingPageContent() {
             maturalnym Españolita
           </h1>
           <p className="mt-6 text-lg text-gray-600 max-w-xl">
-            Skuteczne przygotowanie do matury z hiszpańskiego — wszystkie typy
+            Skuteczne przygotowanie do matury z hiszpańskiego — typowe zadania,
             zadań, które pojawią się na maturze.
           </p>
           <div className="mt-8 flex flex-wrap gap-4">
@@ -68,7 +68,7 @@ export function LandingPageContent() {
       </section>
 
       {/* STATS */}
-      <section className="max-w-6xl mx-auto px-6 py-20">
+      <section className="max-w-6xl mx-auto px-4 py-20">
         <div className="grid sm:grid-cols-3 gap-8">
           {[
             {
@@ -108,7 +108,7 @@ export function LandingPageContent() {
       </section>
 
       {/* WHY SPANISH */}
-      <section className="bg-white py-24">
+      <section className="bg-white py-12">
         <div className="max-w-5xl mx-auto px-6">
           <motion.h2
             initial={{ opacity: 0 }}
@@ -160,7 +160,7 @@ export function LandingPageContent() {
       </section>
 
       {/* CTA */}
-      <section className="py-24">
+      <section className="py-12">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
