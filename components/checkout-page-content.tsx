@@ -11,9 +11,9 @@ const benefits = [
     description: "Dostęp do arkusza i zadań bonusowych na zawsze.",
   },
   {
-    title: "11 zadań",
+    title: "Matura na próbę",
     description:
-      "Arkusz składa się z 11 zadań, które pomogą Ci zdać maturę z języka hiszpańskiego.",
+      "Arkusz składa się z typowych zadań, które są podobne do zadań, które pojawią się na maturze.",
   },
   {
     title: "Zadania bonusowe",
@@ -98,7 +98,7 @@ export function CheckoutPageContent() {
 
               <ul className="space-y-3 text-sm text-gray-600">
                 <li>✔ Dostęp na zawsze</li>
-                <li>✔ 11 zadań</li>
+                <li>✔ Matura na próbę</li>
                 <li>✔ Zadania bonusowe</li>
                 <li>✔ Wsparcie AI przy pisaniu wypracowania</li>
                 <li>

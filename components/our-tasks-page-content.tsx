@@ -84,7 +84,7 @@ export function OurTasksPageContent() {
           >
             <ClipboardList className="w-10 h-10 text-red-500 mb-4" />
             <p className="font-semibold text-lg">
-              11 zadań w pakiecie + zadania bonusowe
+              Zadania maturalne + bonusowe
             </p>
             <p className="mt-2 text-sm text-gray-600">
               Poniżej zobaczysz przykładowe wizualizacje zadań.
