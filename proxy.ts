@@ -9,10 +9,10 @@ export async function proxy(req: NextRequest) {
   const supabase = await createSupabaseServerClient();
 
   const {
-    data: { user },
-  } = await supabase.auth.getUser();
+    data: { session },
+  } = await supabase.auth.getSession();
 
-  if (!user) {
+  if (!session) {
     if (isApiRoute) {
       return NextResponse.json({ error: "Nieautoryzowany" }, { status: 401 });
     }
