@@ -24,6 +24,12 @@ export function LandingPageContent() {
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6 }}
         >
+          <p className="text-sm font-semibold uppercase tracking-wider text-red-500 mb-3">
+            Matura Españolita{" "}
+            <span className="text-gray-400 font-normal normal-case tracking-normal">
+              (Espanolita)
+            </span>
+          </p>
           <h1 className="text-4xl md:text-5xl font-semibold leading-tight">
             Przygotuj się do matury z pewnością siebie <br /> dzięki zadaniom
             maturalnym Españolita
