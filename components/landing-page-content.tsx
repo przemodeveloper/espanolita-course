@@ -61,7 +61,7 @@ export function LandingPageContent() {
             height={1600}
             className="rounded-3xl w-full h-[600px] object-cover"
             priority
-            quality={65}
+            quality={75}
             sizes="(min-width: 1280px) 600px, (min-width: 768px) 50vw, 100vw"
           />
         </motion.div>
