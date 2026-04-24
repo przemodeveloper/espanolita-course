@@ -4,7 +4,6 @@ import { useTask } from "@/queries/useTask";
 import LoadingSpinner from "./loading-spinner";
 import { useLayoutEffect } from "react";
 import { useParams } from "next/navigation";
-import dynamic from "next/dynamic";
 import { useAttempt } from "@/queries/useAttempt";
 import { Instructions } from "./instructions";
 import { Criterion } from "./criterion";
@@ -16,39 +15,10 @@ import SingleChoiceTasks from "./single-choice-tasks";
 import OpenTextTasks from "./open-text-tasks";
 import OpenTextGapsTask from "./open-text-gaps-task";
 import AudioOpenTextTasks from "./audio-open-text-tasks";
-
-function TaskTypeChunkFallback() {
-  return (
-    <div className="flex justify-center items-center min-h-[40vh] w-full">
-      <LoadingSpinner />
-    </div>
-  );
-}
-
-const GapFillSharedTask = dynamic(
-  () =>
-    import("./gap-fill-shared-task").then((m) => ({
-      default: m.GapFillSharedTask,
-    })),
-  { loading: TaskTypeChunkFallback },
-);
-
-const WritingTask = dynamic(() => import("./writing-task"), {
-  loading: TaskTypeChunkFallback,
-});
-
-const AudioSingleChoiceTasks = dynamic(
-  () => import("./audio-single-choice-tasks"),
-  { loading: TaskTypeChunkFallback },
-);
-
-const HeadingMatchTask = dynamic(
-  () =>
-    import("./heading-match-task").then((m) => ({
-      default: m.HeadingMatchTask,
-    })),
-  { loading: TaskTypeChunkFallback },
-);
+import { GapFillSharedTask } from "./gap-fill-shared-task";
+import WritingTask from "./writing-task";
+import AudioSingleChoiceTasks from "./audio-single-choice-tasks";
+import { HeadingMatchTask } from "./heading-match-task";
 
 export function TaskPageContent({ taskId }: { taskId: string }) {
   const params = useParams<{ taskSetId: string }>();
