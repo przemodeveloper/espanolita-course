@@ -1,3 +1,5 @@
+import Link from "next/link";
+
 export function Footer() {
   return (
     <footer className="bg-gray-100 py-4">
@@ -8,9 +10,13 @@ export function Footer() {
         </p>
         <p className="text-center text-gray-500 text-sm">
           Developed by{" "}
-          <a href="https://pgdeveloper.net/" className="text-blue-500">
+          <Link
+            target="_blank"
+            href="https://pgdeveloper.net/"
+            className="text-blue-500"
+          >
             Przemysław Górecki
-          </a>
+          </Link>
         </p>
       </div>
     </footer>
