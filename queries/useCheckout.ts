@@ -3,7 +3,8 @@ import { postCheckout } from "@/services/checkout.service";
 
 export const useCheckout = () => {
   const mutation = useMutation({
-    mutationFn: () => postCheckout(),
+    mutationFn: ({ termsVersion }: { termsVersion: string }) =>
+      postCheckout({ termsVersion }),
     onSuccess: ({ url }) => {
       window.location.href = url;
     },
