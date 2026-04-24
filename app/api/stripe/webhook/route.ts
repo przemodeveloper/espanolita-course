@@ -47,6 +47,11 @@ export async function POST(req: Request) {
         return new NextResponse("Missing price", { status: 400 });
       }
 
+      const metadata = session.metadata ?? {};
+      const termsAcceptedAt = metadata.termsAcceptedAt
+        ? new Date(metadata.termsAcceptedAt)
+        : null;
+
       await prisma.purchases.upsert({
         where: {
           stripe_session_id: session.id,
@@ -57,6 +62,13 @@ export async function POST(req: Request) {
           stripe_customer_id: session.customer as string | null,
           price_id: priceId,
           email: session.customer_details?.email ?? null,
+          terms_version: metadata.termsVersion ?? null,
+          terms_accepted_at:
+            termsAcceptedAt && !Number.isNaN(termsAcceptedAt.getTime())
+              ? termsAcceptedAt
+              : null,
+          terms_accepted_ip: metadata.termsAcceptedIp ?? null,
+          terms_user_agent: metadata.termsUserAgent || null,
         },
       });
 

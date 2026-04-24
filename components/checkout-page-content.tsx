@@ -4,6 +4,17 @@ import { motion } from "motion/react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { useCheckout } from "@/queries/useCheckout";
+import Link from "next/link";
+import {
+  Field,
+  FieldContent,
+  FieldDescription,
+  FieldGroup,
+  FieldLabel,
+} from "./ui/field";
+import { Checkbox } from "./ui/checkbox";
+import { useState } from "react";
+import { CURRENT_TERMS_VERSION } from "@/lib/terms";
 
 const benefits = [
   {
@@ -33,6 +44,7 @@ const benefits = [
 
 export function CheckoutPageContent() {
   const { mutate } = useCheckout();
+  const [isTermsAccepted, setIsTermsAccepted] = useState(false);
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -108,7 +120,10 @@ export function CheckoutPageContent() {
 
               <Button
                 className="w-full rounded-xl text-base py-6"
-                onClick={() => mutate()}
+                onClick={() =>
+                  mutate({ termsVersion: CURRENT_TERMS_VERSION })
+                }
+                disabled={!isTermsAccepted}
               >
                 Kup Zadania Maturalne Españolita
               </Button>
@@ -117,9 +132,34 @@ export function CheckoutPageContent() {
                 14-dniowa gwarancja zwrotu pieniędzy (obowiązują warunki i
                 regulamin)
               </p>
-              <p className="text-xs text-center text-gray-400">
-                Dokonując zakupu akceptujesz warunki i regulamin.
-              </p>
+              <FieldGroup>
+                <Field orientation="horizontal">
+                  <Checkbox
+                    id="terms-checkbox-2"
+                    name="terms-checkbox-2"
+                    checked={isTermsAccepted}
+                    onCheckedChange={(checked) =>
+                      setIsTermsAccepted(checked === true)
+                    }
+                  />
+                  <FieldContent>
+                    <FieldLabel htmlFor="terms-checkbox-2">
+                      Akceptuję warunki i regulamin
+                    </FieldLabel>
+                    <FieldDescription>
+                      Dokonując zakupu akceptujesz{" "}
+                      <Link
+                        className="text-blue-500 underline"
+                        target="_blank"
+                        href="https://regulamin-kursu.tiiny.site"
+                      >
+                        warunki i regulamin
+                      </Link>
+                      .
+                    </FieldDescription>
+                  </FieldContent>
+                </Field>
+              </FieldGroup>
             </CardContent>
           </Card>
         </motion.div>
