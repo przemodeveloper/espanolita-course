@@ -13,6 +13,7 @@ import {
   SidebarMenuSub,
   SidebarMenuSubItem,
   SidebarMenuSubButton,
+  useSidebar,
 } from "@/components/ui/sidebar";
 import {
   Collapsible,
@@ -35,6 +36,8 @@ export function AppSidebar() {
   const pathname = usePathname();
   const router = useRouter();
   const isActiveLink = (url: string) => pathname === url;
+
+  const { isMobile, setOpenMobile } = useSidebar();
 
   return (
     <Sidebar>
@@ -82,6 +85,11 @@ export function AppSidebar() {
                                   >
                                     <Link
                                       href={url}
+                                      onClick={() => {
+                                        if (isMobile) {
+                                          setOpenMobile(false);
+                                        }
+                                      }}
                                       prefetch
                                       onMouseEnter={() => {
                                         router.prefetch(url);

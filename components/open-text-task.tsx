@@ -21,7 +21,7 @@ const GapFillInput = ({
         {parts[0]}{" "}
         <Input
           type="text"
-          className="w-[300px]"
+          className="w-full"
           onChange={(e) => onChange(e.target.value)}
           value={value}
           disabled={disabled}
