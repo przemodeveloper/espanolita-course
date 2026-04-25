@@ -120,9 +120,7 @@ export function CheckoutPageContent() {
 
               <Button
                 className="w-full rounded-xl text-base py-6"
-                onClick={() =>
-                  mutate({ termsVersion: CURRENT_TERMS_VERSION })
-                }
+                onClick={() => mutate({ termsVersion: CURRENT_TERMS_VERSION })}
                 disabled={!isTermsAccepted}
               >
                 Kup Zadania Maturalne Españolita
@@ -151,9 +149,17 @@ export function CheckoutPageContent() {
                       <Link
                         className="text-blue-500 underline"
                         target="_blank"
-                        href="https://regulamin-kursu.tiiny.site"
+                        href="https://coffee-hayley-30.tiiny.site/regulamin-kursu.pdf"
                       >
-                        warunki i regulamin
+                        regulamin
+                      </Link>{" "}
+                      oraz{" "}
+                      <Link
+                        className="text-blue-500 underline"
+                        target="_blank"
+                        href="https://coffee-hayley-30.tiiny.site/polityka-prywatności.pdf"
+                      >
+                        politykę prywatności
                       </Link>
                       .
                     </FieldDescription>
