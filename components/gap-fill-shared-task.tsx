@@ -58,12 +58,14 @@ export function GapFillSharedTask({
   taskId,
   questions,
   attempt,
+  title,
 }: {
   text: string;
   options?: Option[];
   taskId: string;
   questions: Question[];
   attempt?: Attempt | null;
+  title?: string;
 }) {
   const { mutate: submitResponse, isPending: isSubmitting } =
     useSubmitResponse(taskId);
@@ -157,6 +159,9 @@ export function GapFillSharedTask({
 
   return (
     <DndContext sensors={sensors} onDragEnd={handleDragEnd}>
+      {title && (
+        <h2 className="text-lg text-center font-semibold mb-2">{title}</h2>
+      )}
       <div className="space-y-6">
         <div className="flex items-center justify-between">
           <p className="leading-relaxed">
