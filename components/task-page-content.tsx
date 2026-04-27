@@ -74,6 +74,7 @@ export function TaskPageContent({ taskId }: { taskId: string }) {
             options={task?.content?.options}
             questions={task?.questions}
             attempt={attempt}
+            title={task?.content?.title}
           />
         </>
       );
