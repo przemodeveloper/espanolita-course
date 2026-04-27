@@ -19,6 +19,8 @@ import { GapFillSharedTask } from "./gap-fill-shared-task";
 import WritingTask from "./writing-task";
 import AudioSingleChoiceTasks from "./audio-single-choice-tasks";
 import { HeadingMatchTask } from "./heading-match-task";
+import { FileIcon } from "lucide-react";
+import { Button } from "./ui/button";
 
 export function TaskPageContent({ taskId }: { taskId: string }) {
   const params = useParams<{ taskSetId: string }>();
@@ -26,6 +28,26 @@ export function TaskPageContent({ taskId }: { taskId: string }) {
 
   const { task, isPending } = useTask({ taskId });
   const { attempt } = useAttempt(taskId);
+
+  const downloadFile = async () => {
+    const url =
+      "https://izaubdeiojqofmkeerpv.supabase.co/storage/v1/object/public/espanolita-assets/przewodnik_list_nieformalny.pdf";
+
+    const response = await fetch(url);
+    const blob = await response.blob();
+
+    const blobUrl = window.URL.createObjectURL(blob);
+
+    const link = document.createElement("a");
+    link.href = blobUrl;
+    link.download = "przewodnik_list_nieformalny.pdf";
+
+    document.body.appendChild(link);
+    link.click();
+
+    link.remove();
+    window.URL.revokeObjectURL(blobUrl);
+  };
 
   const { progress } = useProgress(taskSetIdFromRoute);
 
@@ -97,6 +119,17 @@ export function TaskPageContent({ taskId }: { taskId: string }) {
       taskBody = (
         <>
           <h1 className="text-lg font-semibold mb-4">{task?.title}</h1>
+          <div className="flex items-center gap-2 mb-4">
+            <p className="font-semibold">
+              Przed przystąpieniem do zadania, zachęcamy do zapoznania się z
+              przewodnikiem, który pomoże Ci przygotować się do pisania
+              wypracowania maturalnego:
+            </p>
+
+            <Button variant="outline" size="icon" onClick={downloadFile}>
+              <FileIcon className="size-4" />
+            </Button>
+          </div>
           <Instructions className="mb-4">
             <p className="mb-4">{task?.instructions}</p>
             <ul className="mb-4">
@@ -110,6 +143,7 @@ export function TaskPageContent({ taskId }: { taskId: string }) {
               Uwaga: limit dzienny to 3 oceny wypracowań.
             </p>
           </Instructions>
+
           <div className="border border-gray-200 p-4 rounded-lg">
             <p className="font-semibold mb-4">Kryteria oceniania</p>
             <ul className="flex flex-wrap gap-4">
