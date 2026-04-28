@@ -123,12 +123,11 @@ export function TaskPageContent({ taskId }: { taskId: string }) {
             <p className="font-semibold">
               Przed przystąpieniem do zadania, zachęcamy do zapoznania się z
               przewodnikiem, który pomoże Ci przygotować się do pisania
-              wypracowania maturalnego:
+              wypracowania maturalnego:{" "}
+              <Button variant="outline" size="icon" onClick={downloadFile}>
+                <FileIcon className="size-4" />
+              </Button>
             </p>
-
-            <Button variant="outline" size="icon" onClick={downloadFile}>
-              <FileIcon className="size-4" />
-            </Button>
           </div>
           <Instructions className="mb-4">
             <p className="mb-4">{task?.instructions}</p>
