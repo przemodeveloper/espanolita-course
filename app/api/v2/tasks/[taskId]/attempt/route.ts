@@ -1,7 +1,10 @@
 import { type NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
-import type { GradeEssayResponse } from "@/models/grading";
+import type {
+  GradeEssayResponse,
+  GradeAudioGapFillResponse,
+} from "@/models/grading";
 
 export async function GET(
   _req: NextRequest,
@@ -134,6 +137,26 @@ export async function GET(
   const incorrectQuestionIds = answersRaw
     .filter((a) => a.is_correct === false)
     .map((a) => a.question_id);
+
+  if (task.type === "audio_open_text") {
+    return NextResponse.json({
+      attemptId: attempt.id,
+      type: task.type,
+      score: attempt.score !== null ? Number(attempt.score) : null,
+      answers: attempt.student_answers.map((a) => ({
+        questionId: a.question_id,
+        answerText: a.answer_text ?? "",
+      })),
+      correctQuestionIds,
+      incorrectQuestionIds,
+      grading:
+        (
+          attempt.metadata as {
+            grading?: { result: GradeAudioGapFillResponse };
+          } | null
+        )?.grading?.result ?? null,
+    });
+  }
 
   return NextResponse.json({
     attemptId: attempt.id,

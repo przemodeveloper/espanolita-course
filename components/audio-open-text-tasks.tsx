@@ -98,12 +98,25 @@ export default function AudioOpenTextTasks({
             onChange={(answerText) =>
               handleChangeAnswer(question.id, answerText)
             }
+            isCorrect={Boolean(
+              attempt?.correctQuestionIds?.includes(question.id),
+            )}
+            isIncorrect={Boolean(
+              attempt?.incorrectQuestionIds?.includes(question.id),
+            )}
           />
         ))}
       </div>
 
       {attempt?.attemptId && (
-        <TaskSummary score={attempt.score} className="mb-4" />
+        <TaskSummary
+          score={attempt.score}
+          maxScore={questions.length}
+          className="mb-4"
+          breakdown={attempt.grading?.breakdown}
+          feedback={attempt.grading?.feedback}
+          missingPoints={attempt.grading?.missingPoints ?? []}
+        />
       )}
       <TaskActions
         onSubmit={handleGradeTask}

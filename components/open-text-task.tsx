@@ -2,6 +2,7 @@
 
 import { TaskLabel } from "./task-label";
 import { Input } from "./ui/input";
+import { CircleCheck, CircleX } from "lucide-react";
 
 const GapFillInput = ({
   sentence,
@@ -39,6 +40,8 @@ export default function OpenTextTask({
   onChange,
   value,
   disabled,
+  isCorrect,
+  isIncorrect,
 }: {
   orderIndex: number;
   sentence?: string;
@@ -46,10 +49,27 @@ export default function OpenTextTask({
   onChange: (answer: string) => void;
   value: string;
   disabled: boolean;
+  isCorrect: boolean;
+  isIncorrect: boolean;
 }) {
   return (
     <div className="border border-gray-200 p-4 rounded-lg">
-      <TaskLabel label={`Przykład ${orderIndex}`} />
+      <div className="flex items-center gap-2">
+        <TaskLabel label={`Przykład ${orderIndex}`} />
+        {isIncorrect && (
+          <div className="flex items-center gap-2 mb-2">
+            <CircleX className="size-4 text-red-500" />
+            <p className="text-red-500">Nieprawidłowa odpowiedź</p>
+          </div>
+        )}
+        {isCorrect && (
+          <div className="flex items-center gap-2 mb-2">
+            <CircleCheck className="size-4 text-green-500" />
+            <p className="text-green-500">Poprawna odpowiedź</p>
+          </div>
+        )}
+      </div>
+
       <div className="mb-4">
         {sentence && (
           <GapFillInput
@@ -60,6 +80,7 @@ export default function OpenTextTask({
           />
         )}
       </div>
+
       <p className="text-sm italic text-gray-500">{keywords?.join(", ")}</p>
     </div>
   );

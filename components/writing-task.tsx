@@ -5,6 +5,7 @@ import type { RubricItem } from "@/models/grading";
 import { useAiGradeTask } from "@/queries/useAiGradeTask";
 import { useDeleteAttempt } from "@/queries/useDeleteAttempt";
 import type { Attempt } from "@/models/attempt";
+import { TaskSummary } from "./task-summary";
 
 interface WritingTaskProps {
   attempt?: Attempt;
@@ -82,25 +83,17 @@ export default function WritingTask({
       </div>
 
       {error && <p className="text-red-500">{error}</p>}
-      {attempt?.grading && (
-        <div className="bg-green-50 border border-green-200 p-2 rounded-md mb-2">
-          <p>
-            <span className="font-bold">Wynik:</span>{" "}
-            {attempt?.grading?.totalScore}
-          </p>
-          <ul>
-            {attempt?.grading?.missingPoints?.map((item) => (
-              <li className="list-disc list-inside" key={item}>
-                {item}
-              </li>
-            ))}
-          </ul>
-          <p>
-            <span className="font-bold">Podsumowanie:</span>{" "}
-            {attempt?.grading?.feedback}
-          </p>
-        </div>
+      {attempt?.attemptId && (
+        <TaskSummary
+          score={attempt?.grading?.totalScore ?? 0}
+          maxScore={12}
+          className="mb-4"
+          breakdown={attempt.grading?.breakdown}
+          feedback={attempt.grading?.feedback}
+          missingPoints={attempt.grading?.missingPoints ?? []}
+        />
       )}
+
       <div className="flex flex-wrap justify-end gap-2">
         <Button
           variant="outline"
