@@ -1,7 +1,10 @@
 import { type NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
-import type { GradeEssayResponse } from "@/models/grading";
+import type {
+  GradeEssayResponse,
+  GradeAudioGapFillResponse,
+} from "@/models/grading";
 
 export async function GET(
   _req: NextRequest,
@@ -134,6 +137,60 @@ export async function GET(
   const incorrectQuestionIds = answersRaw
     .filter((a) => a.is_correct === false)
     .map((a) => a.question_id);
+
+  if (task.type === "audio_open_text") {
+    return NextResponse.json({
+      attemptId: attempt.id,
+      type: task.type,
+      score: attempt.score !== null ? Number(attempt.score) : null,
+      answers: attempt.student_answers.map((a) => ({
+        questionId: a.question_id,
+        answerText: a.answer_text ?? "",
+      })),
+      correctQuestionIds,
+      incorrectQuestionIds,
+      grading:
+        (
+          attempt.metadata as {
+            grading?: { result: GradeAudioGapFillResponse };
+          } | null
+        )?.grading?.result ?? null,
+    });
+  }
+
+  if (task.type === "open_text_gaps" || task.type === "open_text") {
+    const correctAnswersRaw = await prisma.answers.findMany({
+      where: {
+        question_id: { in: answersRaw.map((a) => a.question_id) },
+      },
+      select: {
+        question_id: true,
+        answer_text: true,
+        is_primary: true,
+        order_index: true,
+      },
+      orderBy: [{ is_primary: "desc" }, { order_index: "asc" }],
+    });
+
+    const correctAnswers = correctAnswersRaw.map((a) => ({
+      questionId: a.question_id,
+      answerText: a.answer_text,
+      isPrimary: a.is_primary ?? false,
+    }));
+
+    return NextResponse.json({
+      attemptId: attempt.id,
+      type: task.type,
+      score: attempt.score !== null ? Number(attempt.score) : null,
+      correctQuestionIds,
+      incorrectQuestionIds,
+      answers: attempt.student_answers.map((a) => ({
+        questionId: a.question_id,
+        answerText: a.answer_text ?? "",
+      })),
+      correctAnswers,
+    });
+  }
 
   return NextResponse.json({
     attemptId: attempt.id,

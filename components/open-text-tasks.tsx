@@ -71,12 +71,23 @@ export default function OpenTextTasks({
             onChange={(answerText) =>
               handleChangeAnswer(question.id, answerText)
             }
+            isCorrect={Boolean(
+              attempt?.correctQuestionIds?.includes(question.id),
+            )}
+            isIncorrect={Boolean(
+              attempt?.incorrectQuestionIds?.includes(question.id),
+            )}
           />
         ))}
       </div>
 
       {attempt?.attemptId && (
-        <TaskSummary score={attempt.score} className="mb-4" />
+        <TaskSummary
+          score={attempt.score}
+          className="mb-4"
+          maxScore={questions.length}
+          correctAnswers={attempt.correctAnswers ?? []}
+        />
       )}
       <TaskActions
         onSubmit={handleSubmitAnswers}

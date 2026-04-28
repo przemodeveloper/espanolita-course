@@ -48,3 +48,15 @@ export interface GradeEssayResponse {
 
   feedback: string;
 }
+
+export interface GradeAudioGapFillResponse {
+  totalScore: number;
+  languageCorrect: boolean;
+  breakdown: {
+    category: string;
+    score: number;
+    reasoning: string;
+  }[];
+  missingPoints: string[];
+  feedback: string;
+}

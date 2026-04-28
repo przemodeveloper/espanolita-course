@@ -96,7 +96,11 @@ export default function SingleChoiceTasks({
       </div>
 
       {attempt?.attemptId && (
-        <TaskSummary score={attempt.score} className="mb-4" />
+        <TaskSummary
+          score={attempt.score}
+          className="mb-4"
+          maxScore={questions.length}
+        />
       )}
       <TaskActions
         onSubmit={handleSubmitAnswers}
