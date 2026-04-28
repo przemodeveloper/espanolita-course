@@ -158,6 +158,40 @@ export async function GET(
     });
   }
 
+  if (task.type === "open_text_gaps") {
+    const correctAnswersRaw = await prisma.answers.findMany({
+      where: {
+        question_id: { in: answersRaw.map((a) => a.question_id) },
+      },
+      select: {
+        question_id: true,
+        answer_text: true,
+        is_primary: true,
+        order_index: true,
+      },
+      orderBy: [{ is_primary: "desc" }, { order_index: "asc" }],
+    });
+
+    const correctAnswers = correctAnswersRaw.map((a) => ({
+      questionId: a.question_id,
+      answerText: a.answer_text,
+      isPrimary: a.is_primary ?? false,
+    }));
+
+    return NextResponse.json({
+      attemptId: attempt.id,
+      type: task.type,
+      score: attempt.score !== null ? Number(attempt.score) : null,
+      correctQuestionIds,
+      incorrectQuestionIds,
+      answers: attempt.student_answers.map((a) => ({
+        questionId: a.question_id,
+        answerText: a.answer_text ?? "",
+      })),
+      correctAnswers,
+    });
+  }
+
   return NextResponse.json({
     attemptId: attempt.id,
     type: task.type,

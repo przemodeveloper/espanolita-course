@@ -113,6 +113,7 @@ export default function OpenTextGapsTask({
           score={attempt.score}
           className="mb-4"
           maxScore={questions.length}
+          correctAnswers={attempt.correctAnswers ?? []}
         />
       )}
       <TaskActions

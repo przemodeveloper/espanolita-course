@@ -12,5 +12,10 @@ export interface Attempt {
     optionId?: string;
     answerText?: string;
   }[];
+  correctAnswers?: {
+    questionId: string;
+    answerText: string;
+    isPrimary: boolean;
+  }[];
   grading?: GradeEssayResponse;
 }

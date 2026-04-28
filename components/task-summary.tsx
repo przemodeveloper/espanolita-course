@@ -1,6 +1,8 @@
 import { cn } from "@/lib/utils";
 import { CheckCircleIcon, XCircleIcon } from "lucide-react";
 import { CircleAlert } from "lucide-react";
+import { useState } from "react";
+import { Button } from "./ui/button";
 
 const BreakdownSection = ({
   breakdown,
@@ -59,6 +61,7 @@ export function TaskSummary({
   maxScore,
   feedback,
   missingPoints,
+  correctAnswers,
 }: {
   score: number;
   className?: string;
@@ -70,7 +73,14 @@ export function TaskSummary({
   maxScore: number;
   feedback?: string;
   missingPoints?: string[];
+  correctAnswers?: {
+    questionId: string;
+    answerText: string;
+    isPrimary: boolean;
+  }[];
 }) {
+  const [showCorrectAnswers, setShowCorrectAnswers] = useState(false);
+
   return (
     <div
       className={cn(
@@ -112,6 +122,26 @@ export function TaskSummary({
           </div>
         </div>
       </div>
+
+      {correctAnswers && correctAnswers?.length > 0 && score !== maxScore && (
+        <div className="p-4">
+          <Button
+            variant="outline"
+            onClick={() => setShowCorrectAnswers(!showCorrectAnswers)}
+          >
+            {showCorrectAnswers
+              ? "Ukryj poprawne odpowiedzi"
+              : "Pokaż poprawne odpowiedzi"}
+          </Button>
+          {showCorrectAnswers && (
+            <ul className="list-disc list-inside">
+              {correctAnswers?.map((answer) => (
+                <li key={answer.questionId}>{answer.answerText}</li>
+              ))}
+            </ul>
+          )}
+        </div>
+      )}
 
       {breakdown && <BreakdownSection breakdown={breakdown} />}
       {feedback && (
