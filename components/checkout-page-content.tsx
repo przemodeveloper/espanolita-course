@@ -149,9 +149,12 @@ export function CheckoutPageContent() {
                     id="terms-checkbox-2"
                     name="terms-checkbox-2"
                     checked={isTermsAccepted}
-                    onCheckedChange={(checked) =>
-                      setIsTermsAccepted(checked === true)
-                    }
+                    onCheckedChange={(checked) => {
+                      if (checked === true) {
+                        setError(null);
+                      }
+                      setIsTermsAccepted(checked === true);
+                    }}
                   />
 
                   <FieldContent>
