@@ -86,6 +86,7 @@ export default function OpenTextTasks({
           score={attempt.score}
           className="mb-4"
           maxScore={questions.length}
+          correctAnswers={attempt.correctAnswers ?? []}
         />
       )}
       <TaskActions

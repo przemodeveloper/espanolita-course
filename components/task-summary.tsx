@@ -124,7 +124,7 @@ export function TaskSummary({
       </div>
 
       {correctAnswers && correctAnswers?.length > 0 && score !== maxScore && (
-        <div className="p-4">
+        <div className="p-4 space-y-2">
           <Button
             variant="outline"
             onClick={() => setShowCorrectAnswers(!showCorrectAnswers)}

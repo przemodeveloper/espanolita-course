@@ -158,7 +158,7 @@ export async function GET(
     });
   }
 
-  if (task.type === "open_text_gaps") {
+  if (task.type === "open_text_gaps" || task.type === "open_text") {
     const correctAnswersRaw = await prisma.answers.findMany({
       where: {
         question_id: { in: answersRaw.map((a) => a.question_id) },
