@@ -118,7 +118,9 @@ export function TaskSummary({
         >
           <p className="text-2xl font-bold">{score}</p>
           <div>
-            <p className="text-sm font-semibold text-gray-500">z {maxScore}</p>
+            <p className="text-sm font-semibold text-gray-500 text-center">
+              z {maxScore}
+            </p>
           </div>
         </div>
       </div>
