@@ -9,6 +9,7 @@ import {
   Field,
   FieldContent,
   FieldDescription,
+  FieldError,
   FieldGroup,
   FieldLabel,
 } from "./ui/field";
@@ -45,6 +46,18 @@ const benefits = [
 export function CheckoutPageContent() {
   const { mutate } = useCheckout();
   const [isTermsAccepted, setIsTermsAccepted] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  const handleBuy = () => {
+    if (!isTermsAccepted) {
+      setError(
+        "Musisz zaakceptować warunki i regulamin oraz politykę prywatności",
+      );
+      return;
+    }
+    setError(null);
+    mutate({ termsVersion: CURRENT_TERMS_VERSION });
+  };
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -120,8 +133,7 @@ export function CheckoutPageContent() {
 
               <Button
                 className="w-full rounded-xl text-base py-6"
-                onClick={() => mutate({ termsVersion: CURRENT_TERMS_VERSION })}
-                disabled={!isTermsAccepted}
+                onClick={handleBuy}
               >
                 Kup Zadania Maturalne Españolita
               </Button>
@@ -133,13 +145,18 @@ export function CheckoutPageContent() {
               <FieldGroup>
                 <Field orientation="horizontal">
                   <Checkbox
+                    className={error ? "border-red-500" : ""}
                     id="terms-checkbox-2"
                     name="terms-checkbox-2"
                     checked={isTermsAccepted}
-                    onCheckedChange={(checked) =>
-                      setIsTermsAccepted(checked === true)
-                    }
+                    onCheckedChange={(checked) => {
+                      if (checked === true) {
+                        setError(null);
+                      }
+                      setIsTermsAccepted(checked === true);
+                    }}
                   />
+
                   <FieldContent>
                     <FieldLabel htmlFor="terms-checkbox-2">
                       Akceptuję warunki i regulamin
@@ -163,6 +180,7 @@ export function CheckoutPageContent() {
                       </Link>
                       .
                     </FieldDescription>
+                    {error && <FieldError>{error}</FieldError>}
                   </FieldContent>
                 </Field>
               </FieldGroup>
