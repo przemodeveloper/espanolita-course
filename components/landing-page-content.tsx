@@ -36,7 +36,7 @@ export function LandingPageContent() {
           </h1>
           <p className="mt-6 text-lg text-gray-600 max-w-xl">
             Skuteczne przygotowanie do matury z hiszpańskiego — typowe zadania,
-            zadań, które pojawią się na maturze.
+            które pojawią się na maturze.
           </p>
           <div className="mt-8 flex flex-wrap gap-4">
             <Button asChild className="px-8 py-6 text-base rounded-xl">
