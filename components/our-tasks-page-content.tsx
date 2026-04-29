@@ -43,7 +43,7 @@ const tasks = [
   {
     src: "/task_seven.jpg",
     title: "Zadanie 7",
-    blurb: "Przygotowanie pod część ustną i pisaną — spójnie z resztą kursu.",
+    blurb: "Przygotowanie pod część pisaną — spójnie z resztą kursu.",
   },
   {
     src: "/task_eight.jpg",
