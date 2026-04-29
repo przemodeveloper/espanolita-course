@@ -20,7 +20,7 @@ export default function Success() {
       <h1 className="text-2xl font-semibold">
         Płatność zakończona sukcesem 🎉
       </h1>
-      <p className="text-lg text-muted-foreground mb-4">
+      <p className="text-lg text-center text-muted-foreground mb-4">
         Dziękujemy za kupienie kursu. Możesz teraz zarejestrować się klikając na
         poniższy przycisk.
       </p>
