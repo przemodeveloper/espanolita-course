@@ -1,11 +1,18 @@
+import { redirect } from "next/navigation";
 import { AppSidebar } from "@/components/app-sidebar";
 import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
+import { requireCourseAccess } from "@/server/auth/requireCourseAccess";
 
-export default function CourseLayout({
+export default async function CourseLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
+  const access = await requireCourseAccess();
+  if (access.response) {
+    redirect("/unauthorized");
+  }
+
   return (
     <SidebarProvider defaultOpen>
       <AppSidebar />

@@ -1,20 +1,14 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
-import { createSupabaseServerClient } from "@/lib/supabase/server";
+import { requireCourseAccess } from "@/server/auth/requireCourseAccess";
 
 export async function GET() {
-  const supabase = await createSupabaseServerClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-
-  if (!user) {
-    return NextResponse.json({ error: "Nieautoryzowany" }, { status: 401 });
-  }
+  const access = await requireCourseAccess();
+  if (access.response) return access.response;
 
   // latest attempt per task
   const attempts = await prisma.task_attempts.findMany({
-    where: { user_id: user.id },
+    where: { user_id: access.user.id },
     orderBy: { created_at: "desc" },
     distinct: ["task_id"], // only latest
     select: {

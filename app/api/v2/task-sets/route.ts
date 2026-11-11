@@ -1,27 +1,18 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
-import { createSupabaseServerClient } from "@/lib/supabase/server";
+import { requireCourseAccess } from "@/server/auth/requireCourseAccess";
 
 export async function GET() {
-  const supabase = await createSupabaseServerClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-
-  if (!user) {
-    return NextResponse.json({ error: "Nieautoryzowany" }, { status: 401 });
-  }
+  const access = await requireCourseAccess();
+  if (access.response) return access.response;
 
   const sets = await prisma.task_sets.findMany({
     orderBy: { title: "asc" },
-
     select: {
       id: true,
       title: true,
-
       task_set_items: {
         orderBy: { order_index: "asc" },
-
         select: {
           tasks: {
             select: {
@@ -44,12 +35,10 @@ export async function GET() {
   const result = sets.map((set) => ({
     id: set.id,
     title: set.title,
-
     tasks: set.task_set_items.map((i) => ({
       id: i.tasks.id,
       title: i.tasks.title,
     })),
-
     tasksCount: set.task_set_items.length,
   }));
 

@@ -1,19 +1,13 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
-import { createSupabaseServerClient } from "@/lib/supabase/server";
+import { requireCourseAccess } from "@/server/auth/requireCourseAccess";
 
 export async function GET(
   _req: Request,
   { params }: { params: Promise<{ setId: string }> },
 ) {
-  const supabase = await createSupabaseServerClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-
-  if (!user) {
-    return NextResponse.json({ error: "Nieautoryzowany" }, { status: 401 });
-  }
+  const access = await requireCourseAccess();
+  if (access.response) return access.response;
 
   const { setId: id } = await params;
 
