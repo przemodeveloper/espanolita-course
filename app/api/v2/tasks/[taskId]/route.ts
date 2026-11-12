@@ -1,20 +1,13 @@
-import { type NextRequest, NextResponse } from "next/server";
+import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
-import { createSupabaseServerClient } from "@/lib/supabase/server";
+import { requireCourseAccess } from "@/server/auth/requireCourseAccess";
 
 export async function GET(
   _req: Request,
   { params }: { params: Promise<{ taskId: string }> },
 ) {
-  const supabase = await createSupabaseServerClient();
-
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-
-  if (!user) {
-    return Response.json({ error: "Unauthorized" }, { status: 401 });
-  }
+  const access = await requireCourseAccess();
+  if (access.response) return access.response;
 
   const { taskId } = await params;
 
@@ -74,163 +67,4 @@ export async function GET(
   }
 
   return NextResponse.json({ ...taskBase, taskSetId, taskSetTitle });
-}
-
-export async function POST(
-  req: NextRequest,
-  { params }: { params: Promise<{ taskId: string }> },
-) {
-  const supabase = await createSupabaseServerClient();
-
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-
-  if (!user) {
-    return NextResponse.json({ error: "Nieautoryzowany" }, { status: 401 });
-  }
-
-  const { taskId } = await params;
-  const body = await req.json();
-
-  try {
-    const result = await prisma.$transaction(async (tx) => {
-      const task = await tx.tasks.findUnique({
-        where: { id: taskId },
-        select: { type: true },
-      });
-
-      if (!task) throw new Error("Zadanie nie znalezione");
-
-      // ==================================================
-      // WRITING (whole answer stored on attempt)
-      // ==================================================
-      if (task.type === "writing") {
-        const answerText: string = body.answerText ?? "";
-
-        const attempt = await tx.task_attempts.create({
-          data: {
-            task_id: taskId,
-            user_id: user.id,
-            answer_text: answerText,
-            started_at: new Date(),
-            submitted_at: new Date(),
-            status: "submitted",
-          },
-        });
-
-        return {
-          attemptId: attempt.id,
-          type: "writing",
-        };
-      }
-
-      // ==================================================
-      // QUESTION BASED
-      // single_choice | gap_fill_shared | open_text
-      // ==================================================
-      const answers: {
-        questionId: string;
-        optionId?: string;
-        answerText?: string;
-      }[] = body.answers ?? [];
-
-      if (!answers.length) throw new Error("No answers provided");
-
-      const attempt = await tx.task_attempts.create({
-        data: {
-          task_id: taskId,
-          user_id: user.id,
-          started_at: new Date(),
-          submitted_at: new Date(),
-          status: "graded",
-        },
-      });
-
-      const rows = [];
-
-      const normalizeKey = (s: string) =>
-        s.trim().toLowerCase().replace(/\s+/g, " ");
-
-      for (const a of answers) {
-        let points = 0;
-        let isCorrect: boolean | null = null;
-
-        // -------------------------
-        // gap_fill_shared (option label vs questions.correct_key)
-        // -------------------------
-        if (task.type === "gap_fill_shared" && a.answerText) {
-          const q = await tx.questions.findUnique({
-            where: { id: a.questionId },
-          });
-
-          const key = q?.correct_key;
-          if (key != null && key !== "") {
-            isCorrect = normalizeKey(key) === normalizeKey(a.answerText);
-          } else {
-            isCorrect = false;
-          }
-
-          points = isCorrect ? (q?.points ?? 1) : 0;
-        } else if (a.optionId) {
-          // -------------------------
-          // single choice (option.is_correct)
-          // -------------------------
-          const option = await tx.options.findUnique({
-            where: { id: a.optionId },
-            include: { questions: true },
-          });
-
-          isCorrect = option?.is_correct ?? false;
-          points = isCorrect ? (option?.questions.points ?? 1) : 0;
-        } else if (a.answerText) {
-          // -------------------------
-          // open text
-          // -------------------------
-          const q = await tx.questions.findUnique({
-            where: { id: a.questionId },
-          });
-
-          isCorrect =
-            normalizeKey(a.answerText) === normalizeKey(q?.correct_key ?? "");
-
-          points = isCorrect ? (q?.points ?? 1) : 0;
-        }
-
-        rows.push({
-          attempt_id: attempt.id,
-          user_id: user.id,
-          question_id: a.questionId,
-          option_id: a.optionId ?? null,
-          answer_text: a.answerText ?? null,
-          is_correct: isCorrect,
-          points_awarded: points,
-        });
-      }
-
-      await tx.student_answers.createMany({ data: rows });
-
-      const total = rows.reduce((s, r) => s + r.points_awarded, 0);
-
-      await tx.task_attempts.update({
-        where: { id: attempt.id },
-        data: { score: total },
-      });
-
-      return {
-        attemptId: attempt.id,
-        type: task.type,
-        score: total,
-      };
-    });
-
-    return NextResponse.json(result);
-  } catch (err) {
-    console.error(err);
-
-    return NextResponse.json(
-      { error: "Nie udało się złożyć zgłoszenia" },
-      { status: 500 },
-    );
-  }
 }

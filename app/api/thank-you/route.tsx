@@ -1,58 +1,44 @@
-import { Resend } from "resend";
 import { NextResponse } from "next/server";
-import ThankYouEmail from "@/components/thank-you-email";
-
-const resend = new Resend(process.env.RESEND_API_KEY);
+import { assertInternalApiSecret } from "@/server/auth/internalApiAuth";
+import { sendThankYouEmail } from "@/server/email/sendThankYouEmail";
+import { isDomainError } from "@/server/errors";
+import {
+  thankYouBodySchema,
+  zodErrorMessage,
+} from "@/server/validation/schemas";
 
 export async function POST(req: Request) {
-  if (!process.env.RESEND_API_KEY) {
-    return NextResponse.json(
-      { error: "RESEND_API_KEY nie jest skonfigurowany" },
-      { status: 500 },
-    );
+  const auth = assertInternalApiSecret(req);
+  if (!auth.ok) {
+    return NextResponse.json({ error: auth.error }, { status: auth.status });
   }
-  let body: unknown;
+
+  let raw: unknown;
   try {
-    body = await req.json();
+    raw = await req.json();
   } catch {
     return NextResponse.json({ error: "Nieprawidłowy JSON" }, { status: 400 });
   }
 
-  const { customerEmail, customerName, courseUrl } = body as {
-    customerEmail?: string;
-    customerName?: string;
-    courseUrl?: string;
-  };
-
-  if (!customerEmail?.trim()) {
+  const parsed = thankYouBodySchema.safeParse(raw);
+  if (!parsed.success) {
     return NextResponse.json(
-      { error: "customerEmail is required" },
-      { status: 400 },
-    );
-  }
-  if (!courseUrl?.trim()) {
-    return NextResponse.json(
-      { error: "courseUrl is required" },
+      { error: zodErrorMessage(parsed.error) },
       { status: 400 },
     );
   }
 
-  const { data, error } = await resend.emails.send({
-    from: "Españolita <noreply@matura-espanolita.pl>",
-    replyTo: "biuro@espanolita.pl",
-    to: customerEmail.trim(),
-    subject:
-      "Dziękujemy za kupienie dostępu do zadań maturalnych Españolita! 🎉",
-    react: (
-      <ThankYouEmail
-        customerName={customerName?.trim() || "Kliencie"}
-        courseUrl={courseUrl.trim()}
-      />
-    ),
-  });
-
-  if (error) {
-    return NextResponse.json({ error }, { status: 500 });
+  try {
+    const data = await sendThankYouEmail(parsed.data);
+    return NextResponse.json({ data });
+  } catch (err) {
+    if (isDomainError(err)) {
+      return NextResponse.json({ error: err.message }, { status: err.status });
+    }
+    console.error("[thank-you]", err);
+    return NextResponse.json(
+      { error: "Nie udało się wysłać e-maila" },
+      { status: 500 },
+    );
   }
-  return NextResponse.json({ data });
 }

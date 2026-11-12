@@ -1,25 +1,32 @@
 import { NextResponse } from "next/server";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 import { verifyTurnstile } from "@/lib/turnstile/verifyTurnstile";
+import {
+  loginBodySchema,
+  zodErrorMessage,
+} from "@/server/validation/schemas";
 
 export async function POST(req: Request) {
   try {
-    const { email, password, turnstileToken } = await req.json();
-
-    if (!email || !password) {
+    let raw: unknown;
+    try {
+      raw = await req.json();
+    } catch {
       return NextResponse.json(
-        { error: "Email i hasło są wymagane." },
+        { error: "Nieprawidłowe dane wejściowe" },
         { status: 400 },
       );
     }
 
-    // Verify Turnstile before touching auth
-    if (!turnstileToken) {
+    const parsed = loginBodySchema.safeParse(raw);
+    if (!parsed.success) {
       return NextResponse.json(
-        { error: "Brak tokenu sprawdzania zabezpieczeń." },
+        { error: zodErrorMessage(parsed.error) },
         { status: 400 },
       );
     }
+
+    const { email, password, turnstileToken } = parsed.data;
 
     const isHuman = await verifyTurnstile(turnstileToken);
     if (!isHuman) {

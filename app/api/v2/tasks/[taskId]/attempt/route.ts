@@ -1,24 +1,18 @@
 import { type NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
-import { createSupabaseServerClient } from "@/lib/supabase/server";
 import type {
   GradeEssayResponse,
   GradeAudioGapFillResponse,
 } from "@/models/grading";
+import { requireCourseAccess } from "@/server/auth/requireCourseAccess";
 
 export async function GET(
   _req: NextRequest,
   { params }: { params: Promise<{ taskId: string }> },
 ) {
-  const supabase = await createSupabaseServerClient();
-
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-
-  if (!user) {
-    return NextResponse.json({ error: "Nieautoryzowany" }, { status: 401 });
-  }
+  const access = await requireCourseAccess();
+  if (access.response) return access.response;
+  const user = access.user;
 
   const { taskId } = await params;
 
@@ -210,15 +204,9 @@ export async function DELETE(
   _req: NextRequest,
   { params }: { params: Promise<{ taskId: string }> },
 ) {
-  const supabase = await createSupabaseServerClient();
-
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-
-  if (!user) {
-    return NextResponse.json({ error: "Nieautoryzowany" }, { status: 401 });
-  }
+  const access = await requireCourseAccess();
+  if (access.response) return access.response;
+  const user = access.user;
 
   const { taskId } = await params;
 

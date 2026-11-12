@@ -30,11 +30,13 @@ app/                 Next.js App Router (pages + API routes)
 components/          UI components (task players, forms, navbar, footer, shadcn-style ui/)
 context/             React context providers
 hooks/               Reusable React hooks
-lib/                 Server-side helpers: Prisma, Supabase, Stripe, OpenAI,
-                     Turnstile, AI grading prompts, getTaskForUser, etc.
+lib/                 Shared helpers: Prisma, Supabase, Stripe, OpenAI,
+                     Turnstile, AI grading prompts, etc.
+server/              Server domain modules used by API routes (auth access,
+                     submit/grading, purchases, email, Zod schemas)
 models/              Domain types / models
 queries/             TanStack Query hooks (useTask, useAttempt, useProgress, …)
-services/            Server-side service layer used by API routes
+services/            Browser HTTP clients (axios) used by TanStack Query hooks
 prisma/              Prisma schema (Supabase auth + public domain tables)
 supabase/            Supabase config and SQL migrations
 public/              Static assets (images, audio, fonts)
@@ -97,9 +99,20 @@ TURNSTILE_SECRET_KEY="..."
 
 # Resend (transactional email)
 RESEND_API_KEY="re_..."
+
+# Internal HTTP endpoints (e.g. POST /api/thank-you)
+# Required header: x-internal-api-secret
+INTERNAL_API_SECRET="long-random-string"
 ```
 
 > Never commit real secrets. `.env*` files are git‑ignored.
+
+### Tests
+
+```bash
+npm test          # vitest unit tests (grading, validation, purchases, auth helpers)
+npm run lint
+```
 
 ### Database
 

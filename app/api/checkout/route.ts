@@ -2,6 +2,10 @@ import { NextResponse } from "next/server";
 import { headers } from "next/headers";
 import { stripe } from "@/lib/stripe";
 import { CURRENT_TERMS_VERSION } from "@/lib/terms";
+import {
+  checkoutBodySchema,
+  zodErrorMessage,
+} from "@/server/validation/schemas";
 
 export async function POST(req: Request) {
   const priceId = process.env.STRIPE_PRICE_ID;
@@ -12,9 +16,9 @@ export async function POST(req: Request) {
     );
   }
 
-  let body: { termsVersion?: unknown };
+  let raw: unknown;
   try {
-    body = await req.json();
+    raw = await req.json();
   } catch {
     return NextResponse.json(
       { error: "Nieprawidłowe dane wejściowe" },
@@ -22,9 +26,10 @@ export async function POST(req: Request) {
     );
   }
 
-  if (body.termsVersion !== CURRENT_TERMS_VERSION) {
+  const parsed = checkoutBodySchema.safeParse(raw);
+  if (!parsed.success) {
     return NextResponse.json(
-      { error: "Nieaktualna wersja regulaminu" },
+      { error: zodErrorMessage(parsed.error) },
       { status: 400 },
     );
   }

@@ -6,10 +6,10 @@ import type {
   GradeEssayRequest,
 } from "@/models/grading";
 import { prisma } from "@/lib/prisma";
-import { createSupabaseServerClient } from "@/lib/supabase/server";
 import { countAiUsageSince, logAiUsage, startOfTodayUtc } from "@/lib/aiUsage";
 import type { AiUsageKind } from "@/lib/aiUsage";
 import { buildAudioGapFillGradingPrompt } from "@/lib/buildAudioGapFillGradingPrompt";
+import { requireCourseAccess } from "@/server/auth/requireCourseAccess";
 
 const DAILY_LIMIT = 3;
 const GRADING_MODEL = "gpt-4.1";
@@ -26,15 +26,11 @@ export async function POST(
   },
 ) {
   try {
-    const supabase = await createSupabaseServerClient();
-    const body: GradeEssayRequest | GradeAudioGapFillRequest = await req.json();
-    const {
-      data: { user },
-    } = await supabase.auth.getUser();
+    const access = await requireCourseAccess();
+    if (access.response) return access.response;
+    const user = access.user;
 
-    if (!user) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-    }
+    const body: GradeEssayRequest | GradeAudioGapFillRequest = await req.json();
 
     const kindParam = req.nextUrl.searchParams.get("kind");
 

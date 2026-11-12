@@ -1,29 +1,26 @@
 import { NextResponse, type NextRequest } from "next/server";
 import { createSupabaseServerClient } from "./lib/supabase/server";
 
+/**
+ * Gate /course UI behind a verified Supabase user (getUser, not getSession).
+ * Purchase entitlement is enforced in `app/course/layout.tsx` and v2 APIs
+ * via `requireCourseAccess` (Node runtime / Prisma).
+ */
 export async function proxy(req: NextRequest) {
-  const res = NextResponse.next();
-
-  const isApiRoute = req.nextUrl.pathname.startsWith("/api");
-
   const supabase = await createSupabaseServerClient();
 
   const {
-    data: { session },
-  } = await supabase.auth.getSession();
+    data: { user },
+  } = await supabase.auth.getUser();
 
-  if (!session) {
-    if (isApiRoute) {
-      return NextResponse.json({ error: "Nieautoryzowany" }, { status: 401 });
-    }
-
+  if (!user) {
     const redirectUrl = new URL("/unauthorized", req.url);
     return NextResponse.redirect(redirectUrl);
   }
 
-  return res;
+  return NextResponse.next();
 }
 
 export const config = {
-  matcher: ["/course/:path*", "/course/task/:path*"],
+  matcher: ["/course", "/course/:path*"],
 };
