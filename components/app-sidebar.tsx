@@ -22,22 +22,29 @@ import {
 } from "@/components/ui/collapsible";
 import Link from "next/link";
 import { useTask } from "@/queries/useTask";
-import { usePathname, useParams, useRouter } from "next/navigation";
+import { useAttempt } from "@/queries/useAttempt";
+import { usePathname, useRouter } from "next/navigation";
 import { useTaskSets } from "@/queries/useTaskSets";
 import type { TaskSet } from "@/models/taskSets";
 import { useProgress } from "@/queries/useProgress";
 
 export function AppSidebar() {
   const { taskSets = [] } = useTaskSets();
-  const { taskSetId = "" } = useParams<{ taskSetId: string }>();
-  const { progress } = useProgress(taskSetId as string);
+  const { progress } = useProgress();
 
   const { prefetchQuery } = useTask({ enabled: false });
+  const { prefetchAttempt } = useAttempt();
   const pathname = usePathname();
   const router = useRouter();
   const isActiveLink = (url: string) => pathname === url;
 
   const { isMobile, setOpenMobile } = useSidebar();
+
+  const prefetchTask = (taskId: string, url: string) => {
+    router.prefetch(url);
+    prefetchQuery(taskId);
+    prefetchAttempt(taskId);
+  };
 
   return (
     <Sidebar>
@@ -91,14 +98,8 @@ export function AppSidebar() {
                                         }
                                       }}
                                       prefetch
-                                      onMouseEnter={() => {
-                                        router.prefetch(url);
-                                        prefetchQuery(task.id);
-                                      }}
-                                      onFocus={() => {
-                                        router.prefetch(url);
-                                        prefetchQuery(task.id);
-                                      }}
+                                      onMouseEnter={() => prefetchTask(task.id, url)}
+                                      onFocus={() => prefetchTask(task.id, url)}
                                     >
                                       {progress?.taskSets?.[
                                         taskSet.id

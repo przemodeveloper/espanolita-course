@@ -438,6 +438,7 @@ model purchases {
   terms_accepted_ip  String?
   terms_user_agent   String?
 
+  @@index([user_id], map: "purchases_user_id_idx")
   @@schema("public")
 }
 

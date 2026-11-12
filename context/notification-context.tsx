@@ -2,7 +2,14 @@
 
 import { createContext, useCallback, useContext } from "react";
 import type { CSSProperties, ReactNode } from "react";
-import { toast, ToastContainer } from "react-toastify";
+import dynamic from "next/dynamic";
+import { toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
+
+const ToastContainer = dynamic(
+  () => import("react-toastify").then((m) => m.ToastContainer),
+  { ssr: false },
+);
 
 type NotificationVariant = "default" | "success" | "error";
 
@@ -46,7 +53,6 @@ export const NotificationContextProvider = ({
         closeOnClick
         style={
           {
-            // Tailwind-ish colors (green-600 / red-600)
             "--toastify-color-success": "#16a34a",
             "--toastify-color-error": "#dc2626",
             "--toastify-color-progress-success": "#16a34a",

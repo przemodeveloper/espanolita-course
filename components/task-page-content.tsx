@@ -1,5 +1,6 @@
 "use client";
 
+import dynamic from "next/dynamic";
 import { useTask } from "@/queries/useTask";
 import LoadingSpinner from "./loading-spinner";
 import { useLayoutEffect } from "react";
@@ -11,16 +12,38 @@ import { TaskLabel } from "./task-label";
 import { formatPoints } from "@/lib/utils";
 import TaskSetProgressBar from "./task-set-progress-bar";
 import { useProgress } from "@/queries/useProgress";
-import SingleChoiceTasks from "./single-choice-tasks";
-import OpenTextTasks from "./open-text-tasks";
-import OpenTextGapsTask from "./open-text-gaps-task";
-import AudioOpenTextTasks from "./audio-open-text-tasks";
-import { GapFillSharedTask } from "./gap-fill-shared-task";
-import WritingTask from "./writing-task";
-import AudioSingleChoiceTasks from "./audio-single-choice-tasks";
-import { HeadingMatchTask } from "./heading-match-task";
 import { FileIcon } from "lucide-react";
 import { Button } from "./ui/button";
+
+const SingleChoiceTasks = dynamic(() => import("./single-choice-tasks"), {
+  loading: () => <LoadingSpinner />,
+});
+const OpenTextTasks = dynamic(() => import("./open-text-tasks"), {
+  loading: () => <LoadingSpinner />,
+});
+const OpenTextGapsTask = dynamic(() => import("./open-text-gaps-task"), {
+  loading: () => <LoadingSpinner />,
+});
+const AudioOpenTextTasks = dynamic(() => import("./audio-open-text-tasks"), {
+  loading: () => <LoadingSpinner />,
+});
+const GapFillSharedTask = dynamic(
+  () =>
+    import("./gap-fill-shared-task").then((m) => m.GapFillSharedTask),
+  { loading: () => <LoadingSpinner /> },
+);
+const WritingTask = dynamic(() => import("./writing-task"), {
+  loading: () => <LoadingSpinner />,
+});
+const AudioSingleChoiceTasks = dynamic(
+  () => import("./audio-single-choice-tasks"),
+  { loading: () => <LoadingSpinner /> },
+);
+const HeadingMatchTask = dynamic(
+  () =>
+    import("./heading-match-task").then((m) => m.HeadingMatchTask),
+  { loading: () => <LoadingSpinner /> },
+);
 
 export function TaskPageContent({ taskId }: { taskId: string }) {
   const params = useParams<{ taskSetId: string }>();
@@ -49,7 +72,7 @@ export function TaskPageContent({ taskId }: { taskId: string }) {
     window.URL.revokeObjectURL(blobUrl);
   };
 
-  const { progress } = useProgress(taskSetIdFromRoute);
+  const { progress } = useProgress();
 
   useLayoutEffect(() => {
     document.title = `${task?.title} - Matura Españolita`;

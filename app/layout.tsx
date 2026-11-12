@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { Inter, Poppins } from "next/font/google";
 import "./globals.css";
-import { CourseContext } from "@/context/course-context";
+import { AuthProviders } from "@/context/auth-providers";
 import { NavbarContainer } from "@/components/navbar-container";
 import { NotificationContextProvider } from "@/context/notification-context";
 import { Analytics } from "@vercel/analytics/next";
@@ -57,7 +57,7 @@ export const metadata: Metadata = {
       "Skuteczne przygotowanie do matury z języka hiszpańskiego. Typowe zadania, które pojawią się na maturze.",
     images: [
       {
-        url: "/spanish-stairs.jpg",
+        url: "/spanish-stairs-og.jpg",
         width: 1200,
         height: 630,
         alt: "Matura Españolita",
@@ -69,7 +69,7 @@ export const metadata: Metadata = {
     title: "Matura Españolita – zadania maturalne z hiszpańskiego",
     description:
       "Skuteczne przygotowanie do matury z języka hiszpańskiego. Typowe zadania, które pojawią się na maturze.",
-    images: ["/spanish-stairs.jpg"],
+    images: ["/spanish-stairs-og.jpg"],
   },
   robots: {
     index: true,
@@ -126,12 +126,12 @@ export default function RootLayout({
           // biome-ignore lint/security/noDangerouslySetInnerHtml: JSON-LD requires raw JSON injection; content is fully static and serialized.
           dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
         />
-        <CourseContext>
+        <AuthProviders>
           <NotificationContextProvider>
             <NavbarContainer />
             <main className="flex-1 pt-[64px]">{children}</main>
           </NotificationContextProvider>
-        </CourseContext>
+        </AuthProviders>
         <Analytics />
         <SpeedInsights />
       </body>

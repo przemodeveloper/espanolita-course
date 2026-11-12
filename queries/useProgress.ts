@@ -2,14 +2,13 @@ import { useQuery } from "@tanstack/react-query";
 import { QUERY_KEYS } from "./consts";
 import { getProgress } from "@/services/progress.service";
 
-export const useProgress = (taskSetId: string) => {
+export const useProgress = () => {
   const query = useQuery({
-    queryKey: [QUERY_KEYS.PROGRESS, taskSetId],
+    queryKey: [QUERY_KEYS.PROGRESS],
     queryFn: async () => {
       const response = await getProgress();
       return response;
     },
-    enabled: Boolean(taskSetId),
     staleTime: Infinity,
   });
   return {

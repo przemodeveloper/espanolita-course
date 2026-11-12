@@ -11,22 +11,20 @@ export async function GET(
 
   const { setId: id } = await params;
 
+  // Slim payload: set metadata + task list only (no nested questions/options).
   const taskSet = await prisma.task_sets.findUnique({
     where: { id },
-    include: {
+    select: {
+      id: true,
+      title: true,
       task_set_items: {
         orderBy: { order_index: "asc" },
-        include: {
+        select: {
           tasks: {
-            include: {
-              questions: {
-                orderBy: { order_index: "asc" },
-                include: {
-                  options: {
-                    orderBy: { order_index: "asc" },
-                  },
-                },
-              },
+            select: {
+              id: true,
+              title: true,
+              type: true,
             },
           },
         },
@@ -41,7 +39,6 @@ export async function GET(
     );
   }
 
-  // flatten items → tasks
   const tasks = taskSet.task_set_items.map((item) => item.tasks);
 
   return NextResponse.json({

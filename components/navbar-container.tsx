@@ -1,10 +1,7 @@
-import { createSupabaseServerClient } from "@/lib/supabase/server";
+import { getUserCached } from "@/server/auth/getUserCached";
 import { Navbar } from "./navbar";
 
 export async function NavbarContainer() {
-  const supabase = await createSupabaseServerClient();
-  const { data } = await supabase.auth.getUser();
-  const { user } = data || {};
-
+  const user = await getUserCached();
   return <Navbar user={user} />;
 }
